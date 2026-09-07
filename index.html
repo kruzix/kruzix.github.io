@@ -58,7 +58,7 @@ linear-gradient(180deg,rgba(5,2,8,.03) 15%,rgba(7,4,11,.06) 40%,rgba(7,4,11,.88)
 .scroll{display:inline-flex;align-items:center;gap:10px;margin-top:24px;color:#bcaac8;font-size:10px;letter-spacing:.25em}.scroll i{display:block;width:34px;height:1px;background:#9e7dbb}
 
 .profile{position:relative;margin:-84px auto 0;z-index:5;width:min(980px,calc(100% - 24px));padding:28px 34px;border:1px solid var(--stroke);border-radius:30px;background:linear-gradient(115deg,rgba(28,16,41,.86),rgba(10,7,16,.78));backdrop-filter:blur(24px);box-shadow:0 30px 90px rgba(0,0,0,.55)}
-.profile-row{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}.avatar-wrap{position:relative;width:126px;height:126px;border-radius:50%;isolation:isolate;flex:none}.avatar{position:relative;z-index:3;width:126px;height:126px;border-radius:50%;object-fit:cover;border:2px solid rgba(242,225,255,.72);box-shadow:0 0 0 7px rgba(205,163,255,.08),0 0 45px rgba(185,138,255,.34)}.avatar-ripple{position:absolute;inset:50% auto auto 50%;z-index:1;width:100%;height:100%;border-radius:50%;border:1px solid rgba(211,171,255,.48);transform:translate(-50%,-50%) scale(.82);opacity:0;pointer-events:none;animation:avatarRipple 3.8s cubic-bezier(.16,.7,.32,1) infinite;box-shadow:0 0 22px rgba(188,135,255,.18)}.avatar-ripple:nth-child(2){animation-delay:1.25s}.avatar-ripple:nth-child(3){animation-delay:2.5s}@keyframes avatarRipple{0%{transform:translate(-50%,-50%) scale(.78);opacity:0}14%{opacity:.42}58%{opacity:.14}100%{transform:translate(-50%,-50%) scale(1.52);opacity:0}}
+.profile-row{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center}.avatar-wrap{position:relative;width:126px;height:126px;border-radius:50%;isolation:isolate;flex:none}.avatar{position:relative;z-index:3;width:126px;height:126px;border-radius:50%;object-fit:cover;border:2px solid rgba(242,225,255,.72);box-shadow:0 0 0 7px rgba(205,163,255,.08),0 0 45px rgba(185,138,255,.34)}.avatar-ripple{position:absolute;inset:50% auto auto 50%;z-index:1;width:100%;height:100%;border-radius:50%;border:1px solid rgba(211,171,255,.48);transform:translate(-50%,-50%) scale(.82);opacity:0;pointer-events:none;animation:avatarRipple 3.8s cubic-bezier(.16,.7,.32,1) infinite;animation-play-state:paused;box-shadow:0 0 22px rgba(188,135,255,.18)}.avatar-ripple:nth-child(2){animation-delay:1.25s}.avatar-ripple:nth-child(3){animation-delay:2.5s}@keyframes avatarRipple{0%{transform:translate(-50%,-50%) scale(.78);opacity:0}14%{opacity:.42}58%{opacity:.14}100%{transform:translate(-50%,-50%) scale(1.52);opacity:0}}.avatar-wrap.music-playing .avatar-ripple{animation-play-state:running}
 .kicker{font-size:11px;color:#bdaacb;letter-spacing:.16em;text-transform:uppercase}.name{font:700 58px/.85 "Cormorant Garamond",serif;margin-top:7px}.handle{color:#b9a9c4;font-size:13px;margin-top:10px}.status{display:inline-flex;align-items:center;gap:8px;margin-top:13px;padding:7px 12px;border-radius:100px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1);font-size:11px}.dot{width:7px;height:7px;border-radius:50%;background:#c89cff;box-shadow:0 0 14px #c89cff}
 .socials{display:flex;gap:9px}.social{width:48px;height:48px;border:1px solid var(--stroke);border-radius:16px;display:grid;place-items:center;color:#e9dcf3;text-decoration:none;font-size:13px;background:rgba(255,255,255,.035);transition:.25s}.social:hover{transform:translateY(-4px);background:rgba(210,173,255,.11);border-color:rgba(224,198,255,.42);box-shadow:0 12px 30px rgba(160,105,230,.18)}
 .quote{text-align:center;padding:34px 0 8px;font:600 34px/1.05 "Cormorant Garamond",serif;color:#f1e4fb}.quote small{font:500 12px Manrope;color:#a895b4;letter-spacing:.05em}
@@ -257,6 +257,29 @@ body.no-pointer-cursor #pollen{
   margin-left:-3px !important;
 }
 </style>
+
+<style id="v58-light-player-fix">
+body.light .profile .music-player{background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(242,238,248,.88));border-color:rgba(81,61,102,.14);box-shadow:0 10px 30px rgba(84,62,110,.07)}
+body.light .profile .music-player:before{background:linear-gradient(90deg,transparent,rgba(116,82,150,.28),transparent)}
+body.light .profile .music-title{color:#31283a}
+body.light .profile .music-title span{color:#796b87}
+body.light .profile .music-kicker,body.light .profile .music-artist,body.light .profile .music-time{color:#75697f}
+body.light .profile .music-progress,body.light .profile .music-volume{background:rgba(93,70,115,.16);accent-color:#8661ad}
+body.light .profile .music-controls button{color:#594766;background:rgba(255,255,255,.62);border-color:rgba(83,61,105,.14)}
+body.light .profile .music-play{box-shadow:0 0 18px rgba(125,91,164,.12)}
+body.light .profile .music-art{border-color:rgba(92,67,117,.15);box-shadow:0 0 22px rgba(125,91,164,.13)}
+</style>
+
+<style id="v59-light-music-art">
+/* Светлая тема: декоративный квадрат слева от названия трека */
+body.light .profile .music-art{
+  background:radial-gradient(circle at 65% 30%,rgba(198,170,222,.72),transparent 24%),radial-gradient(circle at 35% 75%,rgba(174,148,204,.42),transparent 42%),linear-gradient(145deg,#f8f5fa,#e8e0ee);
+  border-color:rgba(92,67,117,.18);
+  box-shadow:0 0 22px rgba(125,91,164,.12);
+}
+body.light .profile .music-art:before,body.light .profile .music-art:after{border-color:rgba(91,69,113,.16)}
+body.light .profile .music-art span{color:#705784;text-shadow:0 0 12px rgba(125,91,164,.32)}
+</style>
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -295,7 +318,7 @@ body.no-pointer-cursor #pollen{
   <div class="music-art" aria-hidden="true"><span>✦</span></div>
   <div class="music-main">
     <div class="music-meta">
-      <div class="music-title">Electric Chapel<span> — instrumental</span></div>
+      <div class="music-title">Electric Chapel <span>— instrumental</span></div>
       <div class="music-artist">Lady Gaga</div>
     </div>
     <div class="music-progress-row">
@@ -908,7 +931,7 @@ html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78)
 /* Integrated music player: part of the upper profile card */
 .profile .music-player{
   width:100%;
-  margin:34px 0 14px;
+  margin:50px 0 14px;
   min-height:94px;
   box-sizing:border-box;
   grid-template-columns:70px minmax(0,1fr) auto;
@@ -926,7 +949,7 @@ html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78)
 .profile .music-title{font-size:19px}
 .profile .music-player:before{content:'';position:absolute;left:18px;right:18px;top:-11px;height:1px;background:linear-gradient(90deg,transparent,rgba(187,153,233,.20),transparent)}
 @media(max-width:700px){
-  .profile .music-player{width:100%;margin:28px 0 10px;grid-template-columns:58px minmax(0,1fr);gap:12px;padding:12px 14px;border-radius:16px}
+  .profile .music-player{width:100%;margin:38px 0 10px;grid-template-columns:58px minmax(0,1fr);gap:12px;padding:12px 14px;border-radius:16px}
   .profile .music-art{width:58px;height:58px;border-radius:14px}
   .profile .music-controls{grid-column:1/-1;justify-self:center;width:100%;justify-content:center}
   .profile .music-volume{width:min(34vw,130px)}
@@ -934,12 +957,12 @@ html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78)
 </style>
 <script id="v52-music-player-script">
 (()=>{
- const audio=document.getElementById('siteAudio'), play=document.getElementById('musicPlay'), back=document.getElementById('musicBack'), mute=document.getElementById('musicMute'), vol=document.getElementById('musicVolume'), progress=document.getElementById('musicProgress'), current=document.getElementById('musicCurrent'), duration=document.getElementById('musicDuration'), card=document.querySelector('.music-player');
+ const audio=document.getElementById('siteAudio'), avatarWrap=document.querySelector('.avatar-wrap'), play=document.getElementById('musicPlay'), back=document.getElementById('musicBack'), mute=document.getElementById('musicMute'), vol=document.getElementById('musicVolume'), progress=document.getElementById('musicProgress'), current=document.getElementById('musicCurrent'), duration=document.getElementById('musicDuration'), card=document.querySelector('.music-player');
  if(!audio||!play) return;
  const fmt=t=>{if(!Number.isFinite(t)) return '0:00';const m=Math.floor(t/60),s=Math.floor(t%60);return `${m}:${String(s).padStart(2,'0')}`};
  audio.volume=.18;
  const sync=()=>{const d=audio.duration||0;progress.value=d?audio.currentTime/d*100:0;current.textContent=fmt(audio.currentTime);duration.textContent=fmt(d)};
- const state=()=>{const on=!audio.paused&&!audio.ended;card.classList.toggle('is-playing',on);play.textContent=on?'❚❚':'▶';play.setAttribute('aria-label',on?'Pause':'Play')};
+ const state=()=>{const on=!audio.paused&&!audio.ended;card.classList.toggle('is-playing',on);if(avatarWrap) avatarWrap.classList.toggle('music-playing',on);play.textContent=on?'❚❚':'▶';play.setAttribute('aria-label',on?'Pause':'Play')};
  play.addEventListener('click',()=>{if(audio.paused) audio.play().catch(()=>{});else audio.pause()});
  back.addEventListener('click',()=>{audio.currentTime=0;sync()});
  mute.addEventListener('click',()=>{audio.muted=!audio.muted;mute.textContent=audio.muted?'◌':'◔'});
