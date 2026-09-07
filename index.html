@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>KRUZIX — Personal Space</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ballet&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@400;500;600;700&display=swap');
 :root{--ink:#0a0710;--purple:#b98aff;--lav:#e9d8ff;--muted:#b9aac5;--glass:rgba(18,11,28,.62);--stroke:rgba(233,216,255,.17)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--ink);color:#fff;font-family:Manrope,system-ui,sans-serif}
 body:before{content:"";position:fixed;inset:0;z-index:-10;background:
@@ -18,11 +18,13 @@ radial-gradient(circle at 15% 70%,rgba(115,62,180,.13),transparent 30%),
 .nav-inner{width:min(1180px,calc(100% - 32px));display:flex;align-items:center;justify-content:space-between}.brand{font-family:"Cormorant Garamond",serif;font-size:24px;letter-spacing:.18em}.nav a{color:#cfc1da;text-decoration:none;font-size:12px;margin-left:22px;transition:.2s}.nav a:hover{color:white}.moon{width:34px;height:34px;border:1px solid var(--stroke);border-radius:50%;display:grid;place-items:center;color:#eadcff}
 
 .wrap{width:min(1120px,calc(100% - 28px));margin:auto}
-.hero{padding-top:86px}.hero-frame{position:relative;min-height:620px;border-radius:34px;overflow:hidden;border:1px solid rgba(237,218,255,.2);box-shadow:0 40px 120px rgba(0,0,0,.52),0 0 100px rgba(149,88,240,.12);background:#110a18}
-.hero-frame>img{width:100%;height:620px;display:block;object-fit:cover;object-position:center}
-.hero-frame:after{content:"";position:absolute;inset:0;background:
+.hero{padding-top:86px}.hero-frame{position:relative;aspect-ratio:720/254;min-height:0;border-radius:34px;overflow:hidden;border:1px solid rgba(237,218,255,.2);box-shadow:0 40px 120px rgba(0,0,0,.52),0 0 100px rgba(149,88,240,.12);background:#110a18}
+.hero-frame>img,.hero-banner{width:100%;height:100%;display:block;object-fit:contain;object-position:center;background:#10091a}
+.hero-banner{position:absolute;inset:0;z-index:1}
+.hero-frame:before{content:"";position:absolute;inset:-8%;background:url("banner.gif") center/cover no-repeat;filter:blur(28px) brightness(.32) saturate(1.25);transform:scale(1.08);z-index:0}
+.hero-frame:after{content:"";position:absolute;inset:0;z-index:2;background:
 linear-gradient(180deg,rgba(5,2,8,.03) 15%,rgba(7,4,11,.06) 40%,rgba(7,4,11,.88) 100%)}
-.hero-copy{position:absolute;z-index:3;left:50%;bottom:42px;transform:translateX(-50%);width:calc(100% - 70px);text-align:center}
+.hero-copy{position:absolute;z-index:4;left:50%;bottom:28px;transform:translateX(-50%);width:calc(100% - 70px);text-align:center}
 .eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:#ddcaff}.hero h1{font:700 clamp(72px,12vw,150px)/.72 "Cormorant Garamond",serif;letter-spacing:.04em;margin:18px 0 12px;text-shadow:0 10px 50px #000}.hero p{margin:0;color:#d5c6df;letter-spacing:.24em;font-size:11px}
 .scroll{display:inline-flex;align-items:center;gap:10px;margin-top:24px;color:#bcaac8;font-size:10px;letter-spacing:.25em}.scroll i{display:block;width:34px;height:1px;background:#9e7dbb}
 
@@ -50,21 +52,28 @@ linear-gradient(145deg,#fff9ff,#dcbcff 40%,#8952c8 100%);box-shadow:inset 0 0 0 
 footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter-spacing:.2em}
 
 @media(max-width:800px){
-.nav a{display:none}.hero-frame,.hero-frame>img{height:480px}.hero-copy{bottom:28px;width:calc(100% - 34px)}.hero h1{font-size:72px}
+.nav a{display:none}.hero-frame{aspect-ratio:720/254}.hero-copy{bottom:28px;width:calc(100% - 34px)}.hero h1{font-size:72px}
 .profile{padding:22px}.profile-row{grid-template-columns:auto 1fr}.socials{grid-column:1/-1;justify-content:center}.avatar{width:96px;height:96px}.name{font-size:46px}.cards{grid-template-columns:1fr}.links{grid-column:auto}.link-grid{grid-template-columns:1fr 1fr}
 }
-@media(max-width:480px){.hero-frame{border-radius:24px}.hero-frame,.hero-frame>img{height:410px}.hero h1{font-size:58px}.profile{margin-top:-55px}.quote{font-size:28px}.section-title{font-size:36px}.link-grid{grid-template-columns:1fr}.social{width:44px;height:44px}}
+@media(max-width:480px){.hero-frame{border-radius:24px}.hero-frame{aspect-ratio:720/254}.hero h1{font-size:58px}.profile{margin-top:-55px}.quote{font-size:28px}.section-title{font-size:36px}.link-grid{grid-template-columns:1fr}.social{width:44px;height:44px}}
 </style>
 </head>
 <body>
 <div class="bg"><img src="banner.gif" alt=""></div><div class="grain"></div>
-<nav class="nav"><div class="nav-inner"><div class="brand">KRUZIX</div><div><a href="#home">Home</a><a href="#about">About</a><a href="#links">Links</a><a href="#gallery">Gallery</a></div><div class="moon">☾</div></div></nav>
+<nav class="nav"><div class="nav-inner">
+  <a class="brand-simple" href="#home">KRUZIX</a>
+  <div class="nav-links"><a href="#home">Home</a><a href="#about">About</a><a href="#links">Links</a><a href="#gallery">Gallery</a></div>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾</button>
+</div></nav>
 
 <main class="wrap" id="home">
 <section class="hero">
  <div class="hero-frame">
-  <img src="banner.gif" alt="KRUZIX animated banner">
-  <div class="hero-copy"><div class="eyebrow">personal space</div><h1>KRUZIX</h1><p>DREAM · CREATE · EXIST</p><div class="scroll"><i></i> SCROLL TO EXPLORE <i></i></div></div>
+  <video class="hero-banner" autoplay muted loop playsinline preload="auto" poster="banner.gif">
+    <source src="banner.mp4" type="video/mp4">
+    <img src="banner.gif" alt="KRUZIX animated banner">
+  </video>
+  
  </div>
 </section>
 
@@ -72,7 +81,7 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
  <div class="profile-row">
   <img class="avatar" src="avatar.gif" alt="KRUZIX avatar">
   <div><div class="kicker">welcome to my world</div><div class="name">kruzix <span style="color:#c59aff">♂</span></div><div class="handle">心の花を育てよう</div><div class="status"><span class="dot"></span> Idle</div></div>
-  <div class="socials"><a class="social" href="#" onclick="return false" title="Discord">◉</a><a class="social" href="#" onclick="return false" title="Telegram">➤</a><a class="social" href="#" onclick="return false" title="GitHub">◌</a><a class="social" href="#" onclick="return false" title="Steam">◈</a></div>
+  <div class="socials"><a class="social" href="https://discord.com/users/kruzix" target="_blank" rel="noopener" title="Discord @kruzix">◉</a><a class="social" href="https://t.me/kruzix" target="_blank" rel="noopener" title="Telegram @kruzix">➤</a><a class="social" href="https://github.com/kruzix" target="_blank" rel="noopener" title="GitHub kruzix">◌</a><a class="social" href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener" title="Steam kruzixx">◈</a></div>
  </div>
  <div class="quote">心の花を育てよう <small>— cultivate the flower in your heart</small></div>
  <p class="about">Привет! Это моё личное пространство — немного обо мне, моих интересах и вещах, которые мне нравятся. Спасибо, что заглянул сюда.</p><div class="ornament"></div>
@@ -82,19 +91,232 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
  <div class="section-head"><div class="section-title">About me</div><div class="section-note">a little piece of me</div></div>
  <div class="cards">
   <div class="card info"><div class="rows">
-   <div class="row"><span>Nickname</span><b>KRUZIX</b></div><div class="row"><span>Pronouns</span><b>♂</b></div><div class="row"><span>Status</span><b>Idle</b></div><div class="row"><span>Vibe</span><b>Lavender / Dreamy</b></div><div class="row"><span>Languages</span><b>EN / RU / JP</b></div>
+   <div class="row"><span>Nickname</span><b>KRUZIX</b></div><div class="row"><span>Gender</span><b>♂</b></div><div class="row"><span>Age</span><b>17</b></div><div class="row"><span>Vibe</span><b>Lavender / Dreamy</b></div><div class="row"><span>Languages</span><b>EN / RU</b></div>
   </div></div>
   <div class="card butterfly">
    <span class="star s1">✦</span><span class="star s2">✧</span><span class="star s3">✦</span>
    <div class="bfly"><div class="w wl"></div><div class="w wr"></div><div class="ant al"></div><div class="ant ar"></div><div class="body"></div></div>
   </div>
   <div class="card links" id="links"><div class="section-title" style="font-size:34px;margin-bottom:18px">Find me</div><div class="link-grid">
-   <a href="#" onclick="return false">Discord<span>connect</span></a><a href="#" onclick="return false">Telegram<span>message</span></a><a href="#" onclick="return false">GitHub<span>projects</span></a><a href="#" onclick="return false">Steam<span>games</span></a>
+   <a href="https://discord.com/users/kruzix" target="_blank" rel="noopener">Discord<span>@kruzix</span></a><a href="https://t.me/kruzix" target="_blank" rel="noopener">Telegram<span>@kruzix</span></a><a href="https://github.com/kruzix" target="_blank" rel="noopener">GitHub<span>@kruzix</span></a><a href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener">Steam<span>kruzixx</span></a>
   </div></div>
  </div>
 </section>
 
 <footer id="gallery">KRUZIX · 心の花を育てよう · 2026</footer>
 </main>
+
+<style>
+/* Header layout: left title, navigation to the right, theme button at far right */
+.nav{
+  height:64px;
+  background:rgba(8,6,12,.72);
+  border-bottom:1px solid rgba(233,216,255,.08);
+}
+.nav-inner{
+  width:min(1180px,calc(100% - 32px));
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+}
+.brand-simple{
+  color:#f6effc;
+  text-decoration:none;
+  font-family:"Cormorant Garamond",serif;
+  font-size:24px;
+  font-weight:600;
+  letter-spacing:.18em;
+  text-shadow:0 0 18px rgba(195,151,255,.28);
+}
+.nav-links{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:27px;
+}
+.nav-links a{
+  color:#aaa0b0;
+  text-decoration:none;
+  font-size:11px;
+  transition:color .2s,transform .2s;
+}
+.nav-links a:hover{color:#fff;transform:translateY(-1px)}
+.theme-toggle{
+  margin-left:22px;
+  width:36px;height:36px;
+  border-radius:50%;
+  border:1px solid rgba(233,216,255,.16);
+  background:rgba(255,255,255,.025);
+  color:#ded1e8;
+  display:grid;place-items:center;
+  cursor:pointer;
+  font:14px Manrope,sans-serif;
+  transition:.25s;
+}
+.theme-toggle:hover{border-color:rgba(197,154,255,.55);box-shadow:0 0 22px rgba(178,126,255,.18);transform:rotate(12deg)}
+
+body.light{
+  --ink:#f4eff8;--purple:#8b5fc4;--lav:#5f4776;--muted:#6f6179;
+  --glass:rgba(255,255,255,.74);--stroke:rgba(74,45,96,.16);
+  color:#241b2b;
+}
+body.light:before{
+  background:
+  radial-gradient(ellipse at 50% 5%,rgba(194,157,230,.35),transparent 38%),
+  radial-gradient(circle at 15% 70%,rgba(214,190,232,.38),transparent 30%),
+  #f5f1f7;
+}
+body.light .bg img{filter:blur(26px) brightness(1.02) saturate(.75);opacity:.20}
+body.light .bg:after{background:linear-gradient(180deg,rgba(248,244,250,.30),#f5f1f7 78%,#f5f1f7)}
+body.light .nav{background:rgba(248,244,250,.76);border-bottom-color:rgba(74,45,96,.10)}
+body.light .brand-simple{color:#32243b;text-shadow:0 0 16px rgba(137,91,177,.18)}
+body.light .nav-links a{color:#62556b}
+body.light .nav-links a:hover{color:#281c31}
+body.light .theme-toggle{color:#4c3b56;border-color:rgba(74,45,96,.18);background:rgba(255,255,255,.45)}
+body.light .hero-frame{border-color:rgba(74,45,96,.20);box-shadow:0 35px 90px rgba(77,47,96,.16),0 0 80px rgba(170,125,204,.16)}
+body.light .hero-copy .eyebrow,
+body.light .hero-copy p{color:#f7f1fb}
+body.light .profile,
+body.light .card{
+  background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(249,244,251,.68));
+  border-color:rgba(74,45,96,.15);
+  box-shadow:0 24px 70px rgba(70,44,86,.12);
+}
+body.light .name,body.light .quote,body.light .section-title{color:#2a2031}
+body.light .kicker,body.light .handle,body.light .about,body.light .row{color:#71627a}
+body.light .row b{color:#33273b}
+body.light .social,
+body.light .link-grid a{
+  color:#3b2d44;background:rgba(255,255,255,.46);border-color:rgba(74,45,96,.13)
+}
+body.light footer{color:#87768e}
+
+@media(max-width:800px){
+  .nav-links{gap:13px}
+  .nav-links a:nth-child(4){display:none}
+  .theme-toggle{margin-left:14px}
+}
+@media(max-width:520px){
+  .brand-simple{font-size:21px}
+  .nav-links{gap:10px}
+  .nav-links a{font-size:10px}
+  .nav-links a:nth-child(3){display:none}
+  .theme-toggle{width:33px;height:33px;margin-left:10px}
+}
+</style>
+<script>
+(function(){
+  const btn=document.getElementById('themeToggle');
+  const saved=localStorage.getItem('kruzix-theme');
+  if(saved==='light') document.body.classList.add('light');
+  function sync(){
+    const light=document.body.classList.contains('light');
+    btn.textContent=light?'☀':'☾';
+    btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');
+  }
+  sync();
+  btn.addEventListener('click',()=>{
+    document.body.classList.toggle('light');
+    localStorage.setItem('kruzix-theme',document.body.classList.contains('light')?'light':'dark');
+    sync();
+  });
+})();
+</script>
+
 </body>
 </html>
+<style>
+
+</style>
+
+<style>
+/* Elegant centered header title */
+.nav{height:78px;background:linear-gradient(180deg,rgba(5,3,9,.96),rgba(8,6,12,.50),transparent)}
+.nav-inner{position:relative}
+.brand-lux{
+ position:absolute;left:50%;top:3px;transform:translateX(-50%);
+ display:flex;align-items:center;justify-content:center;gap:10px;
+ min-width:270px;pointer-events:none
+}
+.brand-word{
+ font-family:"Ballet","Cormorant Garamond",serif;
+ font-size:54px;font-weight:400;line-height:1;
+ letter-spacing:.06em;color:#fbf5ff;
+ text-shadow:0 0 8px rgba(245,225,255,.98),0 0 24px rgba(190,140,255,.78),0 0 52px rgba(150,86,240,.42);
+ position:relative
+}
+.brand-word:after{
+ content:"";position:absolute;left:8%;right:8%;bottom:-7px;height:1px;
+ background:linear-gradient(90deg,transparent,#dcbaff,transparent);opacity:.8
+}
+.brand-butterfly{
+ font-size:15px;opacity:.85;
+ filter:drop-shadow(0 0 8px rgba(218,177,255,.95));
+ animation:headerButterfly 3.2s ease-in-out infinite
+}
+.b-right{animation-delay:1.1s}
+@keyframes headerButterfly{
+ 0%,100%{transform:translateY(2px) rotate(-8deg) scale(.9);opacity:.6}
+ 50%{transform:translateY(-8px) rotate(8deg) scale(1.12);opacity:1}
+}
+.nav-inner>div:nth-child(2){margin-left:auto}
+.nav a{font-size:11px;letter-spacing:.04em}
+
+@media(max-width:800px){
+ .brand-lux{min-width:210px}.brand-word{font-size:42px}.brand-butterfly{font-size:12px}
+ .hero h1:before,.hero h1:after{font-size:15px}.hero h1:before{left:-28px}.hero h1:after{right:-28px}
+}
+</style>
+
+<style>
+.hero-banner{object-fit:contain!important}
+@media(max-width:800px){
+  .hero-copy{bottom:14px}
+  .hero .eyebrow{font-size:8px;letter-spacing:.28em}
+  .hero p{font-size:8px;letter-spacing:.16em}
+  .hero .scroll{margin-top:10px;font-size:8px}
+}
+@media(max-width:480px){
+  .hero-copy{bottom:10px}
+  .hero h1{font-size:52px}
+  .hero .scroll{display:none}
+}
+</style>
+
+<style>
+.brand-butterfly{
+  color:#c59aff;
+  font-size:16px;
+  text-shadow:0 0 7px rgba(197,154,255,.95),0 0 16px rgba(155,95,230,.55);
+}
+.b-right{transform:scaleX(-1)}
+/* Keep the restored butterfly centered and elegant */
+.butterfly{min-height:330px}
+.bfly{transform:scale(1.08);animation:float 4s ease-in-out infinite}
+</style>
+
+<style>
+/* Banner: keep the whole artwork visible and mask its square/black corners. */
+.brand-simple{font-size:30px;letter-spacing:.20em}
+.hero-frame{background:linear-gradient(135deg,#f3eef8,#d9cbea 50%,#eee7f4);border-radius:38px;overflow:hidden;isolation:isolate}
+.hero-banner{border-radius:inherit!important;clip-path:inset(0 0 0 0 round 38px);background:transparent!important;object-fit:contain!important}
+.hero-frame:after{border-radius:inherit;pointer-events:none}
+@media(max-width:800px){.brand-simple{font-size:26px}.hero-frame{border-radius:26px}.hero-banner{clip-path:inset(0 0 0 0 round 26px)}}
+@media(max-width:520px){.brand-simple{font-size:22px}}
+/* Quiet lavender pollen following the cursor. */
+#pollen{position:fixed;left:0;top:0;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:9999;opacity:0;background:#d9b5ff;box-shadow:0 0 7px #d9b5ff,0 0 16px rgba(185,138,255,.65);transform:translate(-50%,-50%);transition:opacity .25s ease}
+#pollen:before,#pollen:after{content:"";position:absolute;border-radius:50%;background:#c99aff;opacity:.6}.pollen:before{width:3px;height:3px;left:-7px;top:3px}.pollen:after{width:2px;height:2px;right:-6px;top:-5px}
+.tilt-card{transform-style:preserve-3d;will-change:transform;transition:transform .16s ease,box-shadow .25s ease}.tilt-card:hover{box-shadow:0 28px 75px rgba(0,0,0,.38),0 0 35px rgba(177,126,242,.09)}
+</style>
+<div id="pollen" aria-hidden="true"></div>
+<script>
+(function(){
+ const pollen=document.getElementById('pollen'); let tx=0,ty=0,x=0,y=0;
+ window.addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY;pollen.style.opacity='.72';});
+ window.addEventListener('pointerleave',()=>pollen.style.opacity='0');
+ function follow(){x+=(tx-x)*.18;y+=(ty-y)*.18;pollen.style.left=x+'px';pollen.style.top=y+'px';requestAnimationFrame(follow)} follow();
+ const cards=[...document.querySelectorAll('.card,.profile,.hero-frame')];
+ cards.forEach(card=>{card.classList.add('tilt-card');card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5,max=3.2;card.style.transform=`perspective(900px) rotateX(${-py*max}deg) rotateY(${px*max}deg) translateY(-2px)`});card.addEventListener('pointerleave',()=>card.style.transform='perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)')});
+})();
+</script>
