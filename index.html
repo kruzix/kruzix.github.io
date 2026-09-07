@@ -62,7 +62,7 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
 <div class="bg"><img src="banner.gif" alt=""></div><div class="grain"></div>
 <nav class="nav"><div class="nav-inner">
   <a class="brand-simple" href="#home">KRUZIX</a>
-  <div class="nav-links"><a href="#home">Home</a><a href="#about">About</a><a href="#links">Links</a><a href="#gallery">Gallery</a></div>
+  <div class="nav-links"><a href="#home">Home</a><a href="#about">About</a><a href="#links">Links</a></div>
   <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾</button>
 </div></nav>
 
@@ -98,7 +98,7 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
    <div class="bfly"><div class="w wl"></div><div class="w wr"></div><div class="ant al"></div><div class="ant ar"></div><div class="body"></div></div>
   </div>
   <div class="card links" id="links"><div class="section-title" style="font-size:34px;margin-bottom:18px">Find me</div><div class="link-grid">
-   <a href="https://discord.com/users/kruzix" target="_blank" rel="noopener">Discord<span>@kruzix</span></a><a href="https://t.me/kruzix" target="_blank" rel="noopener">Telegram<span>@kruzix</span></a><a href="https://github.com/kruzix" target="_blank" rel="noopener">GitHub<span>@kruzix</span></a><a href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener">Steam<span>kruzixx</span></a>
+   <a href="https://discord.com/users/kruzix" target="_blank" rel="noopener">Discord<span>Contact</span></a><a href="https://t.me/kruzix" target="_blank" rel="noopener">Telegram<span>Contact</span></a><a href="https://github.com/kruzix" target="_blank" rel="noopener">GitHub<span>View</span></a><a href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener">Steam<span>View</span></a>
   </div></div>
  </div>
 </section>
@@ -320,3 +320,84 @@ body.light footer{color:#87768e}
  cards.forEach(card=>{card.classList.add('tilt-card');card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5,max=3.2;card.style.transform=`perspective(900px) rotateX(${-py*max}deg) rotateY(${px*max}deg) translateY(-2px)`});card.addEventListener('pointerleave',()=>card.style.transform='perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)')});
 })();
 </script>
+
+<style>
+.nav .brand,
+.nav .brand-lux,
+.nav-inner .brand {
+  font-size: 30px !important;
+  line-height: 1 !important;
+  letter-spacing: .08em !important;
+  transform: none !important;
+}
+@media (max-width:800px){
+  .nav .brand,
+  .nav .brand-lux,
+  .nav-inner .brand {
+    font-size:25px !important;
+  }
+}
+</style>
+
+<style>
+/* Светлая тень баннера в светлой теме */
+body.light .hero-frame{
+  box-shadow:
+    0 18px 45px rgba(255,255,255,.95),
+    0 8px 26px rgba(184,145,225,.22) !important;
+}
+</style>
+
+<style>
+/* Маленькие сиреневые бабочки по бокам KRUZIX в верхней навигации */
+.nav-butterfly{
+  position:relative;
+  display:inline-block;
+  width:18px;
+  height:15px;
+  margin:0 9px;
+  flex:0 0 18px;
+  filter:drop-shadow(0 0 5px rgba(184,132,255,.72));
+  animation:navBflyFloat 3.6s ease-in-out infinite;
+}
+.nav-butterfly i{
+  position:absolute;
+  display:block;
+  width:8px;
+  height:12px;
+  top:1px;
+  background:linear-gradient(135deg,#e5caff,#a978e8);
+  border:1px solid rgba(255,255,255,.5);
+}
+.nav-butterfly i:first-child{
+  left:0;
+  border-radius:70% 35% 65% 45%;
+  transform:rotate(28deg);
+}
+.nav-butterfly i:last-child{
+  right:0;
+  border-radius:35% 70% 45% 65%;
+  transform:rotate(-28deg);
+}
+.nav-butterfly:after{
+  content:"";
+  position:absolute;
+  left:8px;
+  top:4px;
+  width:2px;
+  height:9px;
+  border-radius:50%;
+  background:#8f63c9;
+  box-shadow:0 0 4px rgba(226,195,255,.9);
+}
+.nav-butterfly.right{animation-delay:1.5s}
+@keyframes navBflyFloat{
+  0%,100%{transform:translateY(1px) rotate(-5deg);opacity:.72}
+  50%{transform:translateY(-4px) rotate(5deg);opacity:1}
+}
+@media(max-width:800px){
+  .nav-butterfly{width:14px;height:12px;margin:0 5px;flex-basis:14px}
+  .nav-butterfly i{width:6px;height:9px}
+  .nav-butterfly:after{left:6px;top:3px;height:7px}
+}
+</style>
