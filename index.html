@@ -67,7 +67,7 @@ linear-gradient(180deg,rgba(5,2,8,.03) 15%,rgba(7,4,11,.06) 40%,rgba(7,4,11,.88)
 .section{padding-top:34px}.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:20px}.section-title{font:600 42px/.8 "Cormorant Garamond",serif}.section-note{color:#806f8d;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid var(--stroke);border-radius:26px;background:linear-gradient(135deg,rgba(24,14,34,.8),rgba(12,8,18,.7));backdrop-filter:blur(18px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .info{padding:30px}.rows{margin-top:10px}.row{display:flex;justify-content:space-between;padding:17px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px;color:#a99aae}.row:last-child{border:0}.row b{color:#eee8f1;font-weight:600}
-.butterfly{min-height:330px;display:grid;place-items:center;position:relative;overflow:hidden}.butterfly:before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(184,135,255,.28),transparent 66%);filter:blur(8px)}
+.butterfly{min-height:330px;display:grid;place-items:center;position:relative;overflow:hidden}.butterfly:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(184,135,255,.28),transparent 66%);filter:blur(8px)}
 .bfly{position:relative;width:190px;height:155px;filter:drop-shadow(0 0 22px rgba(208,170,255,.65));animation:float 4s ease-in-out infinite}
 .w{position:absolute;top:20px;width:88px;height:112px;background:
 radial-gradient(circle at 65% 30%,#fff 0 3%,transparent 4%),
@@ -404,11 +404,12 @@ body.light footer{color:#87768e}
 <script>
 (function(){
   const btn=document.getElementById('themeToggle');
-  const saved=localStorage.getItem('kruzix-theme');
-  if(saved==='light') document.body.classList.add('light');
+  // Сайт всегда открывается в тёмной теме.
+  document.body.classList.remove('light');
+  localStorage.setItem('kruzix-theme','dark');
   function sync(){
     const light=document.body.classList.contains('light');
-    btn.textContent=light?'☀':'☾';
+    btn.textContent=light?'☾':'☀';
     btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');
   }
   sync();
@@ -457,7 +458,7 @@ document.querySelectorAll(".butterfly").forEach(card => {
 
   if (!stars) return;
 
-  const total = 26;
+  const total = 46;
 
   const positions = [];
 
@@ -466,7 +467,7 @@ document.querySelectorAll(".butterfly").forEach(card => {
     const star = document.createElement("span");
     star.className = "random-star";
 
-    const size = 2 + Math.random() * 3.5;
+    const size = 3 + Math.random() * 5.5;
 
     let left, top;
     let attempts = 0;
@@ -480,7 +481,7 @@ document.querySelectorAll(".butterfly").forEach(card => {
     */
     do {
       left = 5 + Math.random() * 90;
-      top = 72 + Math.random() * 235;
+      top = 58 + Math.random() * 255;
       attempts++;
 
       const insideButterfly =
@@ -524,7 +525,7 @@ document.querySelectorAll(".butterfly").forEach(card => {
   const layer = document.getElementById("background-dots");
   if (!layer) return;
 
-  const total = 70;
+  const total = 140;
 
   for(let i = 0; i < total; i++){
     const dot = document.createElement("span");
@@ -533,7 +534,7 @@ document.querySelectorAll(".butterfly").forEach(card => {
 
     dot.style.left = (Math.random() * 100) + "%";
     dot.style.top = (Math.random() * 100) + "%";
-    dot.style.setProperty("--star-size", (7 + Math.random() * 6) + "px");
+    dot.style.setProperty("--star-size", (10 + Math.random() * 10) + "px");
     dot.style.setProperty("--delay", (Math.random() * 8) + "s");
     dot.style.setProperty("--dur", (4 + Math.random() * 5) + "s");
 
@@ -541,6 +542,57 @@ document.querySelectorAll(".butterfly").forEach(card => {
   }
 })();
 </script>
+
+
+<style id="requested-visual-adjustments">
+/* Requested visual alignment: Dream header mirrors the About card */
+.butterfly-header{
+  top:30px !important;
+  left:30px !important;
+  right:30px !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:baseline !important;
+  justify-content:space-between !important;
+}
+.butterfly-header .section-title{
+  font-family:"Cormorant Garamond",serif !important;
+  font-size:34px !important;
+  font-weight:600 !important;
+  line-height:.8 !important;
+}
+.butterfly-header .section-note{
+  font-size:11px !important;
+  letter-spacing:2px !important;
+  text-transform:uppercase !important;
+  color:#806f8d !important;
+}
+
+/* Larger, denser stars */
+.background-dot{
+  text-shadow:
+    0 0 9px rgba(205,170,255,.85),
+    0 0 24px rgba(180,130,255,.52) !important;
+}
+.butterfly .random-star{
+  box-shadow:
+    0 0 9px rgba(205,170,255,.9),
+    0 0 24px rgba(180,130,255,.58) !important;
+}
+
+/* Make KRUZIX in the top navigation noticeably larger */
+.brand-simple{
+  font-size:38px !important;
+  line-height:1 !important;
+  letter-spacing:.16em !important;
+}
+@media(max-width:800px){
+  .brand-simple{font-size:30px !important;}
+}
+@media(max-width:520px){
+  .brand-simple{font-size:25px !important;}
+}
+</style>
 
 </body>
 </html>
@@ -743,4 +795,19 @@ body.light .hero-frame{
   .nav-butterfly i{width:6px;height:9px}
   .nav-butterfly:after{left:6px;top:3px;height:7px}
 }
+</style>
+
+<style>
+/* Исправления светлой темы */
+body.light .profile{
+  box-shadow:
+    0 18px 48px rgba(255,255,255,.96),
+    0 8px 28px rgba(225,214,237,.24),
+    0 0 72px rgba(255,255,255,.68) !important;
+}
+</style>
+
+<style>
+/* Финальные настройки: тёмная тема при открытии и более компактное свечение вокруг бабочки */
+.butterfly:before{width:210px;height:210px;filter:blur(7px)}
 </style>
