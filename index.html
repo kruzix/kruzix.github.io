@@ -64,7 +64,7 @@ linear-gradient(180deg,rgba(5,2,8,.03) 15%,rgba(7,4,11,.06) 40%,rgba(7,4,11,.88)
 .quote{text-align:center;padding:34px 0 8px;font:600 34px/1.05 "Cormorant Garamond",serif;color:#f1e4fb}.quote small{font:500 12px Manrope;color:#a895b4;letter-spacing:.05em}
 .about{max-width:760px;margin:14px auto 0;text-align:center;color:#bdb0c6;line-height:1.75;font-size:13px}.ornament{width:110px;height:1px;margin:22px auto 0;background:linear-gradient(90deg,transparent,#c49ce7,transparent)}
 
-.section{padding-top:92px}.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:20px}.section-title{font:600 42px/.8 "Cormorant Garamond",serif}.section-note{color:#806f8d;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
+.section{padding-top:34px}.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:20px}.section-title{font:600 42px/.8 "Cormorant Garamond",serif}.section-note{color:#806f8d;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid var(--stroke);border-radius:26px;background:linear-gradient(135deg,rgba(24,14,34,.8),rgba(12,8,18,.7));backdrop-filter:blur(18px);box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .info{padding:30px}.rows{margin-top:10px}.row{display:flex;justify-content:space-between;padding:17px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px;color:#a99aae}.row:last-child{border:0}.row b{color:#eee8f1;font-weight:600}
 .butterfly{min-height:330px;display:grid;place-items:center;position:relative;overflow:hidden}.butterfly:before{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(184,135,255,.28),transparent 66%);filter:blur(8px)}
@@ -75,7 +75,6 @@ radial-gradient(circle at 32% 67%,rgba(255,255,255,.7) 0 5%,transparent 6%),
 linear-gradient(145deg,#fff9ff,#dcbcff 40%,#8952c8 100%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),inset 0 0 25px rgba(255,255,255,.35),0 0 28px rgba(184,137,255,.35)}
 .w:after{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.45);border-radius:inherit}.wl{left:3px;border-radius:88% 25% 82% 28%;transform-origin:100% 75%;animation:flap 1.45s ease-in-out infinite}.wr{right:3px;border-radius:25% 88% 28% 82%;transform-origin:0 75%;animation:flap 1.45s ease-in-out infinite .08s}
 .body{position:absolute;left:92px;top:34px;width:7px;height:86px;border-radius:10px;background:linear-gradient(#fff,#7f48bd);box-shadow:0 0 15px white;z-index:2}.ant{position:absolute;top:25px;width:48px;height:32px;border-top:1px solid #e7cfff;border-radius:50%}.al{left:48px;transform:rotate(20deg)}.ar{right:48px;transform:scaleX(-1) rotate(20deg)}
-.star{position:absolute;color:#ead8ff;font-size:14px;animation:tw 2.5s infinite}.s1{left:19%;top:22%}.s2{right:17%;top:67%;animation-delay:1s}.s3{right:26%;top:25%;animation-delay:1.7s}
 @keyframes flap{50%{transform:rotateY(58deg) rotate(-3deg)}}@keyframes float{50%{transform:translateY(-9px) scale(1.04)}}@keyframes tw{50%{opacity:1;transform:scale(1.4)}0%,100%{opacity:.3}}
 .links{padding:30px;grid-column:1/-1}.link-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.link-grid a{padding:18px;border-radius:17px;border:1px solid var(--stroke);color:#eee4f3;text-decoration:none;background:rgba(255,255,255,.035);transition:.25s}.link-grid a:hover{transform:translateY(-3px);border-color:#b98aff;background:rgba(185,138,255,.08)}.link-grid span{display:block;color:#806d8c;font-size:10px;margin-top:5px}
 footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter-spacing:.2em}
@@ -85,9 +84,129 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
 .profile{padding:22px}.profile-row{grid-template-columns:auto 1fr}.socials{grid-column:1/-1;justify-content:center}.avatar{width:96px;height:96px}.name{font-size:46px}.cards{grid-template-columns:1fr}.links{grid-column:auto}.link-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:480px){.hero-frame{border-radius:24px}.hero-frame{aspect-ratio:720/254}.hero h1{font-size:58px}.profile{margin-top:-55px}.quote{font-size:28px}.section-title{font-size:36px}.link-grid{grid-template-columns:1fr}.social{width:44px;height:44px}}
+
+/* Butterfly card: soft lavender stars */
+.butterfly .random-star{
+  position:absolute;
+  color:#ead8ff;
+  font-size:var(--star-size);
+  line-height:1;
+  background:transparent;
+  width:auto;
+  height:auto;
+  border-radius:0;
+  text-shadow:
+    0 0 8px rgba(205,170,255,.85),
+    0 0 18px rgba(180,130,255,.5);
+}
+
 </style>
+<style>
+/* Кастомный pollen-курсор только для устройств с точным указателем (мышь/тачпад). */
+body.no-pointer-cursor #pollen{
+  display:none !important;
+}
+</style>
+<style>
+
+/* Soft ambient dots across the whole site, behind all blocks */
+#background-dots{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:-2;
+}
+
+.background-dot{
+  position:absolute;
+  width:var(--dot-size);
+  height:var(--dot-size);
+  border-radius:50%;
+  background:#ead8ff;
+  box-shadow:
+    0 0 7px rgba(205,170,255,.7),
+    0 0 18px rgba(180,130,255,.38);
+  opacity:0;
+  animation:backgroundDotTwinkle var(--dur) ease-in-out infinite;
+  animation-delay:var(--delay);
+}
+
+@keyframes backgroundDotTwinkle{
+  0%,100%{opacity:0;transform:scale(.45)}
+  45%{opacity:.25;transform:scale(.8)}
+  60%{opacity:.8;transform:scale(1.15)}
+  75%{opacity:.18;transform:scale(.7)}
+}
+</style>
+
+<style>
+.socials-header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+.socials-header .section-title{
+  font-size:34px;
+}
+.socials-header .section-note{
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+</style>
+
+
+<style>
+/* Заголовки трёх карточек: один визуальный стиль */
+.butterfly-header{
+  top:20px;
+  left:30px;
+  right:30px;
+  align-items:baseline;
+}
+
+.butterfly-header .section-title{
+  font-size:34px;
+}
+
+.butterfly-header .section-note{
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.socials-header{
+  align-items:baseline;
+}
+
+.socials-header .section-title{
+  font-size:34px;
+}
+
+.socials-header .section-note{
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+@media(max-width:520px){
+  .butterfly-header{
+    top:18px;
+    left:22px;
+    right:22px;
+  }
+
+  .butterfly-header .section-title{
+    font-size:34px;
+  }
+}
+</style>
+
 </head>
 <body>
+<div id="background-dots" aria-hidden="true"></div>
 <div class="bg"><img src="banner.gif" alt=""></div><div class="grain"></div>
 <nav class="nav"><div class="nav-inner">
   <a class="brand-simple" href="#home">KRUZIX</a>
@@ -127,23 +246,13 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
    <div class="row"><span>nickname</span><b>kruzix</b></div><div class="row"><span>gender</span><b>♂</b></div><div class="row"><span>age</span><b>17</b></div><div class="row"><span>birthday</span><b>08 / 14</b></div><div class="row"><span>languages</span><b>en / ru</b></div>
   </div></div>
 <div class="card butterfly">
-  <div style="
-    position:absolute;
-    top:48px;
-    left:32px;
-    right:32px;
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    z-index:10;
-  ">
-    <div class="section-title">...</div>
+
+  <div class="butterfly-header">
+    <div class="section-title">Dream</div>
     <div class="section-note">a little piece of me</div>
   </div>
 
-  <span class="star s1">✦</span>
-  <span class="star s2">✦</span>
-  <span class="star s3">✦</span>
+  <div class="stars"></div>
 
   <div class="bfly">
     <div class="w wl"></div>
@@ -154,7 +263,12 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
   </div>
 
 </div>
-  <div class="card links" id="links"><div class="section-title" style="font-size:34px;margin-bottom:18px">Socials</div><div class="link-grid">
+  <div class="card links" id="links">
+  <div class="socials-header">
+    <div class="section-title">Socials</div>
+    <div class="section-note">places to find me</div>
+  </div>
+  <div class="link-grid">
    <a href="https://discord.com/users/kruzix" target="_blank" rel="noopener">Discord<span>contact</span></a><a href="https://t.me/kruzix" target="_blank" rel="noopener">Telegram<span>contact</span></a><a href="https://github.com/kruzix" target="_blank" rel="noopener">GitHub<span>view</span></a><a href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener">Steam<span>view</span></a>
   </div></div>
  </div>
@@ -281,6 +395,125 @@ body.light footer{color:#87768e}
 })();
 </script>
 
+
+<style>
+.butterfly-header{
+  position:absolute;
+  top:20px;
+  left:30px;
+  right:30px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  z-index:20;
+}
+.butterfly-header .section-title{font-size:42px}
+.butterfly-header .section-note{font-size:10px;color:#806f8d;letter-spacing:.22em;text-transform:uppercase}
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.random-star{position:absolute;color:#ead8ff;text-shadow:0 0 8px rgba(205,170,255,.8),0 0 18px rgba(180,130,255,.45);transform:translate(-50%,-50%) scale(.5);opacity:0;animation:randomStarTwinkle var(--dur) ease-in-out infinite;animation-delay:var(--delay)}
+@keyframes randomStarTwinkle{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  25%{opacity:.45}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}
+  75%{opacity:.45}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+}
+@media(max-width:520px){
+  .butterfly-header .section-title{font-size:34px}
+  .butterfly-header{left:22px;right:22px;top:18px}
+}
+</style>
+
+
+<script>
+document.querySelectorAll(".butterfly").forEach(card => {
+
+  const stars = card.querySelector(".stars");
+
+  if (!stars) return;
+
+  const symbols = ["✦", "✧", "⋆"];
+  const total = 26;
+
+  const positions = [];
+
+  for(let i = 0; i < total; i++){
+
+    const star = document.createElement("span");
+    star.className = "random-star";
+
+    star.textContent =
+      symbols[Math.floor(Math.random() * symbols.length)];
+
+    const size = 8 + Math.random() * 8;
+
+    let left, top;
+    let attempts = 0;
+
+
+    do {
+      left = 5 + Math.random() * 90;
+      top = 72 + Math.random() * 235;
+      attempts++;
+
+      const insideButterfly =
+        ((left - 50) / 25) ** 2 +
+        ((top - 168) / 92) ** 2 < 1.55;
+
+      const tooCloseToAnother = positions.some(pos => {
+        const dx = (left - pos.left) * 3.1;
+        const dy = top - pos.top;
+        return Math.sqrt(dx * dx + dy * dy) < 38;
+      });
+
+      if (!insideButterfly && !tooCloseToAnother) break;
+
+    } while (attempts < 150);
+
+    positions.push({left, top});
+
+    star.style.left = left + "%";
+    star.style.top = top + "px";
+    star.style.setProperty("--dot-size", Math.max(3, size * 0.55) + "px");
+
+    star.style.setProperty(
+      "--delay",
+      (Math.random() * 6) + "s"
+    );
+
+    star.style.setProperty(
+      "--dur",
+      (2.8 + Math.random() * 3.2) + "s"
+    );
+
+    stars.appendChild(star);
+  }
+
+});
+</script>
+
+<script>
+(function(){
+  const layer = document.getElementById("background-dots");
+  if (!layer) return;
+
+  const total = 70;
+
+  for(let i = 0; i < total; i++){
+    const dot = document.createElement("span");
+    dot.className = "background-dot";
+
+    dot.style.left = (Math.random() * 100) + "%";
+    dot.style.top = (Math.random() * 100) + "%";
+    dot.style.setProperty("--dot-size", (2 + Math.random() * 3.5) + "px");
+    dot.style.setProperty("--delay", (Math.random() * 8) + "s");
+    dot.style.setProperty("--dur", (4 + Math.random() * 5) + "s");
+
+    layer.appendChild(dot);
+  }
+})();
+</script>
+
 </body>
 </html>
 <style>
@@ -369,9 +602,33 @@ body.light footer{color:#87768e}
 <div id="pollen" aria-hidden="true"></div>
 <script>
 (function(){
- const pollen=document.getElementById('pollen'); let tx=0,ty=0,x=0,y=0;
- window.addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY;pollen.style.opacity='.72';});
- window.addEventListener('pointerleave',()=>pollen.style.opacity='0');
+  const pollen=document.getElementById('pollen');
+  let tx=0,ty=0,x=0,y=0;
+
+  const pointerQuery=window.matchMedia('(hover: hover) and (pointer: fine)');
+
+  function syncPollenMode(){
+    document.body.classList.toggle('no-pointer-cursor',!pointerQuery.matches);
+    if(!pointerQuery.matches) pollen.style.opacity='0';
+  }
+
+  syncPollenMode();
+
+  if(pointerQuery.addEventListener){
+    pointerQuery.addEventListener('change',syncPollenMode);
+  }else if(pointerQuery.addListener){
+    pointerQuery.addListener(syncPollenMode);
+  }
+
+  window.addEventListener('pointermove',e=>{
+    if(!pointerQuery.matches) return;
+    if(e.pointerType && e.pointerType!=='mouse') return;
+    tx=e.clientX;
+    ty=e.clientY;
+    pollen.style.opacity='.72';
+  });
+
+  window.addEventListener('pointerleave',()=>pollen.style.opacity='0');
  function follow(){x+=(tx-x)*.18;y+=(ty-y)*.18;pollen.style.left=x+'px';pollen.style.top=y+'px';requestAnimationFrame(follow)} follow();
  const cards=[...document.querySelectorAll('.card,.profile,.hero-frame')];
  cards.forEach(card=>{card.classList.add('tilt-card');card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5,max=3.2;card.style.transform=`perspective(900px) rotateX(${-py*max}deg) rotateY(${px*max}deg) translateY(-2px)`});card.addEventListener('pointerleave',()=>card.style.transform='perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)')});
@@ -400,8 +657,9 @@ body.light footer{color:#87768e}
 /* Светлая тень баннера в светлой теме */
 body.light .hero-frame{
   box-shadow:
-    0 18px 45px rgba(255,255,255,.95),
-    0 8px 26px rgba(184,145,225,.22) !important;
+    0 24px 62px rgba(255,255,255,1),
+    0 12px 42px rgba(224,207,240,.55),
+    0 0 105px rgba(255,255,255,.72) !important;
 }
 </style>
 
