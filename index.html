@@ -222,6 +222,15 @@ body.no-pointer-cursor #pollen{
 
 
 
+
+<style id="v40-butterfly-v28-position">
+/* Exact butterfly position from v28 */
+.butterfly .bfly{
+  position:relative;
+  top:36px;
+}
+</style>
+
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -456,7 +465,13 @@ document.querySelectorAll(".butterfly").forEach(card => {
     let left, top;
     let attempts = 0;
 
-
+    /*
+      Размещаем звёзды по всей карточке, но:
+      1. верхняя полоса остаётся чистой под заголовок;
+      2. центр вокруг бабочки остаётся свободным;
+      3. каждая новая звезда проверяет расстояние до уже созданных,
+         чтобы они не собирались в одну кучку.
+    */
     do {
       left = 5 + Math.random() * 90;
       top = 58 + Math.random() * 255;
@@ -708,9 +723,6 @@ body.light .flying-butterfly{opacity:.28;filter:drop-shadow(0 0 6px rgba(153,109
 </script>
 
 <style id="v39-navigation-fix">
-/* Restore the butterfly to its original centered position */
-.butterfly .bfly{top:auto!important;}
-
 /* Mobile navigation: keep the brand, links and theme button visible */
 @media (max-width:800px){
   .nav{height:62px;}
@@ -737,6 +749,80 @@ body.light .flying-butterfly{opacity:.28;filter:drop-shadow(0 0 6px rgba(153,109
 }
 </style>
 
+
+<style id="v41-final-dream-layout">
+/* Restore the Dream card composition: labels at opposite top corners. */
+.butterfly-header{
+  position:absolute !important;
+  top:30px !important;
+  left:30px !important;
+  right:30px !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  width:auto !important;
+  z-index:4 !important;
+  pointer-events:none !important;
+}
+.butterfly-header .section-title{
+  margin:0 !important;
+  text-align:left !important;
+}
+.butterfly-header .section-note{
+  margin:0 !important;
+  text-align:right !important;
+  white-space:nowrap !important;
+}
+/* Raise only the butterfly itself; keep the card and its background unchanged. */
+.butterfly .bfly{
+  top:-18px !important;
+  z-index:2;
+}
+@media(max-width:520px){
+  .butterfly-header{top:22px !important;left:22px !important;right:22px !important;}
+  .butterfly-header .section-note{font-size:8px !important;letter-spacing:.14em !important;}
+  .butterfly .bfly{top:-10px !important;}
+}
+</style>
+<script id="v41-theme-fix">
+/* Independent, reliable theme switcher. The page still opens in dark mode. */
+document.addEventListener('DOMContentLoaded',function(){
+  const btn=document.getElementById('themeToggle');
+  if(!btn) return;
+  document.body.classList.remove('light');
+  function sync(){
+    const isLight=document.body.classList.contains('light');
+    btn.textContent=isLight?'☾':'☀';
+    btn.setAttribute('aria-label',isLight?'Switch to dark theme':'Switch to light theme');
+  }
+  sync();
+  btn.onclick=function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    document.body.classList.toggle('light');
+    sync();
+  };
+});
+</script>
+
+<style id="v46-light-star-colors">
+/* Light theme: stars and glowing dots switch from pale lavender to deeper, visible violet-gray tones. */
+body.light .background-dot{
+  color:#6f4b86 !important;
+  text-shadow:
+    0 0 5px rgba(103,68,129,.42),
+    0 0 14px rgba(137,91,177,.28) !important;
+}
+body.light .butterfly .random-star{
+  background:#72508b !important;
+  box-shadow:
+    0 0 5px rgba(103,68,129,.48),
+    0 0 14px rgba(137,91,177,.30) !important;
+}
+body.light .butterfly .stars > .random-star{
+  filter:saturate(.9) brightness(.82);
+}
+</style>
 </body>
 </html>
 <style>
@@ -993,4 +1079,81 @@ body.light .hero-frame{
 /* Keep the right branch mirrored even while the flowers are being shown or hidden. */
 
 
+</style>
+<style id="v43-precise-dream-fix">
+/* Lower only the butterfly by 18px from the previous v41 position. */
+.butterfly .bfly{
+  top:0 !important;
+}
+/* Restore natural vertical alignment of the two Dream labels. */
+.butterfly-header{
+  align-items:baseline !important;
+}
+.butterfly-header .section-note{
+  position:relative;
+  top:0 !important;
+}
+@media(max-width:520px){
+  .butterfly .bfly{top:8px !important;}
+  .butterfly-header{align-items:baseline !important;}
+}
+</style>
+
+<style id="v44-dream-reference-layout">
+/* Dream card layout matched to the provided reference. */
+.butterfly-header{
+  position:absolute !important;
+  top:30px !important;
+  left:28px !important;
+  right:28px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  z-index:4 !important;
+}
+.butterfly-header .section-title{
+  margin:0 !important;
+  font-size:34px !important;
+  line-height:1 !important;
+}
+.butterfly-header .section-note{
+  margin:0 !important;
+  position:static !important;
+  font-size:10px !important;
+  letter-spacing:.22em !important;
+  line-height:1 !important;
+}
+
+/* Move only the butterfly to the reference position; the Dream card itself stays unchanged. */
+.butterfly .bfly{
+  top:-18px !important;
+}
+
+@media(max-width:520px){
+  .butterfly-header{
+    top:28px !important;
+    left:26px !important;
+    right:26px !important;
+  }
+  .butterfly-header .section-title{font-size:34px !important;}
+  .butterfly-header .section-note{font-size:8px !important;letter-spacing:.16em !important;}
+  .butterfly .bfly{top:-10px !important;}
+}
+</style>
+<style id="v45-butterfly-lower-fix">
+/* Lower only the butterfly inside the Dream card. The card and text remain untouched. */
+.butterfly .bfly{
+  top:18px !important;
+}
+@media(max-width:520px){
+  .butterfly .bfly{
+    top:26px !important;
+  }
+}
+</style>
+<style id="v47-stars-behind-butterfly">
+/* Звёзды и точки остаются позади самой бабочки */
+.butterfly .stars{z-index:1 !important;}
+.butterfly .bfly{z-index:2 !important;}
+.butterfly .butterfly-header{z-index:20 !important;}
 </style>
