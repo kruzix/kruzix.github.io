@@ -222,13 +222,6 @@ body.no-pointer-cursor #pollen{
 
 
 
-<style>
-.butterfly .bfly{
-  position:relative;
-  top:18px;
-}
-</style>
-
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -236,7 +229,7 @@ body.no-pointer-cursor #pollen{
 <nav class="nav"><div class="nav-inner">
   <a class="brand-simple" href="#home">KRUZIX</a>
   <div class="nav-links"><a href="#home">home</a><a href="#about">about</a><a href="#links">links</a></div>
-  <div class="nav-controls"><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☀</button></div>
+  <div class="nav-controls"><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾</button></div>
 </div></nav>
 
 <main class="wrap" id="home">
@@ -389,26 +382,10 @@ body.light .link-grid a{
 body.light footer{color:#87768e}
 
 
-/* The Dream butterfly softly fades in the light theme */
-.bfly{transition:opacity .55s ease,filter .55s ease}
-body.light .bfly{opacity:.78;filter:drop-shadow(0 0 17px rgba(160,125,210,.34)) saturate(.84) brightness(1.03)}
-
-@media(max-width:800px){
-  .nav-links{gap:13px}
-  .nav-links a:nth-child(4){display:none}
-  .nav-controls{margin-left:14px;gap:7px}
-}
-@media(max-width:520px){
-  .brand-simple{font-size:21px}
-  .nav-links{gap:10px}
-  .nav-links a{font-size:10px}
-  .nav-links a:nth-child(3){display:none}
-  .nav-controls{margin-left:10px;gap:6px}
-}
-</style>
 <script>
 (function(){
   const btn=document.getElementById('themeToggle');
+
   // The site always starts in dark mode.
   document.body.classList.remove('light');
   localStorage.setItem('kruzix-theme','dark');
@@ -418,21 +395,284 @@ body.light .bfly{opacity:.78;filter:drop-shadow(0 0 17px rgba(160,125,210,.34)) 
     btn.textContent=light?'☾':'☀';
     btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');
   }
-
-
-  syncTheme();
+    syncTheme();
 
   btn.addEventListener('click',()=>{
     document.body.classList.toggle('light');
     localStorage.setItem('kruzix-theme',document.body.classList.contains('light')?'light':'dark');
     syncTheme();
   });
-
-  document.body.prepend(layer);
 })();
 </script>
 
 
+<style>
+.butterfly-header{
+  position:absolute;
+  top:30px;
+  left:30px;
+  right:30px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  z-index:20;
+}
+.butterfly-header .section-title{font-size:42px}
+.butterfly-header .section-note{font-size:10px;color:#806f8d;letter-spacing:.22em;text-transform:uppercase}
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:3}
+.random-star{position:absolute;color:#ead8ff;text-shadow:0 0 8px rgba(205,170,255,.8),0 0 18px rgba(180,130,255,.45);transform:translate(-50%,-50%) scale(.5);opacity:0;animation:randomStarTwinkle var(--dur) ease-in-out infinite;animation-delay:var(--delay)}
+@keyframes randomStarTwinkle{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  25%{opacity:.45}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}
+  75%{opacity:.45}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
+}
+@media(max-width:520px){
+  .butterfly-header .section-title{font-size:34px}
+  .butterfly-header{left:22px;right:22px;top:24px}
+}
+</style>
+
+
+<script>
+document.querySelectorAll(".butterfly").forEach(card => {
+
+  const stars = card.querySelector(".stars");
+
+  if (!stars) return;
+
+  const total = 46;
+
+  const positions = [];
+
+  for(let i = 0; i < total; i++){
+
+    const star = document.createElement("span");
+    star.className = "random-star";
+
+    const size = 3 + Math.random() * 5.5;
+
+    let left, top;
+    let attempts = 0;
+
+
+    do {
+      left = 5 + Math.random() * 90;
+      top = 58 + Math.random() * 255;
+      attempts++;
+
+      const insideButterfly =
+        ((left - 50) / 25) ** 2 +
+        ((top - 168) / 92) ** 2 < 1.55;
+
+      const tooCloseToAnother = positions.some(pos => {
+        const dx = (left - pos.left) * 3.1;
+        const dy = top - pos.top;
+        return Math.sqrt(dx * dx + dy * dy) < 38;
+      });
+
+      if (!insideButterfly && !tooCloseToAnother) break;
+
+    } while (attempts < 150);
+
+    positions.push({left, top});
+
+    star.style.left = left + "%";
+    star.style.top = top + "px";
+    star.style.setProperty("--dot-size", Math.max(3, size * 0.55) + "px");
+
+    star.style.setProperty(
+      "--delay",
+      (Math.random() * 6) + "s"
+    );
+
+    star.style.setProperty(
+      "--dur",
+      (2.8 + Math.random() * 3.2) + "s"
+    );
+
+    stars.appendChild(star);
+  }
+
+});
+</script>
+
+<script>
+(function(){
+  const layer = document.getElementById("background-dots");
+  if (!layer) return;
+
+  const total = 140;
+
+  for(let i = 0; i < total; i++){
+    const dot = document.createElement("span");
+    dot.className = "background-dot";
+    dot.textContent = ["✦","✧","⋆"][Math.floor(Math.random() * 3)];
+
+    dot.style.left = (Math.random() * 100) + "%";
+    dot.style.top = (Math.random() * 100) + "%";
+    dot.style.setProperty("--star-size", (10 + Math.random() * 10) + "px");
+    dot.style.setProperty("--delay", (Math.random() * 8) + "s");
+    dot.style.setProperty("--dur", (4 + Math.random() * 5) + "s");
+
+    layer.appendChild(dot);
+  }
+})();
+</script>
+
+
+<style id="requested-visual-adjustments">
+/* Requested visual alignment: Dream header mirrors the About card */
+.butterfly-header{
+  top:30px !important;
+  left:30px !important;
+  right:30px !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:baseline !important;
+  justify-content:space-between !important;
+}
+.butterfly-header .section-title{
+  font-family:"Cormorant Garamond",serif !important;
+  font-size:34px !important;
+  font-weight:600 !important;
+  line-height:.8 !important;
+}
+.butterfly-header .section-note{
+  font-size:11px !important;
+  letter-spacing:2px !important;
+  text-transform:uppercase !important;
+  color:#806f8d !important;
+}
+
+/* Larger, denser stars */
+.background-dot{
+  text-shadow:
+    0 0 9px rgba(205,170,255,.85),
+    0 0 24px rgba(180,130,255,.52) !important;
+}
+.butterfly .random-star{
+  box-shadow:
+    0 0 9px rgba(205,170,255,.9),
+    0 0 24px rgba(180,130,255,.58) !important;
+}
+
+/* Make KRUZIX in the top navigation noticeably larger */
+.brand-simple{
+  font-size:38px !important;
+  line-height:1 !important;
+  letter-spacing:.16em !important;
+}
+@media(max-width:800px){
+  .brand-simple{font-size:30px !important;}
+}
+@media(max-width:520px){
+  .brand-simple{font-size:25px !important;}
+}
+</style>
+
+
+<style>
+/* Единый стиль для всех трёх маленьких подписей карточек */
+.info .section-note,
+.butterfly-header .section-note,
+.socials-header .section-note{
+  font-family:Manrope,system-ui,sans-serif !important;
+  font-size:10px !important;
+  font-weight:600 !important;
+  line-height:1 !important;
+  letter-spacing:.22em !important;
+  text-transform:uppercase !important;
+  color:#806f8d !important;
+  white-space:nowrap;
+}
+body.light .info .section-note,
+body.light .butterfly-header .section-note,
+body.light .socials-header .section-note{color:#8a7c92 !important}
+
+/* Ненавязчивые пролетающие бабочки на фоне */
+.flying-butterflies{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+  pointer-events:none;
+}
+.flying-butterfly{
+  position:absolute;
+  width:18px;
+  height:14px;
+  opacity:.42;
+  filter:drop-shadow(0 0 7px rgba(194,150,255,.65));
+  animation:flyAcross var(--fly-dur) linear infinite;
+  animation-delay:var(--fly-delay);
+}
+.flying-butterfly::before,
+.flying-butterfly::after{
+  content:"";
+  position:absolute;
+  top:1px;
+  width:9px;
+  height:12px;
+  border:1px solid rgba(242,224,255,.62);
+  background:linear-gradient(135deg,rgba(239,217,255,.92),rgba(157,103,229,.52));
+}
+.flying-butterfly::before{
+  left:0;
+  border-radius:75% 35% 70% 45%;
+  transform:rotate(28deg);
+  transform-origin:100% 80%;
+  animation:wingLeft .55s ease-in-out infinite alternate;
+}
+.flying-butterfly::after{
+  right:0;
+  border-radius:35% 75% 45% 70%;
+  transform:rotate(-28deg);
+  transform-origin:0 80%;
+  animation:wingRight .55s ease-in-out infinite alternate;
+}
+.flying-butterfly span{
+  position:absolute;
+  left:8px;
+  top:4px;
+  width:2px;
+  height:8px;
+  border-radius:50%;
+  background:#c092f2;
+  box-shadow:0 0 5px rgba(221,191,255,.9);
+  z-index:2;
+}
+.fly-one{top:18%;left:-8%;--fly-dur:28s;--fly-delay:-7s;transform:scale(.72)}
+.fly-two{top:53%;left:-10%;--fly-dur:35s;--fly-delay:-18s;transform:scale(.55)}
+.fly-three{top:76%;left:-8%;--fly-dur:31s;--fly-delay:-12s;transform:scale(.62)}
+@keyframes flyAcross{
+  0%{margin-left:0;transform:translateY(0) rotate(-8deg) scale(var(--scale,1));opacity:0}
+  8%{opacity:.38}
+  30%{transform:translateY(-24px) rotate(5deg) scale(var(--scale,1))}
+  55%{transform:translateY(16px) rotate(-4deg) scale(var(--scale,1))}
+  82%{opacity:.32}
+  100%{margin-left:120vw;transform:translateY(-12px) rotate(8deg) scale(var(--scale,1));opacity:0}
+}
+@keyframes wingLeft{to{transform:rotate(48deg) scaleX(.78)}}
+@keyframes wingRight{to{transform:rotate(-48deg) scaleX(.78)}}
+body.light .flying-butterfly{opacity:.28;filter:drop-shadow(0 0 6px rgba(153,109,209,.42))}
+@media(max-width:800px){.flying-butterfly{display:none}}
+</style>
+<script>
+(function(){
+  if(document.querySelector('.flying-butterflies')) return;
+  const layer=document.createElement('div');
+  layer.className='flying-butterflies';
+  ['fly-one','fly-two','fly-three'].forEach(cls=>{
+    const b=document.createElement('div');
+    b.className='flying-butterfly '+cls;
+    b.innerHTML='<span></span>';
+    layer.appendChild(b);
+  });
+  document.body.prepend(layer);
+})();
+</script>
 
 
 <style>
@@ -467,38 +707,36 @@ body.light .bfly{opacity:.78;filter:drop-shadow(0 0 17px rgba(160,125,210,.34)) 
 })();
 </script>
 
+<style id="v39-navigation-fix">
+/* Restore the butterfly to its original centered position */
+.butterfly .bfly{top:auto!important;}
 
-
-<style id="v37-mobile-navigation-fix">
-/* v37: clean navigation without the floral system. */
-.nav{z-index:60 !important;overflow:visible !important;}
-.nav-inner{position:relative;z-index:61;display:flex;align-items:center;width:min(1180px,calc(100% - 32px));min-width:0;}
-.brand-simple{display:block !important;visibility:visible !important;opacity:1 !important;white-space:nowrap;position:relative !important;left:0 !important;z-index:62 !important;}
-.nav-links{display:flex !important;visibility:visible !important;opacity:1 !important;}
-.nav-controls{display:flex !important;visibility:visible !important;opacity:1 !important;}
-@media(max-width:800px){
-  .nav{height:64px !important;background:rgba(8,6,12,.88) !important;}
-  body.light .nav{background:rgba(248,244,250,.88) !important;}
-  .nav-inner{width:calc(100% - 20px) !important;padding:0 !important;gap:0 !important;}
-  .brand-simple{font-size:clamp(19px,6vw,25px) !important;letter-spacing:.14em !important;margin:0 !important;}
-  .nav-links{margin-left:auto !important;gap:clamp(8px,2.8vw,16px) !important;transform:none !important;}
-  .nav-links a{display:block !important;margin:0 !important;font-size:clamp(9px,2.5vw,11px) !important;white-space:nowrap;}
-  .nav-controls{margin-left:clamp(8px,2.5vw,14px) !important;gap:0 !important;transform:none !important;}
-  .theme-toggle{display:grid !important;margin:0 !important;width:34px !important;height:34px !important;flex:0 0 34px;}
+/* Mobile navigation: keep the brand, links and theme button visible */
+@media (max-width:800px){
+  .nav{height:62px;}
+  .nav-inner{width:calc(100% - 24px);gap:12px;justify-content:flex-start;}
+  .brand-simple{display:block!important;flex:0 0 auto;font-size:24px!important;white-space:nowrap;}
+  .nav-links{display:flex!important;margin-left:auto;gap:13px;align-items:center;min-width:0;}
+  .nav-links a{display:block!important;margin:0!important;font-size:10px;white-space:nowrap;}
+  .nav-controls{display:flex!important;margin-left:2px;flex:0 0 auto;}
+  .theme-toggle{display:grid!important;margin-left:0;width:34px;height:34px;}
 }
-@media(max-width:520px){
-  .brand-simple{font-size:18px !important;letter-spacing:.12em !important;}
-  .nav-links{gap:9px !important;}
-  .nav-links a{font-size:9px !important;letter-spacing:0 !important;}
-  .theme-toggle{width:32px !important;height:32px !important;flex-basis:32px;}
+@media (max-width:520px){
+  .nav{height:58px;}
+  .nav-inner{width:calc(100% - 18px);gap:8px;}
+  .brand-simple{font-size:21px!important;letter-spacing:.12em;}
+  .nav-links{gap:9px;margin-left:auto;}
+  .nav-links a{font-size:9px!important;letter-spacing:.02em;}
+  .theme-toggle{width:32px;height:32px;font-size:13px;}
 }
-@media(max-width:410px){
-  .nav-links{gap:7px !important;}
-  .nav-links a{font-size:8px !important;}
-  .brand-simple{font-size:17px !important;}
-  .nav-controls{margin-left:7px !important;}
+@media (max-width:380px){
+  .brand-simple{font-size:18px!important;}
+  .nav-links{gap:6px;}
+  .nav-links a{font-size:8px!important;}
+  .theme-toggle{width:30px;height:30px;}
 }
 </style>
+
 </body>
 </html>
 <style>
@@ -747,100 +985,12 @@ body.light .hero-frame{
 
 /* Both garlands now use the same reveal/hide animation.
    No transform is applied while toggling, so the mirrored right garland never turns. */
+.rose-garland{
   clip-path:inset(-6% -18% -6% -18%);
   transition:opacity .52s ease,clip-path .72s cubic-bezier(.22,.8,.22,1),filter .4s ease !important;
 }
-  opacity:0 !important;
-  visibility:visible !important;
-  pointer-events:none !important;
-  transform:none !important;
-  clip-path:inset(0 -18% 100% -18%);
-}
+
 /* Keep the right branch mirrored even while the flowers are being shown or hidden. */
 
-</style>
 
-
-
-<style id="v34-final-flower-hover">
-/* v34: lower the floral line and keep it fully visible above the navigation */
-  position:fixed !important;
-  top:68px !important;
-  left:0 !important;
-  right:0 !important;
-  width:100vw !important;
-  max-width:none !important;
-  height:88px !important;
-  z-index:60 !important;
-  opacity:.86 !important;
-  overflow:visible !important;
-  pointer-events:none !important;
-  transform:translateY(0) !important;
-  transition:opacity .6s cubic-bezier(.22,.8,.22,1), transform .6s cubic-bezier(.22,.8,.22,1), filter .5s ease !important;
-}
-  width:110% !important;
-  height:100% !important;
-  margin-left:-5% !important;
-  overflow:visible !important;
-}
-
-/* Hovering the navigation must never make the entire garland hide, shrink or move. */
-@media (hover:hover) and (pointer:fine){
-    opacity:.86 !important;
-    transform:translateY(0) !important;
-    filter:drop-shadow(0 8px 13px rgba(0,0,0,.28)) !important;
-  }
-    animation-play-state:running !important;
-  }
-
-  /* Each flower independently shrinks and takes on the cool silver-grey tone of the stems. */
-    transition:transform .58s cubic-bezier(.22,.8,.22,1), opacity .58s ease, filter .58s ease !important;
-  }
-    transition:fill .58s ease, opacity .58s ease, filter .58s ease !important;
-  }
-    transform:scale(.62) !important;
-    opacity:.9 !important;
-    filter:none !important;
-  }
-    fill:#a9a7b1 !important;
-    opacity:.82 !important;
-  }
-}
-
-/* Keep the flower toggle independent from the hover interaction. */
-  opacity:0 !important;
-  visibility:visible !important;
-  pointer-events:none !important;
-  transform:translateY(-10px) !important;
-}
-</style>
-<style>
-/* v36 — floral line intentionally overlaps the navigation while text stays above it */
-.nav{
-  z-index:60;
-}
-.nav-inner,
-.nav-links,
-.nav-controls,
-.brand-simple{
-  position:relative;
-  z-index:3;
-}
-  top:18px !important;
-  left:0 !important;
-  width:100vw !important;
-  max-width:none !important;
-  height:86px !important;
-  transform:none !important;
-  z-index:59 !important;
-  opacity:.9;
-}
-  width:100%;
-  height:100%;
-}
-  transform:translateY(-9px) scale(.985) !important;
-}
-/* Individual buds react independently to the cursor without moving the whole stem. */
-@media (hover:hover) and (pointer:fine){
-}
 </style>
