@@ -236,7 +236,7 @@ body.no-pointer-cursor #pollen{
 <nav class="nav"><div class="nav-inner">
   <a class="brand-simple" href="#home">KRUZIX</a>
   <div class="nav-links"><a href="#home">home</a><a href="#about">about</a><a href="#links">links</a></div>
-  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾</button>
+  <div class="nav-controls"><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾</button><button class="flowers-toggle" id="flowersToggle" type="button" aria-label="Hide flowers" title="Show or hide flowers">✿</button></div>
 </div></nav>
 
 <main class="wrap" id="home">
@@ -268,7 +268,7 @@ body.no-pointer-cursor #pollen{
     <div class="section-note" style="font-size:11px;letter-spacing:2px;text-transform:uppercase">short info</div>
    </div>
    <div class="rows">
-   <div class="row"><span>nickname</span><b>kruzix</b></div><div class="row"><span>gender</span><b>♂</b></div><div class="row"><span>age</span><b>17</b></div><div class="row"><span>birthday</span><b>08 / 14</b></div><div class="row"><span>languages</span><b>en / ru</b></div>
+   <div class="row"><span>nickname</span><b>kruzix</b></div><div class="row"><span>gender</span><b>♂</b></div><div class="row"><span>age</span><b id="ageValue">17</b></div><div class="row"><span>birthday</span><b>08 / 14</b></div><div class="row"><span>languages</span><b>en / ru</b></div>
   </div></div>
 <div class="card butterfly">
 
@@ -388,35 +388,79 @@ body.light .link-grid a{
 }
 body.light footer{color:#87768e}
 
+/* Flower visibility control next to the theme switch */
+.nav-controls{margin-left:22px;display:flex;align-items:center;gap:9px}
+.theme-toggle{margin-left:0}
+.flowers-toggle{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(233,216,255,.16);
+  background:rgba(255,255,255,.025);color:#d7c6e8;
+  display:grid;place-items:center;cursor:pointer;
+  font:16px/1 "Cormorant Garamond",serif;
+  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease,opacity .25s ease,background .25s ease;
+}
+.flowers-toggle:hover{border-color:rgba(197,154,255,.55);box-shadow:0 0 22px rgba(178,126,255,.18);transform:translateY(-1px) rotate(8deg)}
+.flowers-toggle.is-off{opacity:.46;color:#8d8198;background:rgba(0,0,0,.08)}
+body.light .flowers-toggle{color:#5d4a69;border-color:rgba(74,45,96,.18);background:rgba(255,255,255,.45)}
+body.light .flowers-toggle.is-off{opacity:.5;background:rgba(74,45,96,.06)}
+body.flowers-hidden .rose-garland{opacity:0!important;visibility:hidden;pointer-events:none;transform:translateY(-18px) scale(.96)}
+body.flowers-hidden .rose-garland *{animation-play-state:paused!important}
+.rose-garland{transition:opacity .45s ease,visibility .45s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+
+/* The Dream butterfly softly fades in the light theme */
+.bfly{transition:opacity .55s ease,filter .55s ease}
+body.light .bfly{opacity:.78;filter:drop-shadow(0 0 17px rgba(160,125,210,.34)) saturate(.84) brightness(1.03)}
+
 @media(max-width:800px){
   .nav-links{gap:13px}
   .nav-links a:nth-child(4){display:none}
-  .theme-toggle{margin-left:14px}
+  .nav-controls{margin-left:14px;gap:7px}
 }
 @media(max-width:520px){
   .brand-simple{font-size:21px}
   .nav-links{gap:10px}
   .nav-links a{font-size:10px}
   .nav-links a:nth-child(3){display:none}
-  .theme-toggle{width:33px;height:33px;margin-left:10px}
+  .nav-controls{margin-left:10px;gap:6px}
+  .theme-toggle,.flowers-toggle{width:33px;height:33px}
 }
 </style>
 <script>
 (function(){
   const btn=document.getElementById('themeToggle');
-  // Сайт всегда открывается в тёмной теме.
+  const flowersBtn=document.getElementById('flowersToggle');
+  // The site always starts in dark mode.
   document.body.classList.remove('light');
   localStorage.setItem('kruzix-theme','dark');
-  function sync(){
+
+  function syncTheme(){
     const light=document.body.classList.contains('light');
     btn.textContent=light?'☾':'☀';
     btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');
   }
-  sync();
+
+  function syncFlowers(){
+    const hidden=localStorage.getItem('kruzix-flowers')==='off';
+    document.body.classList.toggle('flowers-hidden',hidden);
+    flowersBtn.classList.toggle('is-off',hidden);
+    flowersBtn.textContent=hidden?'✦':'✿';
+    flowersBtn.setAttribute('aria-label',hidden?'Show flowers':'Hide flowers');
+    flowersBtn.title=hidden?'Show flowers':'Hide flowers';
+  }
+
+  syncTheme();
+  syncFlowers();
+
   btn.addEventListener('click',()=>{
     document.body.classList.toggle('light');
     localStorage.setItem('kruzix-theme',document.body.classList.contains('light')?'light':'dark');
-    sync();
+    syncTheme();
+  });
+
+  flowersBtn.addEventListener('click',()=>{
+    const nextOff=!document.body.classList.contains('flowers-hidden');
+    localStorage.setItem('kruzix-flowers',nextOff?'off':'on');
+    syncFlowers();
   });
 })();
 </script>
@@ -594,6 +638,256 @@ document.querySelectorAll(".butterfly").forEach(card => {
 }
 </style>
 
+
+<style>
+/* Единый стиль для всех трёх маленьких подписей карточек */
+.info .section-note,
+.butterfly-header .section-note,
+.socials-header .section-note{
+  font-family:Manrope,system-ui,sans-serif !important;
+  font-size:10px !important;
+  font-weight:600 !important;
+  line-height:1 !important;
+  letter-spacing:.22em !important;
+  text-transform:uppercase !important;
+  color:#806f8d !important;
+  white-space:nowrap;
+}
+body.light .info .section-note,
+body.light .butterfly-header .section-note,
+body.light .socials-header .section-note{color:#8a7c92 !important}
+
+/* Ненавязчивые пролетающие бабочки на фоне */
+.flying-butterflies{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+  pointer-events:none;
+}
+.flying-butterfly{
+  position:absolute;
+  width:18px;
+  height:14px;
+  opacity:.42;
+  filter:drop-shadow(0 0 7px rgba(194,150,255,.65));
+  animation:flyAcross var(--fly-dur) linear infinite;
+  animation-delay:var(--fly-delay);
+}
+.flying-butterfly::before,
+.flying-butterfly::after{
+  content:"";
+  position:absolute;
+  top:1px;
+  width:9px;
+  height:12px;
+  border:1px solid rgba(242,224,255,.62);
+  background:linear-gradient(135deg,rgba(239,217,255,.92),rgba(157,103,229,.52));
+}
+.flying-butterfly::before{
+  left:0;
+  border-radius:75% 35% 70% 45%;
+  transform:rotate(28deg);
+  transform-origin:100% 80%;
+  animation:wingLeft .55s ease-in-out infinite alternate;
+}
+.flying-butterfly::after{
+  right:0;
+  border-radius:35% 75% 45% 70%;
+  transform:rotate(-28deg);
+  transform-origin:0 80%;
+  animation:wingRight .55s ease-in-out infinite alternate;
+}
+.flying-butterfly span{
+  position:absolute;
+  left:8px;
+  top:4px;
+  width:2px;
+  height:8px;
+  border-radius:50%;
+  background:#c092f2;
+  box-shadow:0 0 5px rgba(221,191,255,.9);
+  z-index:2;
+}
+.fly-one{top:18%;left:-8%;--fly-dur:28s;--fly-delay:-7s;transform:scale(.72)}
+.fly-two{top:53%;left:-10%;--fly-dur:35s;--fly-delay:-18s;transform:scale(.55)}
+.fly-three{top:76%;left:-8%;--fly-dur:31s;--fly-delay:-12s;transform:scale(.62)}
+@keyframes flyAcross{
+  0%{margin-left:0;transform:translateY(0) rotate(-8deg) scale(var(--scale,1));opacity:0}
+  8%{opacity:.38}
+  30%{transform:translateY(-24px) rotate(5deg) scale(var(--scale,1))}
+  55%{transform:translateY(16px) rotate(-4deg) scale(var(--scale,1))}
+  82%{opacity:.32}
+  100%{margin-left:120vw;transform:translateY(-12px) rotate(8deg) scale(var(--scale,1));opacity:0}
+}
+@keyframes wingLeft{to{transform:rotate(48deg) scaleX(.78)}}
+@keyframes wingRight{to{transform:rotate(-48deg) scaleX(.78)}}
+body.light .flying-butterfly{opacity:.28;filter:drop-shadow(0 0 6px rgba(153,109,209,.42))}
+@media(max-width:800px){.flying-butterfly{display:none}}
+</style>
+<script>
+(function(){
+  if(document.querySelector('.flying-butterflies')) return;
+  const layer=document.createElement('div');
+  layer.className='flying-butterflies';
+  ['fly-one','fly-two','fly-three'].forEach(cls=>{
+    const b=document.createElement('div');
+    b.className='flying-butterfly '+cls;
+    b.innerHTML='<span></span>';
+    layer.appendChild(b);
+  });
+  document.body.prepend(layer);
+})();
+</script>
+
+
+<!-- Silver floral filigree beneath the navigation -->
+<div class="rose-garland floral-line" aria-hidden="true">
+  <svg class="silver-floral-svg" viewBox="0 0 1200 86" preserveAspectRatio="none" role="presentation">
+    <defs>
+      <linearGradient id="silverStem" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#625c6d"/><stop offset=".24" stop-color="#d7d4df"/><stop offset=".5" stop-color="#8f899b"/><stop offset=".76" stop-color="#e9e6ee"/><stop offset="1" stop-color="#625c6d"/>
+      </linearGradient>
+      <linearGradient id="lavBud" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f1e8ff"/><stop offset=".34" stop-color="#c5a5f1"/><stop offset=".72" stop-color="#8060aa"/><stop offset="1" stop-color="#3e324d"/>
+      </linearGradient>
+      <linearGradient id="silverLeaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1eff4"/><stop offset=".5" stop-color="#9b96a4"/><stop offset="1" stop-color="#4f4a59"/></linearGradient>
+      <filter id="softGlow" x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <g class="filigree-stems" fill="none" stroke="url(#silverStem)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M45 44 C115 26 151 58 220 43 S337 25 405 44 S521 61 600 42 S682 26 760 43 S885 61 960 43 S1088 27 1155 44"/>
+      <path d="M116 39 C96 18 109 7 129 16 C146 24 137 39 119 32"/>
+      <path d="M265 44 C248 18 272 10 288 22 C301 33 286 44 270 35"/>
+      <path d="M458 43 C438 20 461 9 478 21 C492 32 477 44 461 34"/>
+      <path d="M657 42 C639 19 663 10 679 22 C692 33 678 44 662 35"/>
+      <path d="M851 43 C831 18 855 10 872 22 C886 34 870 45 854 35"/>
+      <path d="M1050 43 C1030 18 1055 10 1072 22 C1085 34 1069 45 1053 35"/>
+      <path d="M184 43 C171 56 176 70 193 72 C208 74 214 63 204 56"/>
+      <path d="M371 43 C358 57 364 71 381 72 C397 73 402 62 392 56"/>
+      <path d="M561 43 C548 57 554 71 571 72 C587 73 592 62 582 56"/>
+      <path d="M746 43 C733 57 739 71 756 72 C772 73 777 62 767 56"/>
+      <path d="M934 43 C921 57 927 71 944 72 C960 73 965 62 955 56"/>
+    </g>
+    <g class="silver-leaves" fill="url(#silverLeaf)" opacity=".88">
+      <path d="M138 34 C148 20 164 19 169 24 C160 35 149 39 138 34Z"/><path d="M303 42 C312 28 327 29 333 35 C324 44 313 47 303 42Z"/>
+      <path d="M425 48 C412 59 399 57 394 50 C404 43 416 42 425 48Z"/><path d="M507 38 C516 24 531 25 537 31 C528 40 517 43 507 38Z"/>
+      <path d="M700 48 C687 59 674 57 669 50 C679 43 691 42 700 48Z"/><path d="M795 37 C804 23 819 24 825 30 C816 39 805 42 795 37Z"/>
+      <path d="M995 48 C982 59 969 57 964 50 C974 43 986 42 995 48Z"/><path d="M1094 36 C1104 23 1119 24 1124 30 C1115 39 1104 41 1094 36Z"/>
+    </g>
+    <g class="lavender-buds" filter="url(#softGlow)">
+      <g class="floral-unit"><g transform="translate(92 24)"><ellipse cx="0" cy="0" rx="7" ry="11" fill="url(#lavBud)" transform="rotate(-18)"/><ellipse cx="10" cy="5" rx="5" ry="8" fill="#b895df" opacity=".88"/></g></g>
+      <g class="floral-unit"><g transform="translate(225 43)"><ellipse cx="0" cy="0" rx="8" ry="12" fill="url(#lavBud)"/><ellipse cx="-8" cy="5" rx="5" ry="8" fill="#a987d0"/></g></g>
+      <g class="floral-unit"><g transform="translate(405 42)"><ellipse cx="0" cy="0" rx="7" ry="11" fill="url(#lavBud)" transform="rotate(20)"/><ellipse cx="10" cy="-4" rx="5" ry="8" fill="#d0b5ef"/></g></g>
+      <g class="floral-unit"><g transform="translate(600 42)"><ellipse cx="0" cy="0" rx="9" ry="13" fill="url(#lavBud)"/><ellipse cx="-10" cy="2" rx="5" ry="8" fill="#b28bd8"/><ellipse cx="10" cy="3" rx="5" ry="8" fill="#e0caff"/></g></g>
+      <g class="floral-unit"><g transform="translate(790 42)"><ellipse cx="0" cy="0" rx="7" ry="11" fill="url(#lavBud)" transform="rotate(-20)"/><ellipse cx="9" cy="5" rx="5" ry="8" fill="#b18bd7"/></g></g>
+      <g class="floral-unit"><g transform="translate(975 43)"><ellipse cx="0" cy="0" rx="8" ry="12" fill="url(#lavBud)"/><ellipse cx="-9" cy="5" rx="5" ry="8" fill="#c2a0e3"/></g></g>
+      <g class="floral-unit"><g transform="translate(1110 28)"><ellipse cx="0" cy="0" rx="7" ry="11" fill="url(#lavBud)" transform="rotate(18)"/><ellipse cx="-9" cy="5" rx="5" ry="8" fill="#ad88d3"/></g></g>
+    </g>
+    <g class="floral-specks" fill="#d9c2ff"><circle cx="166" cy="17" r="1.2"/><circle cx="346" cy="57" r="1"/><circle cx="548" cy="19" r="1.3"/><circle cx="682" cy="64" r="1"/><circle cx="884" cy="17" r="1.2"/><circle cx="1030" cy="64" r="1"/></g>
+  </svg>
+</div>
+<style>
+/* v30: silver filigree inspired by the ornamental flowers in the banner corners */
+.floral-line{position:fixed;top:60px;left:50%;width:min(1120px,calc(100vw - 20px));height:74px;transform:translateX(-50%);z-index:24;pointer-events:none;opacity:.86;transition:opacity .5s ease,visibility .5s ease,transform .55s cubic-bezier(.2,.8,.2,1),filter .5s ease;filter:drop-shadow(0 8px 13px rgba(0,0,0,.28));}
+.silver-floral-svg{display:block;width:100%;height:100%;overflow:visible;animation:filigreeDrift 11s ease-in-out infinite;transform-origin:50% 0;}
+.filigree-stems{filter:drop-shadow(0 0 2px rgba(235,227,255,.22));}
+.silver-leaves,.lavender-buds{transform-box:fill-box;transform-origin:center;animation:budBreath 7.5s ease-in-out infinite;}
+.lavender-buds{animation-delay:-2.8s;}
+.floral-specks{animation:speckPulse 5s ease-in-out infinite;}
+@keyframes filigreeDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(1.5px)}}
+@keyframes budBreath{0%,100%{opacity:.92}50%{opacity:1}}
+@keyframes speckPulse{0%,100%{opacity:.35}50%{opacity:.95}}
+body.flowers-hidden .floral-line{opacity:0!important;visibility:hidden;pointer-events:none;transform:translateX(-50%) translateY(-9px) scale(.985)}
+body.flowers-hidden .floral-line *{animation-play-state:paused!important}
+body.light .floral-line{opacity:.62;filter:drop-shadow(0 5px 10px rgba(109,89,121,.12))}
+body.light .filigree-stems{opacity:.72}
+</style>
+</style>
+
+<style>
+/* Final navigation balance and control order */
+.nav-inner{padding-left:22px;padding-right:22px;box-sizing:border-box}
+.brand-simple{position:relative;left:-24px}
+.nav-links{margin-left:auto;transform:translateX(-10px)}
+.nav-controls{margin-left:12px;transform:translateX(-10px)}
+
+/* Both hanging garlands use the same slow, natural movement. */
+.rose-left .garland-sway,.rose-right .garland-sway{animation:nightVineSway 9s ease-in-out infinite!important}
+.rose-left .garland-sway{animation-delay:-1.6s!important}
+.rose-right .garland-sway{animation-delay:0s!important}
+
+@media(max-width:800px){.brand-simple{left:0}.nav-links,.nav-controls{transform:none}.nav-inner{padding-left:0;padding-right:0}}
+</style>
+<script>
+/* Automatically calculate age from 14 August 2009. */
+(function(){
+  const ageEl=document.getElementById('ageValue');
+  if(!ageEl) return;
+  const birthYear=2009, birthMonth=7, birthDay=14; // August is month 7 in JavaScript
+  function updateAge(){
+    const now=new Date();
+    let age=now.getFullYear()-birthYear;
+    const birthdayThisYear=new Date(now.getFullYear(),birthMonth,birthDay);
+    if(now<birthdayThisYear) age--;
+    ageEl.textContent=String(age);
+  }
+  updateAge();
+  setInterval(updateAge,60*60*1000);
+})();
+</script>
+
+<style id="v33-individual-flower-interaction">
+/* v33: extend the ornament beyond the viewport edges and place it above the navigation */
+.floral-line{
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  max-width:none !important;
+  height:88px !important;
+  top:30px !important;
+  padding:0 !important;
+  overflow:visible !important;
+  z-index:46 !important;
+  pointer-events:none !important;
+  transform:translateY(0) !important;
+}
+.floral-line .silver-floral-svg{
+  width:110% !important;
+  max-width:none !important;
+  height:100% !important;
+  margin-left:-5% !important;
+  overflow:visible !important;
+}
+/* Each lavender flower is an independent interactive object. */
+.floral-unit{
+  pointer-events:all;
+  cursor:default;
+  transform-box:fill-box;
+  transform-origin:center;
+  transition:transform .34s cubic-bezier(.22,.8,.22,1), opacity .34s ease, filter .34s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .floral-unit:hover{
+    transform:translateY(-7px) scale(.72);
+    opacity:.34;
+    filter:blur(.35px);
+  }
+  .floral-unit:hover + .floral-unit{}
+}
+/* The toggle remains a smooth fade/retraction, while individual hover stays separate. */
+body.flowers-hidden .floral-line,body.flowers-hidden .rose-garland.floral-line{
+  opacity:0 !important;
+  visibility:visible !important;
+  transform:translateY(-12px) !important;
+  pointer-events:none !important;
+}
+body:not(.flowers-hidden) .floral-line{
+  opacity:.86 !important;
+  visibility:visible !important;
+  transform:translateY(0) !important;
+}
+body.light:not(.flowers-hidden) .floral-line{opacity:.62 !important}
+</style>
 </body>
 </html>
 <style>
@@ -810,4 +1104,229 @@ body.light .profile{
 <style>
 /* Финальные настройки: тёмная тема при открытии и более компактное свечение вокруг бабочки */
 .butterfly:before{width:210px;height:210px;filter:blur(7px)}
+</style>
+
+<style>
+/* Финальное исправление светлой темы: убираем тёмный размытый слой самого баннера. */
+body.light .hero-frame{
+  background:linear-gradient(135deg,#f8f5fb,#e8e0ef 50%,#f7f3fa) !important;
+  box-shadow:
+    0 18px 52px rgba(255,255,255,.95),
+    0 8px 26px rgba(214,200,226,.22),
+    0 0 80px rgba(255,255,255,.60) !important;
+}
+body.light .hero-frame:before{
+  display:none !important;
+}
+</style>
+
+
+<style>
+/* v28: clean light-theme banner and smoother flower visibility */
+/* The dark band in the light theme came from the banner's own overlay, not only its shadow. */
+body.light .hero-frame:after{
+  background:transparent !important;
+}
+body.light .hero-frame{
+  box-shadow:
+    0 14px 40px rgba(255,255,255,.92),
+    0 8px 28px rgba(210,198,224,.18),
+    0 0 68px rgba(255,255,255,.55) !important;
+}
+
+/* Both garlands now use the same reveal/hide animation.
+   No transform is applied while toggling, so the mirrored right garland never turns. */
+.rose-garland{
+  clip-path:inset(-6% -18% -6% -18%);
+  transition:opacity .52s ease,clip-path .72s cubic-bezier(.22,.8,.22,1),filter .4s ease !important;
+}
+body.flowers-hidden .rose-garland{
+  opacity:0 !important;
+  visibility:visible !important;
+  pointer-events:none !important;
+  transform:none !important;
+  clip-path:inset(0 -18% 100% -18%);
+}
+/* Keep the right branch mirrored even while the flowers are being shown or hidden. */
+
+</style>
+
+<style id="v31-floral-and-light-stars">
+/* v31: stretch the floral filigree across the full navigation container */
+.floral-line{
+  left:50% !important;
+  width:min(1180px,calc(100vw - 32px)) !important;
+  height:78px !important;
+  top:58px !important;
+  transform:translateX(-50%) !important;
+  transform-origin:center top !important;
+  clip-path:none !important;
+  visibility:visible !important;
+  opacity:.86;
+  transition:opacity .6s cubic-bezier(.22,.8,.22,1),filter .45s ease !important;
+}
+
+/* A clean fade: no clipping, jumping or transform conflicts when flowers are toggled. */
+body.flowers-hidden .floral-line,
+body.flowers-hidden .rose-garland.floral-line{
+  opacity:0 !important;
+  visibility:visible !important;
+  pointer-events:none !important;
+  transform:translateX(-50%) !important;
+  clip-path:none !important;
+  filter:none !important;
+}
+body:not(.flowers-hidden) .floral-line{
+  opacity:.86;
+  visibility:visible !important;
+  transform:translateX(-50%) !important;
+  clip-path:none !important;
+}
+body.flowers-hidden .floral-line *{animation-play-state:paused!important}
+body:not(.flowers-hidden) .floral-line *{animation-play-state:running!important}
+
+/* Background stars are a light-theme-only effect. */
+#background-dots{
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .55s ease,visibility 0s linear .55s;
+}
+body.light #background-dots{
+  opacity:1;
+  visibility:visible;
+  transition:opacity .55s ease;
+}
+body.light .background-dot{
+  color:#8f6ab8;
+  text-shadow:
+    0 0 5px rgba(255,255,255,.98),
+    0 0 11px rgba(165,118,213,.52),
+    0 0 24px rgba(145,102,190,.24) !important;
+}
+</style>
+
+<style id="v32-full-width-floral-hover">
+/* v32: the floral filigree spans the complete navigation width and sits slightly behind the bar */
+.floral-line{
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  max-width:none !important;
+  height:88px !important;
+  top:34px !important;
+  transform:translateX(0) !important;
+  transform-origin:50% 0 !important;
+  z-index:35 !important;
+  overflow:hidden;
+  padding:0 1.5vw;
+  opacity:.86;
+  transition:
+    opacity .58s cubic-bezier(.22,.8,.22,1),
+    transform .58s cubic-bezier(.22,.8,.22,1),
+    filter .45s ease !important;
+}
+.floral-line .silver-floral-svg{
+  width:100%;
+  height:100%;
+  max-width:none;
+}
+
+/* Toggle: flowers fade and gently retract upward without being abruptly removed. */
+body.flowers-hidden .floral-line,
+body.flowers-hidden .rose-garland.floral-line{
+  opacity:0 !important;
+  visibility:visible !important;
+  transform:translateY(-14px) scaleY(.72) !important;
+  pointer-events:none !important;
+  filter:blur(1px) !important;
+}
+body:not(.flowers-hidden) .floral-line{
+  opacity:.86;
+  visibility:visible !important;
+  transform:translateY(0) scaleY(1) !important;
+  filter:drop-shadow(0 8px 13px rgba(0,0,0,.28));
+}
+
+/* Desktop mouse interaction: the garland retreats into the navigation bar. */
+@media (hover:hover) and (pointer:fine){
+  body:has(.nav:hover):not(.flowers-hidden) .floral-line{
+    opacity:.28;
+    transform:translateY(-12px) scaleY(.58) !important;
+    filter:drop-shadow(0 2px 5px rgba(0,0,0,.16));
+  }
+  body:has(.nav:hover):not(.flowers-hidden) .floral-line .silver-floral-svg{
+    animation-play-state:paused;
+  }
+}
+
+/* The same placement is retained on narrow screens; only mouse devices get the hover reaction. */
+@media (max-width:640px){
+  .floral-line{height:76px !important;top:38px !important;padding:0 2vw;}
+}
+</style>
+
+<style id="v34-final-flower-hover">
+/* v34: lower the floral line and keep it fully visible above the navigation */
+.floral-line,
+body:not(.flowers-hidden) .floral-line{
+  position:fixed !important;
+  top:68px !important;
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  max-width:none !important;
+  height:88px !important;
+  z-index:60 !important;
+  opacity:.86 !important;
+  overflow:visible !important;
+  pointer-events:none !important;
+  transform:translateY(0) !important;
+  transition:opacity .6s cubic-bezier(.22,.8,.22,1), transform .6s cubic-bezier(.22,.8,.22,1), filter .5s ease !important;
+}
+.floral-line .silver-floral-svg{
+  width:110% !important;
+  height:100% !important;
+  margin-left:-5% !important;
+  overflow:visible !important;
+}
+
+/* Hovering the navigation must never make the entire garland hide, shrink or move. */
+@media (hover:hover) and (pointer:fine){
+  body:has(.nav:hover):not(.flowers-hidden) .floral-line,
+  body:has(.nav:hover):not(.flowers-hidden) .rose-garland.floral-line{
+    opacity:.86 !important;
+    transform:translateY(0) !important;
+    filter:drop-shadow(0 8px 13px rgba(0,0,0,.28)) !important;
+  }
+  body:has(.nav:hover):not(.flowers-hidden) .floral-line .silver-floral-svg{
+    animation-play-state:running !important;
+  }
+
+  /* Each flower independently shrinks and takes on the cool silver-grey tone of the stems. */
+  .floral-unit{
+    transition:transform .58s cubic-bezier(.22,.8,.22,1), opacity .58s ease, filter .58s ease !important;
+  }
+  .floral-unit ellipse{
+    transition:fill .58s ease, opacity .58s ease, filter .58s ease !important;
+  }
+  .floral-unit:hover{
+    transform:scale(.62) !important;
+    opacity:.9 !important;
+    filter:none !important;
+  }
+  .floral-unit:hover ellipse{
+    fill:#a9a7b1 !important;
+    opacity:.82 !important;
+  }
+}
+
+/* Keep the flower toggle independent from the hover interaction. */
+body.flowers-hidden .floral-line,
+body.flowers-hidden .rose-garland.floral-line{
+  opacity:0 !important;
+  visibility:visible !important;
+  pointer-events:none !important;
+  transform:translateY(-10px) !important;
+}
+body.light:not(.flowers-hidden) .floral-line{opacity:.62 !important;}
 </style>
