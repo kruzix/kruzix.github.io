@@ -160,14 +160,18 @@ body.no-pointer-cursor #pollen{
 <style>
 /* Заголовки трёх карточек: один визуальный стиль */
 .butterfly-header{
-  top:20px;
+  top:30px;
   left:30px;
   right:30px;
+  display:flex;
   align-items:baseline;
+  justify-content:space-between;
+  margin:0;
 }
 
 .butterfly-header .section-title{
   font-size:34px;
+  line-height:.8;
 }
 
 .butterfly-header .section-note{
@@ -209,7 +213,19 @@ body.no-pointer-cursor #pollen{
 .profile .gender-symbol,
 .profile .sex-symbol,
 .profile .gender{
-  font-size:.58em !important;
+  font-size:.54em !important;
+  position:relative;
+  top:-3px;
+}
+</style>
+
+
+
+
+<style>
+.butterfly .bfly{
+  position:relative;
+  top:18px;
 }
 </style>
 
@@ -517,7 +533,7 @@ document.querySelectorAll(".butterfly").forEach(card => {
 
     dot.style.left = (Math.random() * 100) + "%";
     dot.style.top = (Math.random() * 100) + "%";
-    dot.style.setProperty("--star-size", (5 + Math.random() * 5) + "px");
+    dot.style.setProperty("--star-size", (7 + Math.random() * 6) + "px");
     dot.style.setProperty("--delay", (Math.random() * 8) + "s");
     dot.style.setProperty("--dur", (4 + Math.random() * 5) + "s");
 
