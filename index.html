@@ -85,19 +85,19 @@ footer{text-align:center;padding:90px 0 50px;color:#6e6077;font-size:10px;letter
 }
 @media(max-width:480px){.hero-frame{border-radius:24px}.hero-frame{aspect-ratio:720/254}.hero h1{font-size:58px}.profile{margin-top:-55px}.quote{font-size:28px}.section-title{font-size:36px}.link-grid{grid-template-columns:1fr}.social{width:44px;height:44px}}
 
-/* Butterfly card: soft lavender stars */
+/* Butterfly card: the same soft glowing dots as the site background */
 .butterfly .random-star{
   position:absolute;
-  color:#ead8ff;
-  font-size:var(--star-size);
-  line-height:1;
-  background:transparent;
-  width:auto;
-  height:auto;
-  border-radius:0;
-  text-shadow:
-    0 0 8px rgba(205,170,255,.85),
-    0 0 18px rgba(180,130,255,.5);
+  width:var(--dot-size);
+  height:var(--dot-size);
+  border-radius:50%;
+  background:#ead8ff;
+  color:transparent;
+  font-size:0;
+  line-height:0;
+  box-shadow:
+    0 0 7px rgba(205,170,255,.8),
+    0 0 18px rgba(180,130,255,.45);
 }
 
 </style>
@@ -120,11 +120,10 @@ body.no-pointer-cursor #pollen{
 
 .background-dot{
   position:absolute;
-  width:var(--dot-size);
-  height:var(--dot-size);
-  border-radius:50%;
-  background:#ead8ff;
-  box-shadow:
+  color:#ead8ff;
+  font-size:var(--star-size);
+  line-height:1;
+  text-shadow:
     0 0 7px rgba(205,170,255,.7),
     0 0 18px rgba(180,130,255,.38);
   opacity:0;
@@ -204,6 +203,16 @@ body.no-pointer-cursor #pollen{
 }
 </style>
 
+
+<style>
+/* Уменьшенный символ пола в профиле */
+.profile .gender-symbol,
+.profile .sex-symbol,
+.profile .gender{
+  font-size:.58em !important;
+}
+</style>
+
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -228,7 +237,7 @@ body.no-pointer-cursor #pollen{
 <section class="profile">
  <div class="profile-row">
   <img class="avatar" src="avatar.gif" alt="kx">
-  <div><div class="name">kruzix <span style="color:#c59aff">♂</span></div><div class="handle">exist. dream. create.</div><div class="status"><span class="dot"></span> Idle</div></div>
+  <div><div class="name">kruzix <span style="color:#c59aff"><span class="gender-symbol">♂</span></span></div><div class="handle">exist. dream. create.</div><div class="status"><span class="dot"></span> Idle</div></div>
   <div class="socials"><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Discord @kruzix">◉</a><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Telegram @kruzix">➤</a><a class="social" href="https://github.com/kruzix" target="_blank" rel="noopener" title="GitHub kruzix">◌</a><a class="social" href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener" title="Steam kruzixx">◈</a></div>
  </div>
  <div class="quote">心の花を育てよう<small>— cultivate the flower in your heart</small></div>
@@ -248,7 +257,7 @@ body.no-pointer-cursor #pollen{
 <div class="card butterfly">
 
   <div class="butterfly-header">
-    <div class="section-title">Dream</div>
+    <div class="section-title">...</div>
     <div class="section-note">a little piece of me</div>
   </div>
 
@@ -399,7 +408,7 @@ body.light footer{color:#87768e}
 <style>
 .butterfly-header{
   position:absolute;
-  top:20px;
+  top:30px;
   left:30px;
   right:30px;
   display:flex;
@@ -420,7 +429,7 @@ body.light footer{color:#87768e}
 }
 @media(max-width:520px){
   .butterfly-header .section-title{font-size:34px}
-  .butterfly-header{left:22px;right:22px;top:18px}
+  .butterfly-header{left:22px;right:22px;top:24px}
 }
 </style>
 
@@ -432,7 +441,6 @@ document.querySelectorAll(".butterfly").forEach(card => {
 
   if (!stars) return;
 
-  const symbols = ["✦", "✧", "⋆"];
   const total = 26;
 
   const positions = [];
@@ -442,15 +450,18 @@ document.querySelectorAll(".butterfly").forEach(card => {
     const star = document.createElement("span");
     star.className = "random-star";
 
-    star.textContent =
-      symbols[Math.floor(Math.random() * symbols.length)];
-
-    const size = 8 + Math.random() * 8;
+    const size = 2 + Math.random() * 3.5;
 
     let left, top;
     let attempts = 0;
 
-
+    /*
+      Размещаем звёзды по всей карточке, но:
+      1. верхняя полоса остаётся чистой под заголовок;
+      2. центр вокруг бабочки остаётся свободным;
+      3. каждая новая звезда проверяет расстояние до уже созданных,
+         чтобы они не собирались в одну кучку.
+    */
     do {
       left = 5 + Math.random() * 90;
       top = 72 + Math.random() * 235;
@@ -502,10 +513,11 @@ document.querySelectorAll(".butterfly").forEach(card => {
   for(let i = 0; i < total; i++){
     const dot = document.createElement("span");
     dot.className = "background-dot";
+    dot.textContent = ["✦","✧","⋆"][Math.floor(Math.random() * 3)];
 
     dot.style.left = (Math.random() * 100) + "%";
     dot.style.top = (Math.random() * 100) + "%";
-    dot.style.setProperty("--dot-size", (2 + Math.random() * 3.5) + "px");
+    dot.style.setProperty("--star-size", (5 + Math.random() * 5) + "px");
     dot.style.setProperty("--delay", (Math.random() * 8) + "s");
     dot.style.setProperty("--dur", (4 + Math.random() * 5) + "s");
 
