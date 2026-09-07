@@ -289,9 +289,34 @@ body.no-pointer-cursor #pollen{
   <div class="profile-info"><div class="name">kruzix <span style="color:#c59aff"><span class="gender-symbol">♂</span></span></div><div class="handle">exist. dream. create.</div><div class="status"><span class="dot"></span> Idle</div></div>
   <div class="socials"><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Discord @kruzix">◉</a><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Telegram @kruzix">➤</a><a class="social" href="https://github.com/kruzix" target="_blank" rel="noopener" title="GitHub kruzix">◌</a><a class="social" href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener" title="Steam kruzixx">◈</a></div>
  </div>
+
+ <section class="music-player" aria-label="Music player">
+  <audio id="siteAudio" preload="metadata" src="music.mp3"></audio>
+  <div class="music-art" aria-hidden="true"><span>✦</span></div>
+  <div class="music-main">
+    <div class="music-meta">
+      <div class="music-kicker">NOW PLAYING</div>
+      <div class="music-title">The Queen <span>— instrumental</span></div>
+      <div class="music-artist">Lady Gaga</div>
+    </div>
+    <div class="music-progress-row">
+      <span class="music-time" id="musicCurrent">0:00</span>
+      <input class="music-progress" id="musicProgress" type="range" min="0" max="100" value="0" step="0.1" aria-label="Track progress">
+      <span class="music-time" id="musicDuration">0:00</span>
+    </div>
+  </div>
+  <div class="music-controls">
+    <button class="music-icon" id="musicBack" type="button" aria-label="Restart track">↺</button>
+    <button class="music-play" id="musicPlay" type="button" aria-label="Play">▶</button>
+    <button class="music-icon" id="musicMute" type="button" aria-label="Mute">◔</button>
+    <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="18" aria-label="Volume">
+  </div>
+</section>
  <div class="quote">心の花を育てよう<small>— cultivate the flower in your heart</small></div>
  <p class="about">. . .</p><div class="ornament"></div>
 </section>
+
+
 
 <section class="section" id="about">
  <div class="cards">
@@ -854,6 +879,77 @@ body.light .butterfly .stars > .random-star{
   filter:saturate(.9) brightness(.82);
 }
 </style>
+
+<style id="v52-music-player">
+.music-player{
+  width:min(1030px,calc(100% - 32px));
+  margin:44px auto 30px;
+  min-height:112px;
+  display:grid;
+  grid-template-columns:78px minmax(0,1fr) auto;
+  gap:20px;align-items:center;
+  padding:16px 20px;
+  border:1px solid rgba(219,202,255,.13);
+  border-radius:24px;
+  background:linear-gradient(135deg,rgba(30,23,43,.92),rgba(12,10,20,.88));
+  box-shadow:0 16px 40px rgba(0,0,0,.12);
+  backdrop-filter:blur(14px);
+}
+.music-art{width:78px;height:78px;border-radius:18px;position:relative;overflow:hidden;display:grid;place-items:center;border:1px solid rgba(221,202,255,.18);background:radial-gradient(circle at 65% 30%,rgba(213,182,255,.9),transparent 22%),radial-gradient(circle at 35% 75%,rgba(116,75,181,.75),transparent 38%),linear-gradient(145deg,#181126,#3c2957);box-shadow:0 0 26px rgba(170,126,255,.2)}
+.music-art:before,.music-art:after{content:'';position:absolute;border:1px solid rgba(255,255,255,.16);border-radius:50%}
+.music-art:before{width:100px;height:100px}.music-art:after{width:55px;height:55px}
+.music-art span{position:relative;z-index:1;font-size:24px;color:#f0e8ff;text-shadow:0 0 14px rgba(202,169,255,.9)}
+.music-main{min-width:0}.music-kicker{font-size:9px;letter-spacing:2.2px;color:#8f859d;margin-bottom:5px}.music-title{font-family:Georgia,serif;font-size:21px;color:#f0ebf5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.music-title span{font-family:inherit;font-size:.72em;color:#9f94ac}.music-artist{font-size:12px;color:#91869d;margin-top:3px}.music-progress-row{display:grid;grid-template-columns:38px minmax(80px,1fr) 38px;gap:10px;align-items:center;margin-top:14px}.music-time{font-variant-numeric:tabular-nums;font-size:10px;color:#83798e;text-align:center}.music-progress,.music-volume{appearance:none;height:3px;border-radius:99px;outline:none;background:rgba(228,214,255,.14);accent-color:#b38ce8;cursor:pointer}.music-progress::-webkit-slider-thumb,.music-volume::-webkit-slider-thumb{appearance:none;width:11px;height:11px;border-radius:50%;background:#d7c4f3;box-shadow:0 0 10px rgba(185,140,235,.6)}.music-progress::-moz-range-thumb,.music-volume::-moz-range-thumb{width:10px;height:10px;border:0;border-radius:50%;background:#d7c4f3}.music-controls{display:flex;align-items:center;gap:9px}.music-controls button{border:1px solid rgba(222,207,246,.14);color:#d7cce1;background:rgba(255,255,255,.035);cursor:pointer;transition:.25s ease}.music-controls button:hover{background:rgba(183,140,232,.12);border-color:rgba(201,169,240,.32);transform:translateY(-1px)}.music-icon{width:36px;height:36px;border-radius:12px;font-size:15px}.music-play{width:48px;height:48px;border-radius:50%;font-size:17px;box-shadow:0 0 20px rgba(169,119,229,.13)}.music-volume{width:70px}.music-player.is-playing .music-art{animation:musicArtPulse 2.6s ease-in-out infinite}.music-player.is-playing .music-play{color:#fff;background:rgba(180,137,235,.18)}@keyframes musicArtPulse{50%{box-shadow:0 0 35px rgba(180,132,240,.38);transform:scale(1.025)}}
+html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78),rgba(235,230,243,.78));border-color:rgba(65,48,80,.12);box-shadow:0 16px 40px rgba(74,57,92,.09)}html.light .music-title{color:#2b2530}html.light .music-kicker,html.light .music-artist,html.light .music-time{color:#776d80}html.light .music-controls button{color:#564a60;border-color:rgba(66,49,83,.12);background:rgba(255,255,255,.45)}
+@media(max-width:700px){.music-player{grid-template-columns:64px minmax(0,1fr);gap:14px;padding:14px 16px;border-radius:20px}.music-art{width:64px;height:64px;border-radius:16px}.music-controls{grid-column:1/-1;justify-content:center}.music-volume{width:min(30vw,110px)}.music-title{font-size:18px}.music-progress-row{margin-top:10px}}
+@media(max-width:390px){.music-player{width:calc(100% - 20px);gap:10px;padding:12px}.music-art{width:56px;height:56px}.music-progress-row{grid-template-columns:32px minmax(50px,1fr) 32px;gap:5px}.music-icon{width:34px;height:34px}.music-play{width:44px;height:44px}.music-volume{width:68px}}
+</style>
+
+<style id="v53-integrated-player">
+/* Integrated music player: part of the upper profile card */
+.profile .music-player{
+  width:100%;
+  margin:34px 0 14px;
+  min-height:94px;
+  box-sizing:border-box;
+  grid-template-columns:70px minmax(0,1fr) auto;
+  gap:18px;
+  padding:14px 18px;
+  border-radius:18px;
+  background:rgba(255,255,255,.018);
+  border:1px solid rgba(219,202,255,.10);
+  box-shadow:none;
+}
+.profile .music-art{width:70px;height:70px;border-radius:16px}
+.profile .music-progress-row{margin-top:10px}
+.profile .music-controls{justify-self:end}
+.profile .music-kicker{margin-bottom:3px}
+.profile .music-title{font-size:19px}
+.profile .music-player:before{content:'';position:absolute;left:18px;right:18px;top:-11px;height:1px;background:linear-gradient(90deg,transparent,rgba(187,153,233,.20),transparent)}
+@media(max-width:700px){
+  .profile .music-player{width:100%;margin:28px 0 10px;grid-template-columns:58px minmax(0,1fr);gap:12px;padding:12px 14px;border-radius:16px}
+  .profile .music-art{width:58px;height:58px;border-radius:14px}
+  .profile .music-controls{grid-column:1/-1;justify-self:center;width:100%;justify-content:center}
+  .profile .music-volume{width:min(34vw,130px)}
+}
+</style>
+<script id="v52-music-player-script">
+(()=>{
+ const audio=document.getElementById('siteAudio'), play=document.getElementById('musicPlay'), back=document.getElementById('musicBack'), mute=document.getElementById('musicMute'), vol=document.getElementById('musicVolume'), progress=document.getElementById('musicProgress'), current=document.getElementById('musicCurrent'), duration=document.getElementById('musicDuration'), card=document.querySelector('.music-player');
+ if(!audio||!play) return;
+ const fmt=t=>{if(!Number.isFinite(t)) return '0:00';const m=Math.floor(t/60),s=Math.floor(t%60);return `${m}:${String(s).padStart(2,'0')}`};
+ audio.volume=.18;
+ const sync=()=>{const d=audio.duration||0;progress.value=d?audio.currentTime/d*100:0;current.textContent=fmt(audio.currentTime);duration.textContent=fmt(d)};
+ const state=()=>{const on=!audio.paused&&!audio.ended;card.classList.toggle('is-playing',on);play.textContent=on?'❚❚':'▶';play.setAttribute('aria-label',on?'Pause':'Play')};
+ play.addEventListener('click',()=>{if(audio.paused) audio.play().catch(()=>{});else audio.pause()});
+ back.addEventListener('click',()=>{audio.currentTime=0;sync()});
+ mute.addEventListener('click',()=>{audio.muted=!audio.muted;mute.textContent=audio.muted?'◌':'◔'});
+ vol.addEventListener('input',()=>{audio.volume=vol.value/100;audio.muted=false;mute.textContent='◔'});
+ progress.addEventListener('input',()=>{if(audio.duration) audio.currentTime=(progress.value/100)*audio.duration});
+ audio.addEventListener('loadedmetadata',sync);audio.addEventListener('timeupdate',sync);audio.addEventListener('play',state);audio.addEventListener('pause',state);audio.addEventListener('ended',state);
+})();
+</script>
+
 </body>
 </html>
 <style>
