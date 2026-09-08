@@ -252,9 +252,9 @@ body.no-pointer-cursor #pollen{
 </style>
 
 <style id="v50-status-position">
-/* Slightly offset the entire Idle badge to the right, without moving its text independently. */
+/* Keep the Idle status marker aligned with the profile text. */
 .profile-info .status{
-  margin-left:-3px !important;
+  margin-left:0 !important;
 }
 </style>
 
@@ -393,6 +393,64 @@ body.light .profile{
   }
 }
 </style>
+
+<style id="kruzix-language-theme-like-v30">
+/* v30: language changes use the same short crossfade feel as theme changes */
+html.kruzix-lang-transition [data-i18n],
+html.kruzix-lang-transition .music-title,
+html.kruzix-lang-transition .music-artist,
+html.kruzix-lang-transition .profile-status {
+  animation: kruzixLangThemeFade .32s ease both;
+}
+@keyframes kruzixLangThemeFade{
+  0%{opacity:.35;transform:translateY(2px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@media (prefers-reduced-motion: reduce){
+  html.kruzix-lang-transition [data-i18n],
+  html.kruzix-lang-transition .music-title,
+  html.kruzix-lang-transition .music-artist,
+  html.kruzix-lang-transition .profile-status{
+    animation:none !important;
+  }
+}
+/* Light theme: make the OFF Lite Mode switch clearly visible */
+html[data-theme="light"] .settings-toggle,
+body.light .settings-toggle,
+.theme-light .settings-toggle{
+  border-color:rgba(76,60,92,.38) !important;
+  background:rgba(76,60,92,.12) !important;
+}
+html[data-theme="light"] .settings-toggle::after,
+body.light .settings-toggle::after,
+.theme-light .settings-toggle::after{
+  box-shadow:0 1px 4px rgba(40,30,50,.25) !important;
+}
+</style>
+<script id="kruzix-language-theme-like-v30">
+(function(){
+  function bindLanguageTransition(){
+    document.addEventListener('click', function(e){
+      var el = e.target.closest && e.target.closest('[data-language], [data-lang], #languageSelect, .language-option, .lang-option');
+      if(!el) return;
+      if(document.documentElement.classList.contains('lite-mode') ||
+         document.body.classList.contains('lite-mode') ||
+         document.documentElement.classList.contains('kruzix-lite')){
+        return;
+      }
+      document.documentElement.classList.remove('kruzix-lang-transition');
+      void document.documentElement.offsetWidth;
+      document.documentElement.classList.add('kruzix-lang-transition');
+      setTimeout(function(){
+        document.documentElement.classList.remove('kruzix-lang-transition');
+      }, 360);
+    }, true);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindLanguageTransition);
+  else bindLanguageTransition();
+})();
+</script>
+
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -400,8 +458,33 @@ body.light .profile{
 <nav class="nav"><div class="nav-inner">
   <a class="brand-simple" href="#home">KRUZIX</a>
   <div class="nav-links"><a href="#home">home</a><a href="#about">about</a><a href="#links">links</a></div>
-  <div class="nav-controls"><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">☾</button></div>
+  <div class="nav-controls">
+    <button class="perf-toggle" id="perfToggle" type="button" aria-label="Settings" aria-expanded="false">⚙</button>
+  </div>
 </div></nav>
+<div class="perf-panel" id="perfPanel" aria-hidden="true">
+  <div class="perf-panel-title" data-i18n="settings">Settings</div>
+  <div class="settings-section">
+    <div class="settings-label" data-i18n="theme">Theme</div>
+    <div class="settings-choices" role="group" aria-label="Theme">
+      <button class="settings-choice" type="button" data-theme-choice="dark" data-i18n="dark">Dark</button>
+      <button class="settings-choice" type="button" data-theme-choice="light" data-i18n="light">Light</button>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-label" data-i18n="language">Language</div>
+    <div class="settings-choices" role="group" aria-label="Language">
+      <button class="settings-choice" type="button" data-lang-choice="en">English</button>
+      <button class="settings-choice" type="button" data-lang-choice="ru">Русский</button>
+    </div>
+  </div>
+  <div class="settings-section">
+    <label class="perf-option">
+      <span><b data-i18n="liteMode">Lite mode</b><small data-i18n="liteModeDesc">Fewer animations, glow, blur and audio visualization</small></span>
+      <input type="checkbox" id="perfLiteToggle">
+    </label>
+  </div>
+</div>
 
 <main class="wrap" id="home">
 <section class="hero">
@@ -437,7 +520,7 @@ body.light .profile{
   <div class="music-main">
     <div class="music-meta">
       
-      <div class="music-title" aria-live="polite"><span class="music-track-name">Electric Chapel</span><span class="music-track-genre">— instrumental</span></div>
+      <div class="music-title" aria-live="polite"><span class="music-track-name">Electric Chapel</span><span class="music-track-genre" data-i18n="instrumental">— Instrumental</span></div>
       <div class="music-artist" aria-live="polite">Lady Gaga</div>
     </div>
     <div class="music-progress-row">
@@ -468,7 +551,7 @@ body.light .profile{
     <div class="section-note" style="font-size:11px;letter-spacing:2px;text-transform:uppercase">short info</div>
    </div>
    <div class="rows">
-   <div class="row"><span>nickname</span><b>kruzix</b></div><div class="row"><span>gender</span><b>♂</b></div><div class="row"><span>age</span><b id="ageValue">17</b></div><div class="row"><span>birthday</span><b>08 / 14</b></div><div class="row"><span>languages</span><b>en / ru</b></div>
+   <div class="row"><span>nickname</span><b>kruzix</b></div><div class="row"><span>gender</span><b>♂</b></div><div class="row"><span>age</span><b id="ageValue">17</b></div><div class="row"><span>birthday</span><b data-i18n="birthdayValue">08 / 14</b></div><div class="row"><span>languages</span><b data-i18n="languageValue">en / ru</b></div>
   </div></div>
 <div class="card butterfly">
 
@@ -494,7 +577,7 @@ body.light .profile{
     <div class="section-note">places to find me</div>
   </div>
   <div class="link-grid">
-   <a href="https://discord.com/users/kruzix" target="_blank" rel="noopener">Discord<span>contact</span></a><a href="https://t.me/kruzix" target="_blank" rel="noopener">Telegram<span>contact</span></a><a href="https://github.com/kruzix" target="_blank" rel="noopener">GitHub<span>view</span></a><a href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener">Steam<span>view</span></a>
+   <a href="https://discord.com/users/kruzix" target="_blank" rel="noopener">Discord<span data-link-action="contact">contact</span></a><a href="https://t.me/kruzix" target="_blank" rel="noopener">Telegram<span data-link-action="contact">contact</span></a><a href="https://github.com/kruzix" target="_blank" rel="noopener">GitHub<span data-link-action="view">view</span></a><a href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener">Steam<span data-link-action="view">view</span></a>
   </div></div>
  </div>
 </section>
@@ -589,26 +672,12 @@ body.light .link-grid a{
 body.light footer{color:#87768e}
 
 
-<script>
+<script id="theme-settings-base">
+/* Theme is controlled from the unified settings panel. */
 (function(){
-  const btn=document.getElementById('themeToggle');
-
-  // The site always starts in dark mode.
-  document.body.classList.remove('light');
-  localStorage.setItem('kruzix-theme','dark');
-
-  function syncTheme(){
-    const light=document.body.classList.contains('light');
-    btn.textContent=light?'☾':'☀';
-    btn.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');
-  }
-    syncTheme();
-
-  btn.addEventListener('click',()=>{
-    document.body.classList.toggle('light');
-    localStorage.setItem('kruzix-theme',document.body.classList.contains('light')?'light':'dark');
-    syncTheme();
-  });
+  const saved=localStorage.getItem('kruzix-theme');
+  if(saved==='light') document.body.classList.add('light');
+  else document.body.classList.remove('light');
 })();
 </script>
 
@@ -983,24 +1052,7 @@ body.light .flying-butterfly{opacity:.28;filter:drop-shadow(0 0 6px rgba(153,109
 }
 </style>
 <script id="v41-theme-fix">
-/* Independent, reliable theme switcher. The page still opens in dark mode. */
-document.addEventListener('DOMContentLoaded',function(){
-  const btn=document.getElementById('themeToggle');
-  if(!btn) return;
-  document.body.classList.remove('light');
-  function sync(){
-    const isLight=document.body.classList.contains('light');
-    btn.textContent=isLight?'☾':'☀';
-    btn.setAttribute('aria-label',isLight?'Switch to dark theme':'Switch to light theme');
-  }
-  sync();
-  btn.onclick=function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    document.body.classList.toggle('light');
-    sync();
-  };
-});
+/* Theme toggle moved into the unified settings panel. */
 </script>
 
 <style id="v46-light-star-colors">
@@ -1256,8 +1308,11 @@ html.light .profile .music-track-genre{
     }
 
     if (genreEl) {
-      genreEl.textContent = track.genre ? `— ${track.genre}` : '';
-      genreEl.hidden = !track.genre;
+      const currentLang = localStorage.getItem('kruzix-language') === 'ru' ? 'ru' : 'en';
+      const genreText = String(track.genre || '').trim();
+      const translatedGenre = /^instrumental$/i.test(genreText) ? (currentLang === 'ru' ? 'Инструментал' : 'Instrumental') : genreText;
+      genreEl.textContent = translatedGenre ? `— ${translatedGenre}` : '';
+      genreEl.hidden = !translatedGenre;
     }
   }
 
@@ -2308,9 +2363,26 @@ body.light .profile-row .social{
   });
 
   window.addEventListener('pointerleave',()=>pollen.style.opacity='0');
- function follow(){x+=(tx-x)*.18;y+=(ty-y)*.18;pollen.style.left=x+'px';pollen.style.top=y+'px';requestAnimationFrame(follow)} follow();
+ function follow(){
+   if(!document.body.classList.contains('performance-lite')){
+     x+=(tx-x)*.18;y+=(ty-y)*.18;
+     pollen.style.left=x+'px';pollen.style.top=y+'px';
+   }
+   requestAnimationFrame(follow);
+ } follow();
  const cards=[...document.querySelectorAll('.card,.profile,.hero-frame')];
- cards.forEach(card=>{card.classList.add('tilt-card');card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5,max=3.2;card.style.transform=`perspective(900px) rotateX(${-py*max}deg) rotateY(${px*max}deg) translateY(-2px)`});card.addEventListener('pointerleave',()=>card.style.transform='perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)')});
+ cards.forEach(card=>{
+   card.classList.add('tilt-card');
+   card.addEventListener('pointermove',e=>{
+     if(document.body.classList.contains('performance-lite')) return;
+     const r=card.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5,max=3.2;
+     card.style.transform=`perspective(900px) rotateX(${-py*max}deg) rotateY(${px*max}deg) translateY(-2px)`;
+   });
+   card.addEventListener('pointerleave',()=>{
+     if(document.body.classList.contains('performance-lite')) return;
+     card.style.transform='perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)'
+   });
+ });
 })();
 </script>
 
@@ -2594,6 +2666,7 @@ body.light .hero-frame{
   }
 
   function frame(now){
+    if(document.body.classList.contains('performance-lite')){ stop(); return; }
     if(!running||!analyser) return;
 
     analyser.getByteFrequencyData(data);
@@ -2652,6 +2725,7 @@ body.light .hero-frame{
   }
 
   audio.addEventListener('play',()=>{
+    if(document.body.classList.contains('performance-lite')) return;
     if(!setup()) return;
 
     try{
@@ -3354,6 +3428,12 @@ input,button,a{
   }
 
   function render(fadeOnly = false) {
+    if(document.body.classList.contains('performance-lite')){
+      clear();
+      cancelAnimationFrame(raf);
+      raf = 0;
+      return;
+    }
     resize();
 
     if (!fadeOnly) {
@@ -3420,6 +3500,7 @@ input,button,a{
   }
 
   function start() {
+    if(document.body.classList.contains('performance-lite')) return;
     const analyser = window.kruzixAudioAnalyser;
     if (audio.paused || audio.ended || !analyser) return;
 
@@ -3570,8 +3651,286 @@ body.light .profile .music-player:not(.is-playing) .music-art{
   if(!audio.paused&&!audio.ended)startPulse();
 })();
 </script>
+
+<style id="kruzix-performance-settings-v16">
+/* Performance controls: preserve the design while removing the effects that are hardest on weak devices. */
+.nav-controls{display:flex;align-items:center;gap:8px}
+.perf-toggle{
+  width:34px;height:34px;border:1px solid var(--stroke);border-radius:50%;
+  display:grid;place-items:center;color:#eadcff;background:rgba(255,255,255,.025);
+  cursor:pointer;font-size:14px;line-height:1;transition:.2s ease
+}
+.perf-toggle:hover{border-color:rgba(197,154,255,.55);box-shadow:0 0 18px rgba(178,126,255,.14);transform:translateY(-1px)}
+body.light .perf-toggle{color:#4c3b56;border-color:rgba(74,45,96,.18);background:rgba(255,255,255,.45)}
+.perf-panel{
+  position:fixed;top:72px;right:16px;z-index:100;
+  width:min(310px,calc(100vw - 32px));padding:14px 15px;
+  border:1px solid var(--stroke);border-radius:18px;
+  background:rgba(13,9,19,.94);box-shadow:0 18px 55px rgba(0,0,0,.38);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:opacity .16s ease,transform .16s ease,visibility .16s ease
+}
+.perf-panel.is-open{opacity:1;visibility:visible;transform:none}
+.perf-panel-title{font:600 14px/1.2 Manrope,system-ui,sans-serif;color:#eee6f5;margin-bottom:10px}
+.perf-option{display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer}
+.perf-option span{display:flex;flex-direction:column;gap:4px}
+.perf-option b{font-size:12px;color:#eee6f5}
+.perf-option small{font-size:10px;line-height:1.35;color:#96899f}
+.perf-option input{appearance:none;width:40px;height:22px;flex:0 0 40px;border-radius:99px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.12);position:relative;cursor:pointer}
+.perf-option input:before{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;background:#cfc2db;transition:transform .18s ease}
+.perf-option input:checked{background:rgba(181,140,232,.38);border-color:rgba(201,169,240,.42)}
+.perf-option input:checked:before{transform:translateX(18px);background:#fff}
+body.light .perf-panel{background:rgba(248,244,250,.96);box-shadow:0 18px 55px rgba(70,44,86,.12)}
+body.light .perf-panel-title,body.light .perf-option b{color:#302638}
+body.light .perf-option small{color:#786b80}
+
+/* The expensive visual layers are disabled together in the light-performance mode. */
+body.performance-lite .background-dot,
+body.performance-lite .butterfly .random-star,
+body.performance-lite .flying-butterflies,
+body.performance-lite #pollen,
+body.performance-lite .avatar-spectrum{display:none !important}
+body.performance-lite .hero-banner{filter:none !important}
+body.performance-lite .bg img{filter:none !important;transform:scale(1.02) !important}
+body.performance-lite .hero-frame:before{filter:none !important;transform:none !important}
+body.performance-lite .nav,
+body.performance-lite .profile,
+body.performance-lite .card{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+body.performance-lite .hero-frame,
+body.performance-lite .profile,
+body.performance-lite .card,
+body.performance-lite .music-player{box-shadow:0 8px 24px rgba(0,0,0,.16) !important}
+body.performance-lite .avatar,
+body.performance-lite .music-art{box-shadow:none !important}
+body.performance-lite .profile .music-art,
+body.performance-lite .profile .music-player.is-playing .music-art{animation:none !important;transition:none !important;transform:none !important}
+body.performance-lite .tilt-card{transform:none !important;will-change:auto !important;transition:none !important}
+body.performance-lite *{scroll-behavior:auto !important}
+body.performance-lite .social:hover,
+body.performance-lite .link-grid a:hover,
+body.performance-lite .music-controls button:hover,
+body.performance-lite .theme-toggle:hover,
+body.performance-lite .perf-toggle:hover{transform:none !important;box-shadow:none !important}
+body.performance-lite .perf-panel{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+@media(max-width:800px){
+  .perf-panel{right:10px;top:68px}
+  .perf-toggle{width:32px;height:32px}
+}
+@media(prefers-reduced-motion:reduce){
+  body:not(.performance-lite) .perf-panel{transition:none}
+}
+</style>
+
+<style id="kruzix-language-switch-animation-v29">
+/* v29: gentle text-only language transition; no page-wide movement or blur. */
+@keyframes kruzixLanguageSwap{
+  0%{opacity:0;transform:translateY(4px);filter:blur(1.5px)}
+  42%{opacity:.72;transform:translateY(1px);filter:blur(.45px)}
+  100%{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+body:not(.performance-lite) .language-switching{
+  animation:kruzixLanguageSwap .52s cubic-bezier(.22,.72,.2,1) both;
+  animation-delay:var(--lang-delay,0ms);
+  will-change:opacity,transform,filter;
+}
+@media(prefers-reduced-motion:reduce){
+  .language-switching{animation:none !important}
+}
+</style>
+<style id="kruzix-unified-settings-v26">
+/* v26: unified settings for theme, language and performance. */
+.settings-section{padding-top:10px;margin-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+.settings-label{font:600 10px/1.2 Manrope,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#96899f;margin-bottom:8px}
+.settings-choices{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.settings-choice{min-height:31px;border:1px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(255,255,255,.035);color:#cfc5d7;font:500 10px Manrope,system-ui,sans-serif;cursor:pointer;transition:.16s ease}
+.settings-choice:hover{border-color:rgba(197,154,255,.38);color:#fff}
+.settings-choice.is-active{background:rgba(181,140,232,.18);border-color:rgba(201,169,240,.40);color:#fff}
+body.light .settings-section{border-top-color:rgba(74,45,96,.09)}
+body.light .settings-label{color:#786b80}
+body.light .settings-choice{border-color:rgba(74,45,96,.12);background:rgba(255,255,255,.42);color:#5c4c65}
+body.light .settings-choice:hover{border-color:rgba(120,78,148,.34);color:#2f2437}
+body.light .settings-choice.is-active{background:rgba(177,136,211,.16);border-color:rgba(120,78,148,.30);color:#33263c}
+
+/* Mobile settings: keep the panel comfortably inside the viewport and make controls touch-friendly. */
+@media(max-width:520px){
+  .perf-panel{
+    top:64px !important;
+    left:12px !important;
+    right:12px !important;
+    width:auto !important;
+    max-width:none !important;
+    padding:15px !important;
+    border-radius:20px !important;
+  }
+  .perf-panel-title{font-size:15px;margin-bottom:11px}
+  .settings-section{padding-top:11px;margin-top:11px}
+  .settings-label{font-size:10px;margin-bottom:8px}
+  .settings-choices{gap:8px}
+  .settings-choice{min-height:40px;font-size:11px;border-radius:11px}
+  .perf-option{gap:12px}
+  .perf-option b{font-size:12px}
+  .perf-option small{font-size:10px}
+  .perf-option input{width:44px;height:24px;flex-basis:44px}
+  .perf-option input:before{width:18px;height:18px}
+  .perf-option input:checked:before{transform:translateX(20px)}
+}
+@media(max-width:360px){
+  .perf-panel{left:9px !important;right:9px !important;top:62px !important;padding:13px !important}
+  .settings-choice{min-height:38px;font-size:10px}
+}
+</style>
+<script id="kruzix-performance-settings-js">
+(function(){
+  const body=document.body;
+  const btn=document.getElementById('perfToggle');
+  const panel=document.getElementById('perfPanel');
+  const checkbox=document.getElementById('perfLiteToggle');
+  const video=document.querySelector('.hero-banner');
+  if(!btn||!panel||!checkbox) return;
+
+  const PERF_KEY='kruzix-performance-lite';
+  const THEME_KEY='kruzix-theme';
+  const LANG_KEY='kruzix-language';
+
+  const T={
+    en:{settings:'Settings',theme:'Theme',dark:'Dark',light:'Light',language:'Language',liteMode:'Lite mode',liteModeDesc:'Fewer animations, glow, blur and audio visualization',home:'home',about:'about',links:'links',exist:'exist. dream. create.',idle:'Idle',aboutTitle:'About',shortInfo:'short info',nickname:'nickname',gender:'gender',age:'age',birthday:'birthday',languages:'languages',instrumental:'Instrumental',birthdayValue:'08 / 14',languageValue:'en / ru',dream:'Dream',dreamNote:'a little piece of me',socials:'Socials',socialsNote:'places to find me',contact:'contact',view:'view',cultivate:'— cultivate the flower in your heart'},
+    ru:{settings:'Настройки',theme:'Тема',dark:'Тёмная',light:'Светлая',language:'Язык',liteMode:'Лёгкий режим',liteModeDesc:'Меньше анимаций, свечения, размытия и аудиовизуализации',home:'главная',about:'обо мне',links:'ссылки',exist:'живи. твори. делай.',idle:'Неактивен',aboutTitle:'Обо мне',shortInfo:'кратко',nickname:'никнейм',gender:'пол',age:'возраст',birthday:'день рождения',languages:'языки',instrumental:'Инструментал',birthdayValue:'14 / 08',languageValue:'ru / en',dream:'Мечта',dreamNote:'маленькая частичка меня',socials:'Соцсети',socialsNote:'где меня найти',contact:'связаться',view:'открыть',cultivate:'— выращивай цветок в сердце'}
+  };
+
+  function setText(selector,key,lang){
+    const el=document.querySelector(selector);
+    if(el) el.textContent=T[lang][key];
+  }
+
+  let languageInitialized=false;
+  function applyLanguage(lang){
+    if(!T[lang]) lang='en';
+    const shouldAnimate=languageInitialized && !body.classList.contains('performance-lite');
+    const animatedTargets=[
+      ...document.querySelectorAll('[data-i18n], .nav-links a, .profile .handle, .profile .status, #about .section-title, #about .section-note, #links .section-title, #links .section-note, #links .link-grid span, .butterfly-header .section-title, .butterfly-header .section-note, .quote small')
+    ].filter((el,i,a)=>a.indexOf(el)===i);
+    if(shouldAnimate) animatedTargets.forEach((el,i)=>{
+      el.style.setProperty('--lang-delay',Math.min(i,10)*16+'ms');
+      el.classList.add('language-switching');
+    });
+    document.documentElement.lang=lang;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key=el.dataset.i18n;
+      if(T[lang][key]) el.textContent=T[lang][key];
+    });
+    setText('.nav-links a:nth-child(1)','home',lang);
+    setText('.nav-links a:nth-child(2)','about',lang);
+    setText('.nav-links a:nth-child(3)','links',lang);
+    setText('.profile .handle','exist',lang);
+    const quoteSmall=document.querySelector('.quote small');
+    if(quoteSmall) quoteSmall.textContent=T[lang].cultivate;
+    const status=document.querySelector('.profile .status');
+    if(status){
+      const marker=status.querySelector('.dot');
+      status.textContent='';
+      if(marker) status.appendChild(marker);
+      status.appendChild(document.createTextNode(' '+T[lang].idle));
+    }
+    setText('#about .section-title','aboutTitle',lang);
+    setText('#about .section-note','shortInfo',lang);
+    const rows=document.querySelectorAll('#about .row');
+    ['nickname','gender','age','birthday','languages'].forEach((k,i)=>{
+      const span=rows[i]?.querySelector('span'); if(span) span.textContent=T[lang][k];
+    });
+    const birthdayValue=rows[3]?.querySelector('b'); if(birthdayValue) birthdayValue.textContent=T[lang].birthdayValue;
+    const languageValue=rows[4]?.querySelector('b'); if(languageValue) languageValue.textContent=T[lang].languageValue;
+    const genre=document.querySelector('.music-track-genre');
+    if(genre && genre.textContent.trim()) genre.textContent='— '+T[lang].instrumental;
+    setText('#links .section-title','socials',lang);
+    setText('#links .section-note','socialsNote',lang);
+    document.querySelectorAll('#links .link-grid a span').forEach(el=>{ const key=el.dataset.linkAction || (el.textContent.trim().toLowerCase()==='contact'?'contact':'view'); el.textContent=T[lang][key]; });
+    const dream=document.querySelector('.butterfly-header .section-title'); if(dream) dream.textContent=T[lang].dream;
+    const dreamNote=document.querySelector('.butterfly-header .section-note'); if(dreamNote) dreamNote.textContent=T[lang].dreamNote;
+    const cultivate=document.querySelector('.butterfly-header');
+    // Keep the Japanese line itself; translate only the English subtitle where present.
+    const sub=document.querySelector('.butterfly-header .section-note'); if(sub) sub.textContent=T[lang].dreamNote;
+    const flower=document.querySelector('.flower small'); if(flower) flower.textContent=T[lang].cultivate;
+    localStorage.setItem(LANG_KEY,lang);
+    document.querySelectorAll('[data-lang-choice]').forEach(el=>el.classList.toggle('is-active',el.dataset.langChoice===lang));
+    if(shouldAnimate){
+      window.setTimeout(()=>animatedTargets.forEach(el=>{
+        el.classList.remove('language-switching');
+        el.style.removeProperty('--lang-delay');
+      }),760);
+    }
+    languageInitialized=true;
+  }
+
+  function applyTheme(theme){
+    const light=theme==='light';
+    body.classList.toggle('light',light);
+    localStorage.setItem(THEME_KEY,light?'light':'dark');
+    document.querySelectorAll('[data-theme-choice]').forEach(el=>el.classList.toggle('is-active',el.dataset.themeChoice===theme));
+  }
+
+  function applyLite(lite){
+    body.classList.toggle('performance-lite',lite);
+    checkbox.checked=lite;
+    if(lite){
+      document.querySelectorAll('.tilt-card').forEach(el=>{el.style.transform='none';});
+      if(video && !video.paused) video.pause();
+    }else if(video){
+      const p=video.play(); if(p&&p.catch) p.catch(()=>{});
+    }
+    localStorage.setItem(PERF_KEY,lite?'1':'0');
+  }
+
+  let saved=localStorage.getItem(PERF_KEY);
+  let lite=saved==='1';
+  if(saved===null){
+    const weak=(navigator.hardwareConcurrency && navigator.hardwareConcurrency<=4)
+      || (navigator.deviceMemory && navigator.deviceMemory<=4)
+      || navigator.connection?.saveData;
+    lite=!!weak;
+  }
+  applyLite(lite);
+  applyTheme(localStorage.getItem(THEME_KEY)==='light'?'light':'dark');
+  applyLanguage(localStorage.getItem(LANG_KEY)==='ru'?'ru':'en');
+
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const open=panel.classList.toggle('is-open');
+    panel.setAttribute('aria-hidden',open?'false':'true');
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  });
+  checkbox.addEventListener('change',()=>applyLite(checkbox.checked));
+  document.querySelectorAll('[data-theme-choice]').forEach(el=>el.addEventListener('click',()=>applyTheme(el.dataset.themeChoice)));
+  document.querySelectorAll('[data-lang-choice]').forEach(el=>el.addEventListener('click',()=>applyLanguage(el.dataset.langChoice)));
+  document.addEventListener('click',e=>{
+    if(!panel.contains(e.target) && e.target!==btn){
+      panel.classList.remove('is-open');
+      panel.setAttribute('aria-hidden','true');
+      btn.setAttribute('aria-expanded','false');
+    }
+  });
+})();
+</script>
 </body>
+
+<style id="kruzix-status-and-ru-format-v27">
+/* v27: keep Idle marker aligned; localize profile metadata and social actions. */
+.profile-info .status{margin-left:0 !important;}
+</style>
+
+<style id="kruzix-language-v29-final">
+/* v29: Russian profile motto belongs to the inscription above the status, not to Idle. */
+.profile-info .handle{white-space:nowrap;}
+.profile-info .status{display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;}
+.profile-info .status .dot{order:0;flex:0 0 auto;}
+</style>
 </html>
+<style id="kruzix-status-left-v28">
+/* v28: keep the status dot on the left, before the translated status text. */
+.profile-info .status{display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;}
+.profile-info .status .dot{order:0;flex:0 0 auto;}
+</style>
+
 
 <style id="kruzix-progress-position-v16">
 /* v16: move progress row 1px left from v15 */
