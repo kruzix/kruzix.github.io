@@ -2953,5 +2953,63 @@ input,button,a{
 }
 </style>
 
+
+<style id="kruzix-mobile-profile-socials-final">
+/*
+  Mobile profile fix:
+  Older CSS revisions absolutely position .socials, which makes the
+  buttons/equalizer overlap the nickname on narrow screens.
+*/
+@media (max-width: 700px){
+  .profile-row{
+    position:relative !important;
+    grid-template-columns:auto minmax(0,1fr) !important;
+    min-width:0 !important;
+  }
+
+  .profile-row .socials{
+    display:none !important;
+    position:static !important;
+    width:0 !important;
+    height:0 !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+
+  /* Equalizer is inside .socials, so explicitly suppress it too. */
+  .profile-row .socials .profile-eq{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
+  .profile-row .name,
+  .profile-row .handle,
+  .profile-row .status{
+    position:relative !important;
+    z-index:2 !important;
+  }
+
+  html, body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden !important;
+  }
+}
+
+@media (max-width:390px){
+  .profile-row{
+    gap:14px !important;
+  }
+  .profile-row .name{
+    font-size:42px !important;
+  }
+}
+</style>
+
 </body>
 </html>
