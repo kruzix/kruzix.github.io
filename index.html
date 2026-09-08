@@ -7,6 +7,7 @@
 <meta property="og:description" content="a little piece of my world, links, interests and lavender dreams.">
 <meta property="og:image" content="https://kruzix.github.io/preview.png">
 <meta property="og:url" content="https://kruzix.github.io/">
+<meta property="og:site_name" content="kx.">
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
@@ -1305,3 +1306,86 @@ body.light .hero-frame{
 .butterfly .bfly{z-index:2 !important;}
 .butterfly .butterfly-header{z-index:20 !important;}
 </style>
+
+<style id="v61-audio-reactive-ripples-and-dots">
+/* Плавная динамическая яркость точек вокруг бабочки. */
+.butterfly .random-star{
+  animation-name:randomStarTwinkle,dotGlowBreath !important;
+  animation-duration:var(--dur),var(--glow-dur,4.8s) !important;
+  animation-timing-function:ease-in-out,ease-in-out !important;
+  animation-iteration-count:infinite,infinite !important;
+  animation-delay:var(--delay),var(--glow-delay,0s) !important;
+}
+@keyframes dotGlowBreath{
+  0%,100%{filter:brightness(.72);}
+  50%{filter:brightness(1.55);}
+}
+
+/* Рябь запускается настоящими ударами низких частот, определяемыми из аудио. */
+.avatar-wrap.music-beat .avatar-ripple{
+  animation:avatarBeatRipple .92s cubic-bezier(.12,.68,.24,1) forwards !important;
+}
+@keyframes avatarBeatRipple{
+  0%{transform:translate(-50%,-50%) scale(.78);opacity:0}
+  9%{opacity:calc(.28 + var(--beat-power,.45)*.42);box-shadow:0 0 calc(14px + var(--beat-power,.45)*24px) rgba(188,135,255,.34)}
+  100%{transform:translate(-50%,-50%) scale(calc(1.30 + var(--beat-power,.45)*.45));opacity:0}
+}
+</style>
+
+<script id="v61-audio-beat-analysis">
+/* Анализ трека в реальном времени: чувствительность подстраивается под саму музыку. */
+(()=>{
+  const audio=document.getElementById('siteAudio');
+  const avatar=document.querySelector('.avatar-wrap');
+  if(!audio||!avatar) return;
+
+  let ctx, analyser, source, data;
+  let running=false, raf=0, avgBass=0, lastBeat=0;
+
+  function setup(){
+    if(ctx) return;
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return;
+    ctx=new AC();
+    analyser=ctx.createAnalyser();
+    analyser.fftSize=1024;
+    analyser.smoothingTimeConstant=.72;
+    data=new Uint8Array(analyser.frequencyBinCount);
+    source=ctx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(ctx.destination);
+  }
+
+  function frame(now){
+    if(!running||!analyser) return;
+    analyser.getByteFrequencyData(data);
+
+    // Первые частотные корзины содержат бас. Используем адаптивный порог,
+    // поэтому эффект подстраивается под громкость и мастеринг конкретного трека.
+    const bins=Math.max(8,Math.floor(data.length*.075));
+    let bass=0;
+    for(let i=1;i<bins;i++) bass+=data[i];
+    bass/=Math.max(1,bins-1);
+
+    avgBass=avgBass ? avgBass*.965+bass*.035 : bass;
+    const threshold=avgBass*1.34+5;
+    const strength=Math.max(0,Math.min(1,(bass-threshold)/(Math.max(18,avgBass*.55))));
+
+    if(bass>threshold && strength>.05 && now-lastBeat>260){
+      lastBeat=now;
+      avatar.style.setProperty('--beat-power',Math.max(.25,strength).toFixed(3));
+      avatar.classList.remove('music-beat');
+      void avatar.offsetWidth; // перезапуск ряби именно на новом ударе
+      avatar.classList.add('music-beat');
+    }
+    raf=requestAnimationFrame(frame);
+  }
+
+  audio.addEventListener('play',()=>{
+    try{setup(); if(ctx&&ctx.state==='suspended') ctx.resume();}catch(e){return;}
+    if(!running){running=true; raf=requestAnimationFrame(frame);}
+  });
+  audio.addEventListener('pause',()=>{running=false; cancelAnimationFrame(raf); avatar.classList.remove('music-beat');});
+  audio.addEventListener('ended',()=>{running=false; cancelAnimationFrame(raf); avatar.classList.remove('music-beat');});
+})();
+</script>
