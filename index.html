@@ -451,6 +451,90 @@ body.light .settings-toggle::after,
 })();
 </script>
 
+
+<style id="kruzix-final-nav-lite-v32">
+/* Refined navigation + clearer Lite Mode switch */
+.nav{height:72px !important;background:linear-gradient(180deg,rgba(7,5,12,.94),rgba(7,5,12,.52),transparent) !important;border-bottom:1px solid rgba(232,215,250,.07);}
+.nav-inner{height:100%;}
+.nav-links{display:flex !important;align-items:center;gap:6px !important;margin-left:auto !important;transform:none !important;padding:5px;border:1px solid rgba(232,215,250,.08);border-radius:16px;background:rgba(255,255,255,.025);box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 8px 28px rgba(0,0,0,.12);}
+.nav-links a{position:relative !important;display:flex !important;align-items:center;justify-content:center;min-height:31px;padding:0 12px !important;margin:0 !important;border-radius:11px;color:#aaa0b2 !important;font-size:10px !important;letter-spacing:.07em !important;text-transform:lowercase;transition:color .28s ease,background .28s ease,transform .28s ease,box-shadow .28s ease !important;}
+.nav-links a:after{content:"";position:absolute;left:12px;right:12px;bottom:4px;height:1px;border-radius:99px;background:currentColor;opacity:0;transform:scaleX(.45);transition:opacity .28s ease,transform .28s ease;}
+.nav-links a:hover{color:#f5edf9 !important;background:rgba(197,154,255,.07);transform:none !important;}
+.nav-links a:hover:after,.nav-links a.active:after{opacity:.72;transform:scaleX(1);}
+.nav-controls{margin-left:10px !important;transform:none !important;}
+.perf-toggle{width:36px;height:36px;border-color:rgba(232,215,250,.13);background:rgba(255,255,255,.035);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);transition:color .3s ease,border-color .3s ease,background .3s ease,box-shadow .3s ease,transform .3s ease !important;}
+.perf-toggle:hover{transform:rotate(10deg) translateY(-1px) !important;}
+body.light .nav{background:linear-gradient(180deg,rgba(247,243,249,.97),rgba(247,243,249,.72),transparent) !important;border-bottom-color:rgba(74,45,96,.09);}
+body.light .nav-links{border-color:rgba(74,45,96,.11);background:rgba(255,255,255,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 8px 28px rgba(70,44,86,.06);}
+body.light .nav-links a{color:#75677e !important;}
+body.light .nav-links a:hover,body.light .nav-links a.active{color:#34263d !important;background:rgba(145,104,175,.08);}
+body.light .perf-toggle{background:rgba(255,255,255,.58) !important;border-color:rgba(74,45,96,.20) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 5px 18px rgba(70,44,86,.08);}
+/* OFF state: enough contrast in light theme, while keeping the soft visual language */
+body.light .perf-option input{background:rgba(70,52,84,.20) !important;border:1px solid rgba(70,52,84,.48) !important;box-shadow:inset 0 1px 2px rgba(40,28,48,.10),0 0 0 1px rgba(255,255,255,.5);}
+body.light .perf-option input:not(:checked):before{background:#66566e !important;box-shadow:0 1px 4px rgba(40,30,50,.28) !important;}
+body.light .perf-option input:checked{background:rgba(130,88,164,.38) !important;border-color:rgba(101,67,128,.52) !important;}
+body.light .perf-option input:checked:before{background:#fff !important;box-shadow:0 1px 5px rgba(48,30,60,.20) !important;}
+@media(max-width:800px){
+  .nav{height:64px !important;}
+  .nav-links{gap:3px !important;padding:4px;}
+  .nav-links a{min-height:29px;padding:0 9px !important;font-size:9px !important;}
+  .nav-links a:after{left:9px;right:9px;bottom:3px;}
+  .nav-controls{margin-left:7px !important;}
+}
+@media(max-width:520px){
+  .nav-inner{padding-left:0 !important;padding-right:0 !important;}
+  .brand-simple{font-size:22px !important;}
+  .nav-links{margin-left:auto !important;}
+  .nav-links a{padding:0 7px !important;letter-spacing:.04em !important;}
+  .nav-links a:nth-child(2){display:block !important;}
+  .perf-toggle{width:32px;height:32px;}
+}
+@media(max-width:390px){
+  .nav-links a{font-size:8px !important;padding:0 6px !important;}
+  .nav-links a:after{left:7px;right:7px;}
+  .nav-controls{margin-left:5px !important;}
+}
+</style>
+
+
+<style id="kruzix-v31-nav-centered-final">
+/* v31 final: gallery-style navigation, perfectly centered */
+.nav-inner{position:relative !important;justify-content:space-between !important;}
+.nav-links{position:absolute !important;left:50% !important;top:50% !important;transform:translate(-50%,-50%) !important;margin:0 !important;display:flex !important;align-items:center !important;justify-content:center !important;gap:6px !important;padding:5px !important;border:1px solid rgba(232,215,250,.08) !important;border-radius:16px !important;background:rgba(255,255,255,.025) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 8px 28px rgba(0,0,0,.12) !important;}
+.nav-links a{position:relative !important;min-width:58px !important;min-height:31px !important;padding:0 12px !important;margin:0 !important;border-radius:11px !important;display:flex !important;align-items:center !important;justify-content:center !important;color:#aaa0b2 !important;font-size:10px !important;letter-spacing:.07em !important;text-transform:lowercase !important;transition:color .3s ease,background .3s ease,box-shadow .3s ease !important;}
+.nav-links a:after{content:"" !important;position:absolute !important;left:12px !important;right:12px !important;bottom:4px !important;height:1px !important;border-radius:99px !important;background:currentColor !important;opacity:0 !important;transform:scaleX(.45) !important;transition:opacity .3s ease,transform .3s ease !important;}
+.nav-links a:hover,.nav-links a.active{color:#f5edf9 !important;background:rgba(197,154,255,.07) !important;transform:none !important;}
+.nav-links a:hover:after,.nav-links a.active:after{opacity:.72 !important;transform:scaleX(1) !important;}
+body.light .nav-links{border-color:rgba(74,45,96,.11) !important;background:rgba(255,255,255,.46) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,.78),0 8px 28px rgba(70,44,86,.07) !important;}
+body.light .nav-links a{color:#75677e !important;}
+body.light .nav-links a:hover,body.light .nav-links a.active{color:#34263d !important;background:rgba(145,104,175,.09) !important;}
+/* Stronger OFF Lite Mode switch in light theme */
+body.light .perf-option input{background:rgba(63,47,77,.25) !important;border:1px solid rgba(63,47,77,.58) !important;box-shadow:inset 0 1px 2px rgba(30,20,38,.12),0 0 0 1px rgba(255,255,255,.58) !important;}
+body.light .perf-option input:not(:checked):before{background:#5a4a63 !important;box-shadow:0 1px 5px rgba(36,24,44,.34) !important;}
+body.light .perf-option input:checked{background:rgba(130,88,164,.42) !important;border-color:rgba(101,67,128,.58) !important;}
+body.light .perf-option input:checked:before{background:#fff !important;box-shadow:0 1px 5px rgba(48,30,60,.22) !important;}
+@media(max-width:800px){
+  .nav-links{gap:3px !important;padding:4px !important;}
+  .nav-links a{min-width:50px !important;min-height:29px !important;padding:0 9px !important;font-size:9px !important;}
+  .nav-links a:after{left:9px !important;right:9px !important;bottom:3px !important;}
+}
+@media(max-width:520px){
+  .nav-inner{width:calc(100% - 20px) !important;}
+  .nav-links{gap:2px !important;}
+  .nav-links a{min-width:45px !important;padding:0 7px !important;letter-spacing:.04em !important;}
+}
+@media(max-width:390px){
+  .nav-links a{min-width:41px !important;font-size:8px !important;padding:0 6px !important;}
+  .nav-links a:after{left:7px !important;right:7px !important;}
+}
+</style>
+
+
+<style id="kruzix-nav-center-final">
+.nav-inner{position:relative !important;}
+.nav-links{position:absolute !important;left:50% !important;top:50% !important;transform:translate(-50%,-50%) !important;margin:0 !important;}
+@media(max-width:520px){.nav-links{left:50% !important;transform:translate(-50%,-50%) !important;}}
+</style>
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -3779,6 +3863,22 @@ body.light .settings-choice.is-active{background:rgba(177,136,211,.16);border-co
   .perf-panel{left:9px !important;right:9px !important;top:62px !important;padding:13px !important}
   .settings-choice{min-height:38px;font-size:10px}
 }
+<style id="kruzix-lite-toggle-light-final">
+/* Final Lite mode toggle contrast: clearly visible when OFF in the light theme. */
+body.light .perf-option input[type="checkbox"]{
+  background:rgba(78,60,92,.18) !important;
+  border:1px solid rgba(78,60,92,.42) !important;
+  box-shadow:inset 0 1px 2px rgba(55,40,65,.08) !important;
+}
+body.light .perf-option input[type="checkbox"]:not(:checked):before{
+  background:#6f6178 !important;
+  box-shadow:0 1px 4px rgba(45,32,55,.28) !important;
+}
+body.light .perf-option input[type="checkbox"]:checked{
+  background:rgba(143,103,184,.34) !important;
+  border-color:rgba(112,77,148,.48) !important;
+}
+</style>
 </style>
 <script id="kruzix-performance-settings-js">
 (function(){
@@ -3874,7 +3974,7 @@ body.light .settings-choice.is-active{background:rgba(177,136,211,.16);border-co
     checkbox.checked=lite;
     if(lite){
       document.querySelectorAll('.tilt-card').forEach(el=>{el.style.transform='none';});
-      if(video && !video.paused) video.pause();
+      // Keep the hero banner playing in Lite mode; only visual effects are reduced.
     }else if(video){
       const p=video.play(); if(p&&p.catch) p.catch(()=>{});
     }
@@ -3911,6 +4011,73 @@ body.light .settings-choice.is-active{background:rgba(177,136,211,.16);border-co
   });
 })();
 </script>
+
+<style id="v31-nav-right-aligned-fix">
+/* Final navigation: right-aligned, level text, centered inside the gallery-style pill */
+.nav-inner{
+  justify-content:flex-start !important;
+}
+.nav-links{
+  margin-left:auto !important;
+  margin-right:12px !important;
+  transform:none !important;
+  height:40px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  padding:4px !important;
+}
+.nav-links a{
+  height:30px !important;
+  min-height:30px !important;
+  min-width:64px !important;
+  box-sizing:border-box !important;
+  padding:0 13px !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  text-align:center !important;
+  vertical-align:middle !important;
+  transform:none !important;
+}
+.nav-links a:after{bottom:3px !important;}
+.nav-controls{
+  margin-left:0 !important;
+  margin-right:0 !important;
+  transform:none !important;
+  display:flex !important;
+  align-items:center !important;
+}
+/* Make the Lite mode switch clearly readable when OFF in the light theme. */
+body.light .perf-option input{
+  background:#ddd5e2 !important;
+  border:1px solid #9b8ba3 !important;
+  box-shadow:inset 0 1px 2px rgba(52,38,60,.16),0 0 0 1px rgba(255,255,255,.72) !important;
+}
+body.light .perf-option input:not(:checked):before{
+  background:#5b4a64 !important;
+  box-shadow:0 1px 4px rgba(38,27,46,.32) !important;
+}
+@media(max-width:800px){
+  .nav-inner{width:calc(100% - 24px) !important;gap:10px !important;}
+  .nav-links{margin-left:auto !important;margin-right:2px !important;height:38px !important;}
+  .nav-links a{min-width:55px !important;height:28px !important;min-height:28px !important;padding:0 9px !important;}
+}
+@media(max-width:520px){
+  .nav-inner{width:calc(100% - 18px) !important;gap:7px !important;}
+  .nav-links{gap:2px !important;padding:3px !important;height:36px !important;}
+  .nav-links a{min-width:48px !important;height:28px !important;min-height:28px !important;padding:0 7px !important;font-size:9px !important;}
+  .nav-controls{margin-left:0 !important;}
+}
+@media(max-width:380px){
+  .nav-links{margin-right:0 !important;}
+  .nav-links a{min-width:43px !important;padding:0 5px !important;font-size:8px !important;}
+}
+</style>
 </body>
 
 <style id="kruzix-status-and-ru-format-v27">
@@ -3934,5 +4101,136 @@ body.light .settings-choice.is-active{background:rgba(177,136,211,.16);border-co
 
 <style id="kruzix-progress-position-v16">
 /* v16: move progress row 1px left from v15 */
-.progress-row{transform:translateX(7px) !important;}
+.progress-row{transform:translateX(6px) !important;}
+</style>
+
+<style id="kruzix-nav-final-right-v33">
+/* Final navigation: links grouped on the right, directly beside settings */
+.nav-inner{
+  position:relative !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  height:100% !important;
+}
+.brand-simple{display:flex !important;align-items:center !important;height:100% !important;}
+.nav-links{
+  position:static !important;
+  left:auto !important;
+  top:auto !important;
+  transform:none !important;
+  margin-left:auto !important;
+  margin-right:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:auto !important;
+  min-height:31px !important;
+  padding:5px !important;
+  gap:6px !important;
+  box-sizing:border-box !important;
+}
+.nav-links a{
+  height:31px !important;
+  min-height:31px !important;
+  line-height:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 12px !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+}
+.nav-controls{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin-left:10px !important;
+  margin-right:0 !important;
+  height:100% !important;
+}
+.perf-toggle{display:flex !important;align-items:center !important;justify-content:center !important;}
+@media(max-width:800px){
+  .nav-links{gap:3px !important;padding:4px !important;}
+  .nav-links a{height:29px !important;min-height:29px !important;padding:0 9px !important;font-size:9px !important;}
+  .nav-controls{margin-left:7px !important;}
+}
+@media(max-width:520px){
+  .nav-inner{width:calc(100% - 20px) !important;}
+  .nav-links{margin-left:auto !important;gap:2px !important;}
+  .nav-links a{height:29px !important;min-height:29px !important;padding:0 7px !important;letter-spacing:.04em !important;}
+  .nav-controls{margin-left:6px !important;}
+  .perf-toggle{width:32px !important;height:32px !important;}
+}
+@media(max-width:390px){
+  .nav-links a{height:27px !important;min-height:27px !important;padding:0 6px !important;font-size:8px !important;}
+  .nav-controls{margin-left:5px !important;}
+}
+</style>
+
+<style id="kruzix-brand-left-v33">
+/* Move the KRUZIX wordmark slightly left without affecting nav/settings alignment */
+.brand{transform:translateX(-20px) !important;}
+@media(max-width:520px){
+  .brand{transform:translateX(-12px) !important;}
+}
+</style>
+
+<style id="kruzix-nav-between-brand-settings-final">
+/* Navigation: centered in the space between KRUZIX and Settings */
+.nav-inner{
+  display:grid !important;
+  grid-template-columns:auto 1fr auto !important;
+  align-items:center !important;
+  justify-content:normal !important;
+}
+.nav-links{
+  position:static !important;
+  grid-column:2 !important;
+  grid-row:1 !important;
+  justify-self:center !important;
+  align-self:center !important;
+  transform:none !important;
+  margin:0 !important;
+}
+.nav-controls{
+  grid-column:3 !important;
+  grid-row:1 !important;
+  justify-self:end !important;
+  align-self:center !important;
+  margin-left:10px !important;
+}
+.brand-simple{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  align-self:center !important;
+}
+@media(max-width:520px){
+  .nav-inner{grid-template-columns:auto 1fr auto !important;}
+  .nav-links{justify-self:center !important;}
+  .nav-controls{margin-left:7px !important;}
+}
+@media(max-width:360px){
+  .nav-links{gap:1px !important;padding:3px !important;}
+  .nav-links a{min-width:39px !important;padding:0 5px !important;font-size:8px !important;}
+}
+</style>
+
+<style id="kruzix-nav-true-viewport-center-v34">
+/* Navigation is centered against the viewport itself, independently of brand/settings widths. */
+.nav-links{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) !important;
+  margin:0 !important;
+  justify-self:auto !important;
+  grid-column:auto !important;
+  grid-row:auto !important;
+  white-space:nowrap !important;
+}
+.nav-inner{position:relative !important;}
+@media(max-width:520px){
+  .nav-links{left:50% !important;transform:translate(-50%,-50%) !important;}
+}
 </style>
