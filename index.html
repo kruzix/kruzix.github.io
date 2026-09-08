@@ -318,6 +318,7 @@ body.light .profile .music-art span{color:#705784;text-shadow:0 0 12px rgba(125,
   <div class="music-art" aria-hidden="true"><span>✦</span></div>
   <div class="music-main">
     <div class="music-meta">
+      
       <div class="music-title">Electric Chapel <span>— instrumental</span></div>
       <div class="music-artist">Lady Gaga</div>
     </div>
@@ -328,8 +329,9 @@ body.light .profile .music-art span{color:#705784;text-shadow:0 0 12px rgba(125,
     </div>
   </div>
   <div class="music-controls">
-    <button class="music-icon" id="musicBack" type="button" aria-label="Restart track">↺</button>
+    <button class="music-icon" id="musicBack" type="button" aria-label="Previous track" title="Previous track">⏮</button>
     <button class="music-play" id="musicPlay" type="button" aria-label="Play">▶</button>
+    <button class="music-icon" id="musicNext" type="button" aria-label="Next track" title="Next track">⏭</button>
     <button class="music-icon" id="musicMute" type="button" aria-label="Mute">◔</button>
     <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="18" aria-label="Volume">
   </div>
@@ -969,6 +971,399 @@ html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78)
  vol.addEventListener('input',()=>{audio.volume=vol.value/100;audio.muted=false;mute.textContent='◔'});
  progress.addEventListener('input',()=>{if(audio.duration) audio.currentTime=(progress.value/100)*audio.duration});
  audio.addEventListener('loadedmetadata',sync);audio.addEventListener('timeupdate',sync);audio.addEventListener('play',state);audio.addEventListener('pause',state);audio.addEventListener('ended',state);
+})();
+</script>
+
+
+<style id="v62-dot-glow-and-light-butterfly">
+/* Более заметная, но плавная независимая яркость каждой точки. */
+.butterfly .random-star{
+  animation:randomStarTwinkle var(--dur) ease-in-out infinite, dotGlowPulse var(--glow-dur,3.6s) ease-in-out infinite !important;
+  animation-delay:var(--delay),var(--glow-delay,0s) !important;
+  will-change:opacity,transform,filter,box-shadow !important;
+}
+@keyframes dotGlowPulse{
+  0%,100%{filter:brightness(.55) saturate(.8);box-shadow:0 0 3px rgba(205,170,255,.22),0 0 7px rgba(180,130,255,.12)}
+  50%{filter:brightness(2.1) saturate(1.35);box-shadow:0 0 11px rgba(235,214,255,.95),0 0 30px rgba(184,137,255,.72),0 0 48px rgba(170,115,255,.32)}
+}
+/* В светлой теме сама бабочка становится мягче и бледнее, не меняя форму или положение. */
+body.light .butterfly .bfly{
+  opacity:.64 !important;
+  filter:brightness(.82) saturate(.78) drop-shadow(0 0 16px rgba(140,105,175,.28)) !important;
+  transition:opacity .55s ease,filter .55s ease !important;
+}
+body:not(.light) .butterfly .bfly{
+  opacity:1 !important;
+  transition:opacity .55s ease,filter .55s ease !important;
+}
+</style>
+<script>
+/* Даём каждой точке собственный ритм свечения. */
+document.querySelectorAll('.butterfly .random-star').forEach((dot,i)=>{
+  dot.style.setProperty('--glow-dur',(2.7+Math.random()*3.8)+'s');
+  dot.style.setProperty('--glow-delay',(-Math.random()*5)+'s');
+});
+</script>
+
+
+<style>
+/* v63 refinements */
+.light .butterfly, body.light .butterfly, [data-theme="light"] .butterfly { opacity: .82 !important; }
+</style>
+<script>
+/* Playlist controls: edit only the filenames; title/artist are read from embedded audio metadata when available. */
+window.sitePlaylist = window.sitePlaylist || ['music.mp3','track2.mp3','track3.mp3'];
+</script>
+
+<style>
+/* v64: softer butterfly fade in the light theme */
+.light .butterfly, body.light .butterfly,
+[data-theme="light"] .butterfly {
+  opacity: .82 !important;
+}
+</style>
+
+<!-- v64: randomized playlist + beat-reactive ripple -->
+<script>
+(function () {
+  const audio = document.querySelector('audio');
+  if (!audio) return;
+
+  // Discover sequential tracks placed beside this HTML file.
+  const maxTracks = 50;
+  const candidates = Array.from({length: maxTracks}, (_, i) => `music${i + 1}.mp3`);
+  const availableTracks = [];
+
+  async function probeTrack(url) {
+    try {
+      const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      return response.ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  (async function buildPlaylist() {
+    for (const url of candidates) {
+      if (await probeTrack(url)) availableTracks.push(url);
+      else if (availableTracks.length) break;
+    }
+
+    // Fall back to the existing source if probing is unavailable (for local file:// previews).
+    if (!availableTracks.length) {
+      const current = audio.getAttribute('src') || audio.currentSrc;
+      if (current) availableTracks.push(current);
+    }
+
+    // Fisher-Yates shuffle.
+    for (let i = availableTracks.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availableTracks[i], availableTracks[j]] = [availableTracks[j], availableTracks[i]];
+    }
+
+    let trackIndex = Math.floor(Math.random() * availableTracks.length);
+
+    function loadRandomTrack(autoplay) {
+      if (!availableTracks.length) return;
+      const wasPlaying = !audio.paused;
+      audio.src = availableTracks[trackIndex];
+      audio.load();
+      if (autoplay || wasPlaying) audio.play().catch(() => {});
+    }
+
+    if (availableTracks.length) loadRandomTrack(false);
+
+    audio.addEventListener('ended', () => {
+      if (!availableTracks.length) return;
+      if (availableTracks.length > 1) {
+        let next;
+        do next = Math.floor(Math.random() * availableTracks.length);
+        while (next === trackIndex);
+        trackIndex = next;
+      }
+      loadRandomTrack(true);
+    });
+
+    // Optional previous/next controls if they already exist in the player.
+    const controls = Array.from(document.querySelectorAll('button'));
+    const prevBtn = controls.find(b => /prev|previous|назад/i.test(b.className + ' ' + b.getAttribute('aria-label')));
+    const nextBtn = controls.find(b => /next|след|впер/i.test(b.className + ' ' + b.getAttribute('aria-label')));
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+      if (!availableTracks.length) return;
+      trackIndex = (trackIndex - 1 + availableTracks.length) % availableTracks.length;
+      loadRandomTrack(true);
+    });
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      if (!availableTracks.length) return;
+      trackIndex = (trackIndex + 1) % availableTracks.length;
+      loadRandomTrack(true);
+    });
+  })();
+
+  // Real-time audio analysis for the existing ripple.
+  let ctx, analyser, source, data;
+  let smoothedBass = 0;
+  let lastBeat = 0;
+
+  const avatar = document.querySelector('.avatar, .profile-avatar, [class*="avatar"]');
+  const rippleTargets = Array.from(document.querySelectorAll(
+    '.ripple, .ripple-ring, .music-ripple, [class*="ripple"]'
+  ));
+
+  function setupAudioAnalysis() {
+    if (ctx) return;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.72;
+      data = new Uint8Array(analyser.frequencyBinCount);
+      source = ctx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+    } catch (e) {
+      console.warn('Audio analysis unavailable:', e);
+    }
+  }
+
+  function animateBeat() {
+    requestAnimationFrame(animateBeat);
+    if (!analyser || audio.paused) return;
+
+    analyser.getByteFrequencyData(data);
+    const bassBins = Math.max(6, Math.floor(data.length * 0.12));
+    let sum = 0;
+    for (let i = 0; i < bassBins; i++) sum += data[i];
+    const bass = sum / bassBins / 255;
+
+    smoothedBass += (bass - smoothedBass) * 0.18;
+    const now = performance.now();
+    const beatStrength = Math.max(0, bass - smoothedBass);
+
+    if (avatar) {
+      const scale = 1 + Math.min(0.035, bass * 0.025);
+      avatar.style.setProperty('--music-pulse', scale);
+      avatar.classList.toggle('beat-active', bass > 0.22);
+    }
+
+    // Trigger the actual ripple as short pulses on bass peaks.
+    if (bass > 0.24 && beatStrength > 0.035 && now - lastBeat > 180) {
+      lastBeat = now;
+      rippleTargets.forEach((ring, index) => {
+        ring.style.animation = 'none';
+        ring.offsetHeight; // restart animation
+        ring.style.animation = `musicBeatRipple ${1.0 + index * 0.18}s cubic-bezier(.15,.7,.25,1) forwards`;
+      });
+    }
+  }
+
+  audio.addEventListener('play', () => {
+    setupAudioAnalysis();
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+  });
+
+  document.addEventListener('pointerdown', () => {
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+  }, { once: true });
+
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes musicBeatRipple {
+      0% { opacity: .58; transform: translate(-50%, -50%) scale(.78); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.55); }
+    }
+    .beat-active { transition: transform 80ms linear; }
+  `;
+  document.head.appendChild(style);
+
+  animateBeat();
+})();
+</script>
+
+
+<script>
+(function() {
+  function init() {
+    const audio = document.querySelector('audio');
+    if (!audio) return;
+
+    // Dedicated transport buttons. Never infer "next" by position:
+    // the mute button is a separate control and must never be repurposed.
+    const player = document.querySelector('.music-player, .player, [class*="music-player"]') || audio.parentElement;
+    const prevButton = document.getElementById('musicBack');
+    const nextButton = document.getElementById('musicNext');
+
+    // Retrieve the playlist exposed by v64, or rebuild a simple sequential fallback.
+    const playlist = window.__kruzixPlaylist || [];
+    let index = window.__kruzixTrackIndex || 0;
+
+    function getTracks() {
+      return window.__kruzixPlaylist && window.__kruzixPlaylist.length
+        ? window.__kruzixPlaylist
+        : playlist;
+    }
+
+    function changeTrack(direction) {
+      const tracks = getTracks();
+      if (!tracks.length) return;
+      index = (index + direction + tracks.length) % tracks.length;
+      window.__kruzixTrackIndex = index;
+      const wasPlaying = !audio.paused;
+      audio.src = tracks[index];
+      audio.load();
+      if (wasPlaying) audio.play().catch(() => {});
+    }
+
+    if (prevButton) {
+      prevButton.setAttribute('aria-label', 'Previous track');
+      prevButton.title = 'Previous track';
+      prevButton.innerHTML = '&#9664;&#9664;';
+      prevButton.onclick = function(e) {
+        e.preventDefault();
+        changeTrack(-1);
+      };
+    }
+
+    if (nextButton) {
+      nextButton.setAttribute('aria-label', 'Next track');
+      nextButton.title = 'Next track';
+      nextButton.innerHTML = '&#9654;&#9654;';
+      nextButton.onclick = function(e) {
+        e.preventDefault();
+        changeTrack(1);
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+
+<script>
+(function(){
+  function ready(){
+    const audio=document.querySelector('audio');
+    if(!audio) return;
+
+    const player=document.querySelector('.music-player, .player, [class*="music-player"]') || audio.parentElement;
+    const prev=document.getElementById('musicBack');
+    const next=document.getElementById('musicNext');
+
+    // Dedicated transport buttons only. The mute control is intentionally excluded.
+    if(prev){
+      prev.setAttribute('type','button');
+      prev.setAttribute('aria-label','Previous track');
+      prev.title='Previous track';
+      prev.innerHTML='⏮';
+      prev.onclick=function(e){
+        e.preventDefault(); e.stopPropagation();
+        if(window.kruzixPreviousTrack) window.kruzixPreviousTrack();
+      };
+    }
+    if(next){
+      next.setAttribute('type','button');
+      next.setAttribute('aria-label','Next track');
+      next.title='Next track';
+      next.innerHTML='⏭';
+      next.onclick=function(e){
+        e.preventDefault(); e.stopPropagation();
+        if(window.kruzixNextTrack) window.kruzixNextTrack();
+      };
+    }
+    // Playlist discovery. Tracks are sequentially named music1.mp3, music2.mp3...
+    const maxTracks=100;
+    let tracks=[];
+    let current=0;
+
+    async function exists(url){
+      try{
+        const r=await fetch(url,{method:'HEAD',cache:'no-store'});
+        return r.ok;
+      }catch(e){ return false; }
+    }
+
+    async function initPlaylist(){
+      for(let n=1;n<=maxTracks;n++){
+        const url=`music${n}.mp3`;
+        const ok=await exists(url);
+        if(ok) tracks.push(url);
+        else if(tracks.length) break;
+      }
+      if(!tracks.length){
+        const fallback=audio.getAttribute('src');
+        if(fallback) tracks=[fallback];
+      }
+      if(!tracks.length) return;
+      current=Math.floor(Math.random()*tracks.length);
+      load(current,false);
+    }
+
+    function load(index, autoplay){
+      if(!tracks.length) return;
+      current=(index+tracks.length)%tracks.length;
+      audio.src=tracks[current];
+      audio.load();
+      if(autoplay) audio.play().catch(()=>{});
+      updateTrackInfo();
+    }
+
+    window.kruzixPreviousTrack=()=>load(current-1,true);
+    window.kruzixNextTrack=()=>load(current+1,true);
+
+    audio.addEventListener('ended',()=>{
+      if(tracks.length<2) return load(current,true);
+      let n;
+      do{n=Math.floor(Math.random()*tracks.length)}while(n===current);
+      load(n,true);
+    });
+
+    // Automatic metadata reading with jsmediatags.
+    // Uses a CDN when the site is online; falls back gracefully if tags are absent.
+    function ensureTags(cb){
+      if(window.jsmediatags) return cb();
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js';
+      s.onload=cb;
+      document.head.appendChild(s);
+    }
+
+    function findTextElement(patterns){
+      const all=Array.from(player.querySelectorAll('*'));
+      return all.find(el=>el.children.length===0 && patterns.some(p=>p.test((el.className||'')+' '+(el.textContent||''))));
+    }
+
+    function updateTrackInfo(){
+      const titleEl=findTextElement([/track-title/i,/song-title/i,/title/i]);
+      const artistEl=findTextElement([/track-artist/i,/artist/i,/song-artist/i]);
+      if(!titleEl && !artistEl) return;
+
+      ensureTags(()=>{
+        if(!window.jsmediatags) return;
+        const url=audio.src;
+        window.jsmediatags.read(url,{
+          onSuccess(tag){
+            const tags=tag.tags||{};
+            const title=(tags.title||'').trim();
+            const artist=(tags.artist||tags.albumArtist||'').trim();
+
+            // "- instrumental" is shown only when that wording is actually present in metadata.
+            if(titleEl) titleEl.textContent=title || `Track ${current+1}`;
+            if(artistEl) artistEl.textContent=artist || '';
+          },
+          onError(){
+            if(titleEl) titleEl.textContent=`Track ${current+1}`;
+            if(artistEl) artistEl.textContent='';
+          }
+        });
+      });
+    }
+
+    initPlaylist();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',ready);
+  else ready();
 })();
 </script>
 
