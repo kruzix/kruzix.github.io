@@ -2813,3 +2813,32 @@ input,button,a{
 })();
 </script>
 
+<style id="v93-mobile-quote">
+/* На телефонах английская часть цитаты уходит на отдельную строку,
+   чтобы она не ломала композицию японской надписи. */
+@media (max-width: 600px){
+  .quote{
+    padding-left:16px;
+    padding-right:16px;
+    line-height:1.05;
+  }
+  .quote small{
+    display:block;
+    margin-top:7px;
+    font-size:10px;
+    line-height:1.35;
+    letter-spacing:.045em;
+  }
+}
+@media (max-width:380px){
+  .quote{
+    font-size:26px;
+  }
+  .quote small{
+    margin-top:6px;
+    font-size:9px;
+    letter-spacing:.035em;
+  }
+}
+</style>
+
