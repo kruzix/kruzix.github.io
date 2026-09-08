@@ -310,10 +310,12 @@ body.light .profile .music-art span{color:#705784;text-shadow:0 0 12px rgba(125,
    <img class="avatar" src="avatar.gif" alt="kx">
   </div>
   <div class="profile-info"><div class="name">kruzix <span style="color:#c59aff"><span class="gender-symbol">♂</span></span></div><div class="handle">exist. dream. create.</div><div class="status"><span class="dot"></span> Idle</div></div>
-  <div class="socials"><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Discord @kruzix">◉</a><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Telegram @kruzix">➤</a><a class="social" href="https://github.com/kruzix" target="_blank" rel="noopener" title="GitHub kruzix">◌</a><a class="social" href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener" title="Steam kruzixx">◈</a></div>
+  <div class="socials"><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Discord @kruzix">◉</a><a class="social" href="https://kruzix.github.io/#links" target="_blank" rel="noopener" title="Telegram @kruzix">➤</a><a class="social" href="https://github.com/kruzix" target="_blank" rel="noopener" title="GitHub kruzix">◌</a><a class="social" href="https://steamcommunity.com/id/kruzixx/" target="_blank" rel="noopener" title="Steam kruzixx">◈</a>
   <div class="profile-eq" id="profileEqualizer" aria-hidden="true">
     <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
   </div>
+</div>
+  
  </div>
 
  <section class="music-player" aria-label="Music player">
@@ -2546,14 +2548,20 @@ body.light .hero-frame{
 </style>
 
 
-<style id="kruzix-equalizer-v86">
-/* Эквалайзер точно совпадает по ширине с рядом из четырёх кнопок. */
-.profile-eq{
-  position:absolute;
-  top:62px;
-  right:auto;
-  width:0;
-  max-width:none;
+<style id="kruzix-equalizer-v89">
+/* Эквалайзер находится внутри .socials — его ширина = 100% реальных кнопок. */
+.profile-row .socials{
+  position:absolute !important;
+  overflow:visible !important;
+}
+.profile-row .socials .profile-eq{
+  position:absolute !important;
+  left:0 !important;
+  right:auto !important;
+  width:100% !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  top:calc(100% + 10px) !important;
   height:18px;
   display:flex;
   align-items:flex-end;
@@ -2563,9 +2571,8 @@ body.light .hero-frame{
   pointer-events:none;
   opacity:1;
   transition:opacity .25s ease;
-  box-sizing:border-box;
 }
-.profile-eq i{
+.profile-row .socials .profile-eq i{
   display:block;
   flex:0 0 3px;
   width:3px;
@@ -2576,106 +2583,73 @@ body.light .hero-frame{
   box-shadow:0 0 7px rgba(185,138,255,.48);
   transition:height .09s linear,opacity .18s ease,border-radius .18s ease;
 }
-body.light .profile-eq i{
+body.light .profile-row .socials .profile-eq i{
   background:linear-gradient(180deg,#9b7db5,#c7b1d9);
   box-shadow:0 0 6px rgba(155,125,181,.26);
 }
 
-@media(max-width:800px){
-  .profile-eq{
-    top:51px;
-  }
-}
-@media(max-width:480px){
-  .profile-eq{
-    top:47px;
-    height:16px;
-  }
-  .profile-eq i{
-    flex-basis:3px;
-    width:3px;
-  }
-}
-@media(max-width:360px){
-  .profile-eq{
-    top:43px;
-    height:14px;
-  }
-  .profile-eq i{
-    flex-basis:3px;
-    width:3px;
-  }
-}
-
-/* При старте страницы и на паузе остаются только маленькие квадратики. */
-.profile-eq.is-idle i{
+/* На паузе/при загрузке — только маленькие квадратики. */
+.profile-row .socials .profile-eq.is-idle i{
   height:3px !important;
   min-height:3px !important;
   opacity:.46 !important;
   border-radius:1px !important;
   box-shadow:0 0 4px rgba(185,138,255,.25);
 }
-.profile-eq.is-idle{
-  opacity:.9;
+
+@media(max-width:480px){
+  .profile-row .socials .profile-eq{
+    top:calc(100% + 9px) !important;
+    height:16px;
+  }
+  .profile-row .socials .profile-eq i{
+    flex-basis:3px;
+    width:3px;
+  }
+}
+@media(max-width:360px){
+  .profile-row .socials .profile-eq{
+    top:calc(100% + 8px) !important;
+    height:14px;
+  }
+  .profile-row .socials .profile-eq i{
+    flex-basis:3px;
+    width:3px;
+  }
 }
 </style>
 
-<script id="kruzix-equalizer-v88">
+<script id="kruzix-equalizer-v89">
 (() => {
   const audio=document.getElementById('siteAudio');
   const eq=document.getElementById('profileEqualizer');
-  const socials=document.querySelector('.profile-row .socials');
   if(!audio||!eq) return;
 
   const bars=[...eq.querySelectorAll('i')];
   let raf=0;
 
-  // 12 полос, включая крайнюю левую.
+  // 12 частотных зон, включая крайнюю левую.
   const ranges=[
     [0.006,0.016],[0.016,0.026],[0.026,0.040],[0.040,0.060],
     [0.060,0.088],[0.088,0.125],[0.125,0.175],[0.175,0.250],
     [0.250,0.350],[0.350,0.480],[0.480,0.650],[0.650,0.820]
   ];
 
-  function syncToButtons(){
-    if(!socials) return;
-
-    const buttons=[...socials.querySelectorAll('.social')];
-    if(!buttons.length) return;
-
-    const first=buttons[0].getBoundingClientRect();
-    const last=buttons[buttons.length-1].getBoundingClientRect();
-    const parent=eq.offsetParent?.getBoundingClientRect();
-
-    if(!parent) return;
-
-    // Координаты именно видимых кнопок, а не ширина flex-контейнера.
-    const left=first.left-parent.left;
-    const right=last.right-parent.left;
-    const width=Math.max(1,right-left);
-
-    eq.style.left=Math.round(left)+'px';
-    eq.style.right='auto';
-    eq.style.width=Math.round(width)+'px';
-    eq.style.maxWidth=Math.round(width)+'px';
-  }
-
-  function paintIdle(){
+  function idle(){
     cancelAnimationFrame(raf);
+    eq.classList.add('is-idle');
     bars.forEach(bar=>{
       bar.style.height='3px';
       bar.style.opacity='.46';
       bar.style.borderRadius='1px';
     });
-    eq.classList.add('is-idle');
   }
 
   function animate(){
     cancelAnimationFrame(raf);
-
     const analyser=window.kruzixAudioAnalyser;
     if(audio.paused || audio.ended || !analyser){
-      paintIdle();
+      idle();
       return;
     }
 
@@ -2683,7 +2657,7 @@ body.light .profile-eq i{
 
     const frame=()=>{
       if(audio.paused || audio.ended || !window.kruzixAudioAnalyser){
-        paintIdle();
+        idle();
         return;
       }
 
@@ -2692,15 +2666,12 @@ body.light .profile-eq i{
       bars.forEach((bar,i)=>{
         const from=Math.max(1,Math.floor(data.length*ranges[i][0]));
         const to=Math.max(from+1,Math.floor(data.length*ranges[i][1]));
-
         let sum=0;
         for(let j=from;j<to;j++) sum+=data[j];
 
         const avg=sum/Math.max(1,to-from);
         const normalized=Math.min(1,avg/150);
-        const height=3+normalized*15;
-
-        bar.style.height=height.toFixed(1)+'px';
+        bar.style.height=(3+normalized*15).toFixed(1)+'px';
         bar.style.opacity=(.45+normalized*.55).toFixed(2);
         bar.style.borderRadius='99px';
       });
@@ -2712,31 +2683,18 @@ body.light .profile-eq i{
     frame();
   }
 
-  syncToButtons();
-
-  window.addEventListener('resize',syncToButtons,{passive:true});
-  window.addEventListener('orientationchange',syncToButtons,{passive:true});
-
-  // Несколько layout passes: профиль/соцкнопки получают окончательные размеры
-  // не всегда в тот же кадр, когда загружается документ.
-  requestAnimationFrame(syncToButtons);
-  requestAnimationFrame(()=>requestAnimationFrame(syncToButtons));
-  setTimeout(syncToButtons,100);
-  setTimeout(syncToButtons,300);
-  setTimeout(syncToButtons,700);
-
   audio.addEventListener('play',animate);
-  audio.addEventListener('pause',paintIdle);
-  audio.addEventListener('ended',paintIdle);
+  audio.addEventListener('pause',idle);
+  audio.addEventListener('ended',idle);
 
-  const waitForAnalyser=setInterval(()=>{
+  const wait=setInterval(()=>{
     if(window.kruzixAudioAnalyser){
-      clearInterval(waitForAnalyser);
+      clearInterval(wait);
       if(!audio.paused) animate();
     }
   },100);
 
-  paintIdle();
+  idle();
 })();
 </script>
 
