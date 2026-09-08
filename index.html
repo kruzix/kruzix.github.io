@@ -3299,9 +3299,33 @@ input,button,a{
 
       const raw = (sum / count) / 255;
 
-      /* Fast enough to react to kicks, but stable enough not to jitter. */
-      smooth[i] = smooth[i] * 0.72 + raw * 0.28;
-      values[i] = Math.min(1, Math.max(0, smooth[i]));
+      /* Stable first pass: avoid a single FFT bin jumping far ahead of its neighbours. */
+      smooth[i] = smooth[i] * 0.78 + raw * 0.22;
+    }
+
+    /* Circular neighbour smoothing makes the closed ring continuous.
+       In particular, the first and last points can no longer create one
+       oversized spike where the path closes. */
+    for (let pass = 0; pass < 2; pass++) {
+      const next = new Array(POINTS);
+      for (let i = 0; i < POINTS; i++) {
+        const prev = smooth[(i - 1 + POINTS) % POINTS];
+        const cur = smooth[i];
+        const after = smooth[(i + 1) % POINTS];
+        next[i] = prev * 0.22 + cur * 0.56 + after * 0.22;
+      }
+      smooth = next;
+    }
+
+    /* Compress the dynamic range so the whole equalizer stays balanced. */
+    let mean = 0;
+    for (let i = 0; i < POINTS; i++) mean += smooth[i];
+    mean /= POINTS;
+
+    for (let i = 0; i < POINTS; i++) {
+      const relative = smooth[i] - mean;
+      const compressed = mean + relative * 0.48;
+      values[i] = Math.min(0.72, Math.max(0.035, compressed));
     }
 
     clearCanvas();
@@ -3314,10 +3338,10 @@ input,button,a{
         const a = (j / POINTS) * Math.PI * 2 - Math.PI / 2 + phase;
         const v = values[j];
 
-        /* Keep the effect tight around the avatar while making bass
-           noticeably stronger than quiet high frequencies. */
-        const bassBoost = 0.72 + (1 - j / POINTS) * 0.28;
-        const r = base + offset + v * base * 0.22 * strength * bassBoost;
+        /* Keep every segment at a consistent visual scale.
+           The spectrum itself still moves, but there is no artificial
+           bass multiplier that can make one part of the closed ring jump. */
+        const r = base + offset + v * base * 0.16 * strength;
 
         const x = cx + Math.cos(a) * r;
         const y = cy + Math.sin(a) * r;
