@@ -541,7 +541,7 @@ body.light .perf-option input:checked:before{background:#fff !important;box-shad
 <div class="bg"><img src="banner.gif" alt=""></div><div class="grain"></div>
 <nav class="nav"><div class="nav-inner">
   <a class="brand-simple" href="#home">KRUZIX</a>
-  <div class="nav-links"><a href="#home">home</a><a href="#about">about</a><a href="#links">links</a></div>
+  <div class="nav-links"><a href="#home">home</a><a href="#about">about</a><a href="works/">soon..</a></div>
   <div class="nav-controls">
     <button class="perf-toggle" id="perfToggle" type="button" aria-label="Settings" aria-expanded="false">⚙</button>
   </div>
@@ -3879,7 +3879,6 @@ body.light .perf-option input[type="checkbox"]:checked{
   border-color:rgba(112,77,148,.48) !important;
 }
 </style>
-</style>
 <script id="kruzix-performance-settings-js">
 (function(){
   const body=document.body;
@@ -4078,6 +4077,67 @@ body.light .perf-option input:not(:checked):before{
   .nav-links a{min-width:43px !important;padding:0 5px !important;font-size:8px !important;}
 }
 </style>
+
+<style id="kruzix-music-recovery-v97">
+/* v97: keep the audio element independent from visual/audio-analysis effects. */
+#siteAudio{display:none !important;}
+</style>
+<script id="kruzix-music-recovery-v97-js">
+(() => {
+  'use strict';
+  const audio = document.getElementById('siteAudio');
+  const play = document.getElementById('musicPlay');
+  const next = document.getElementById('musicNext');
+  const back = document.getElementById('musicBack');
+  const volume = document.getElementById('musicVolume');
+  if (!audio || !play || !next || !back) return;
+
+  // Never let the visualizer own the audio element. Playback itself stays native.
+  audio.preload = 'metadata';
+  if (!(audio.volume > 0)) audio.volume = 0.18;
+  if (volume && (!Number.isFinite(Number(volume.value)) || Number(volume.value) <= 0)) {
+    volume.value = '18';
+  }
+
+  const sync = () => {
+    const playing = !audio.paused && !audio.ended;
+    play.textContent = playing ? '❚❚' : '▶';
+    play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    document.querySelector('.music-player')?.classList.toggle('is-playing', playing);
+  };
+
+  audio.addEventListener('play', sync);
+  audio.addEventListener('pause', sync);
+  audio.addEventListener('ended', sync);
+  audio.addEventListener('loadedmetadata', sync);
+  audio.addEventListener('error', sync);
+
+  // If a track is changed while it was playing, wait for the new source to be
+  // ready before requesting playback. This avoids a race between load() and play().
+  audio.addEventListener('canplay', () => {
+    if (audio.dataset.kruzixResume === '1' && audio.paused) {
+      audio.play().then(() => {
+        audio.dataset.kruzixResume = '0';
+        sync();
+      }).catch(() => {});
+    }
+  });
+
+  // Capture the playing state immediately before the existing next/previous handlers run.
+  next.addEventListener('click', () => {
+    audio.dataset.kruzixResume = (!audio.paused && !audio.ended) ? '1' : '0';
+  }, true);
+  back.addEventListener('click', () => {
+    audio.dataset.kruzixResume = (!audio.paused && !audio.ended) ? '1' : '0';
+  }, true);
+
+  // Keep playback alive when the current source finishes loading after a switch.
+  const originalSrc = audio.getAttribute('src');
+  if (!audio.currentSrc && originalSrc) audio.src = new URL(originalSrc, document.baseURI).href;
+  sync();
+})();
+</script>
+
 </body>
 
 <style id="kruzix-status-and-ru-format-v27">
