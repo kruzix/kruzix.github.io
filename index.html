@@ -1034,7 +1034,7 @@ html.light .profile .music-track-genre{
 }
 </style>
 
-<script id="kruzix-music-player-v91">
+<script id="kruzix-music-player-v96">
 (() => {
   'use strict';
 
@@ -1055,19 +1055,21 @@ html.light .profile .music-track-genre{
 
   if (!audio || !card || !play || !back || !next || !mute || !vol || !progress) return;
 
-  const MAX_TRACKS = 100;
-  const FIRST_TRACK = 'music.mp3';
+  const TRACKS_FILE = 'tracks.json';
+  const FALLBACK_TRACKS = [
+    {file:'music.mp3', title:'Electric Chapel', artist:'Lady Gaga', genre:'Instrumental'},
+    {file:'music2.mp3', title:'The Queen', artist:'Lady Gaga', genre:'Instrumental'}
+  ];
 
   const state = {
     tracks: [],
     index: 0,
     loadToken: 0,
     playlistPromise: null,
-    lastVolume: 0.18,
     pendingPlay: false
   };
 
-  const trackUrl = n => n === 1 ? FIRST_TRACK : `music${n}.mp3`;
+  const clean = value => String(value ?? '').trim();
 
   const fmt = t => {
     if (!Number.isFinite(t) || t < 0) return '0:00';
@@ -1076,21 +1078,38 @@ html.light .profile .music-track-genre{
     return `${m}:${String(s).padStart(2, '0')}`;
   };
 
-  const clean = value => String(value ?? '').trim();
+  function normalizeTracks(data) {
+    if (!Array.isArray(data)) return [];
 
-  const getFileName = url => {
+    return data
+      .filter(item => item && clean(item.file))
+      .map(item => ({
+        file: clean(item.file),
+        title: clean(item.title),
+        artist: clean(item.artist),
+        genre: clean(item.genre)
+      }));
+  }
+
+  async function loadTracksJson() {
     try {
-      return decodeURIComponent(String(url).split('/').pop() || '');
-    } catch (_) {
-      return String(url).split('/').pop() || '';
-    }
-  };
+      const response = await fetch(TRACKS_FILE, {cache:'no-store'});
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-  const getFallbackName = url =>
-    getFileName(url).replace(/\.mp3$/i, '').replace(/[_-]+/g, ' ').trim();
+      const data = await response.json();
+      const tracks = normalizeTracks(data);
+
+      if (tracks.length) return tracks;
+    } catch (_) {
+      // Fallback keeps the player usable if tracks.json is temporarily unavailable.
+    }
+
+    return FALLBACK_TRACKS;
+  }
 
   function setButtonState() {
     const playing = !audio.paused && !audio.ended;
+
     card.classList.toggle('is-playing', playing);
     if (avatarWrap) avatarWrap.classList.toggle('music-playing', playing);
 
@@ -1106,133 +1125,57 @@ html.light .profile .music-track-genre{
   function syncProgress() {
     const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
     const percent = duration > 0 ? (audio.currentTime / duration) * 100 : 0;
+
     progress.value = String(Math.max(0, Math.min(100, percent)));
     currentEl.textContent = fmt(audio.currentTime);
     durationEl.textContent = fmt(duration);
   }
 
-  function setTrackText(title, artist, genre) {
-    if (titleTextEl) titleTextEl.textContent = clean(title);
-    if (artistEl) artistEl.textContent = clean(artist);
+  function showTrack(track) {
+    if (!track) return;
+
+    if (titleTextEl) {
+      titleTextEl.textContent = track.title || track.file.replace(/\.mp3$/i, '');
+    }
+
+    if (artistEl) {
+      artistEl.textContent = track.artist || '';
+    }
 
     if (genreEl) {
-      const genreText = clean(genre);
-      genreEl.textContent = genreText ? `— ${genreText}` : '';
-      genreEl.hidden = !genreText;
-    }
-  }
-
-  function loadJsmediatags() {
-    if (window.jsmediatags) return Promise.resolve(window.jsmediatags);
-
-    return new Promise(resolve => {
-      let loader = document.querySelector('script[data-jsmediatags]');
-      if (!loader) {
-        loader = document.createElement('script');
-        loader.src = 'https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js';
-        loader.async = true;
-        loader.dataset.jsmediatags = 'true';
-        document.head.appendChild(loader);
-      }
-
-      loader.addEventListener('load', () => resolve(window.jsmediatags || null), {once:true});
-      loader.addEventListener('error', () => resolve(null), {once:true});
-    });
-  }
-
-  /*
-   * Read the actual MP3 bytes first, then pass an ArrayBuffer to jsmediatags.
-   * This is more reliable on GitHub Pages than asking jsmediatags to fetch
-   * the URL itself, and reads the same embedded ID3 fields shown by Windows.
-   */
-  async function readID3(url, token) {
-    const fallback = () => {
-      if (token !== state.loadToken) return;
-      setTrackText(getFallbackName(url), '', '');
-    };
-
-    try {
-      const response = await fetch(url, {cache:'no-store'});
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const buffer = await response.arrayBuffer();
-      if (token !== state.loadToken) return;
-
-      const lib = await loadJsmediatags();
-      if (!lib || token !== state.loadToken) {
-        fallback();
-        return;
-      }
-
-      lib.read(buffer, {
-        onSuccess(tag) {
-          if (token !== state.loadToken) return;
-
-          const tags = tag?.tags || {};
-          const title = clean(tags.title);
-          const artist = clean(tags.artist || tags.albumArtist);
-          const genre = clean(tags.genre);
-
-          setTrackText(
-            title || getFallbackName(url),
-            artist,
-            genre
-          );
-        },
-        onError() {
-          fallback();
-        }
-      });
-    } catch (_) {
-      fallback();
-    }
-  }
-
-  async function exists(url) {
-    try {
-      const response = await fetch(url, {method:'HEAD', cache:'no-store'});
-      if (response.ok) return true;
-    } catch (_) {}
-
-    try {
-      const response = await fetch(url, {
-        method:'GET',
-        headers:{Range:'bytes=0-1'},
-        cache:'no-store'
-      });
-      return response.ok || response.status === 206;
-    } catch (_) {
-      return false;
+      genreEl.textContent = track.genre ? `— ${track.genre}` : '';
+      genreEl.hidden = !track.genre;
     }
   }
 
   async function buildPlaylist() {
-    const found = [];
+    state.tracks = await loadTracksJson();
 
-    for (let n = 1; n <= MAX_TRACKS; n++) {
-      const url = trackUrl(n);
-      if (await exists(url)) found.push(url);
-      else if (n > 1) break;
-    }
+    const currentSrc = audio.getAttribute('src') || '';
+    const currentName = currentSrc.split('/').pop();
 
-    state.tracks = found.length ? found : [audio.getAttribute('src') || FIRST_TRACK];
+    const foundIndex = state.tracks.findIndex(
+      track => track.file.split('/').pop() === currentName
+    );
 
-    const current = audio.getAttribute('src') || FIRST_TRACK;
-    const currentIndex = state.tracks.indexOf(current);
-    state.index = currentIndex >= 0 ? currentIndex : 0;
+    state.index = foundIndex >= 0 ? foundIndex : 0;
 
-    readID3(state.tracks[state.index], state.loadToken);
+    // Metadata comes ONLY from tracks.json now.
+    showTrack(state.tracks[state.index]);
+
     return state.tracks;
   }
 
   function ensurePlaylist() {
     if (!state.playlistPromise) {
       state.playlistPromise = buildPlaylist().catch(() => {
-        state.tracks = [audio.getAttribute('src') || FIRST_TRACK];
+        state.tracks = FALLBACK_TRACKS;
         state.index = 0;
+        showTrack(state.tracks[0]);
         return state.tracks;
       });
     }
+
     return state.playlistPromise;
   }
 
@@ -1241,9 +1184,9 @@ html.light .profile .music-track-genre{
       await audio.play();
       state.pendingPlay = false;
     } catch (_) {
-      // If the browser waits for the newly loaded media, retry at canplay.
       state.pendingPlay = true;
     }
+
     setButtonState();
   }
 
@@ -1253,18 +1196,19 @@ html.light .profile .music-track-genre{
 
     state.index = (index + state.tracks.length) % state.tracks.length;
 
-    const url = state.tracks[state.index];
+    const track = state.tracks[state.index];
     const token = ++state.loadToken;
 
-    // Capture the old state before changing the source.
+    // Preserve the state of the old track.
     const shouldPlay = !!keepPlaying;
     state.pendingPlay = shouldPlay;
 
-    // Do not let old metadata remain visible while the new MP3 is being read.
-    setTrackText(getFallbackName(url), '', '');
-
     audio.pause();
-    audio.src = url;
+
+    // Metadata is updated immediately from tracks.json.
+    showTrack(track);
+
+    audio.src = track.file;
     audio.load();
 
     progress.value = '0';
@@ -1272,13 +1216,13 @@ html.light .profile .music-track-genre{
     durationEl.textContent = '0:00';
     setButtonState();
 
-    // Read ID3 from the NEW file bytes.
-    readID3(url, token);
-
+    // If the previous track was playing, immediately request playback.
     if (shouldPlay) {
-      // First attempt is still made from the button click/ended flow.
       await startPlayback();
     }
+
+    // Prevent an old async operation from affecting the new track.
+    if (token !== state.loadToken) return;
   }
 
   function previousTrack() {
@@ -1299,7 +1243,6 @@ html.light .profile .music-track-genre{
     },
     toggleMute: () => {
       audio.muted = !audio.muted;
-      if (!audio.muted && audio.volume === 0) audio.volume = state.lastVolume || 0.18;
       setButtonState();
     },
     get tracks() { return [...state.tracks]; },
@@ -1330,14 +1273,12 @@ html.light .profile .music-track-genre{
   mute.addEventListener('click', e => {
     e.preventDefault();
     audio.muted = !audio.muted;
-    if (!audio.muted && audio.volume === 0) audio.volume = state.lastVolume || 0.18;
     setButtonState();
   });
 
   vol.addEventListener('input', () => {
     const value = Math.max(0, Math.min(100, Number(vol.value) || 0)) / 100;
     audio.volume = value;
-    if (value > 0) state.lastVolume = value;
     audio.muted = value === 0;
     setButtonState();
   });
@@ -1354,14 +1295,12 @@ html.light .profile .music-track-genre{
   audio.addEventListener('play', setButtonState);
   audio.addEventListener('pause', setButtonState);
 
-  // Critical: after the new source becomes playable, finish the pending
-  // transition automatically if the old track was playing.
+  // Once the browser has enough data for the new source, finish autoplay.
   audio.addEventListener('canplay', () => {
     if (state.pendingPlay && audio.paused) startPlayback();
   });
 
   audio.addEventListener('ended', () => {
-    // Finished track -> next track must continue automatically.
     nextTrack();
   });
 
@@ -2475,10 +2414,10 @@ body.light .hero-frame{
 .butterfly .butterfly-header{z-index:20 !important;}
 </style>
 
-<style id="v92-audio-reactive-ripple">
+<style id="v95-audio-reactive-ripple">
 /* Рябь только на реальных басовых ударах; без постоянного дрожания. */
 .avatar-wrap.music-beat .avatar-ripple{
-  animation:avatarBeatRippleV92 .72s cubic-bezier(.12,.68,.24,1) forwards !important;
+  animation:avatarBeatRippleV95 .46s cubic-bezier(.16,.72,.28,1) forwards !important;
 }
 @keyframes avatarBeatRippleV92{
   0%{
@@ -2497,7 +2436,7 @@ body.light .hero-frame{
 }
 </style>
 
-<script id="v92-audio-beat-analysis">
+<script id="v95-audio-beat-analysis">
 (() => {
   const audio=document.getElementById('siteAudio');
   const avatar=document.querySelector('.avatar-wrap');
@@ -2505,7 +2444,8 @@ body.light .hero-frame{
 
   let ctx=null, analyser=null, source=null, data=null;
   let running=false, raf=0;
-  let bassAverage=0, energyAverage=0, lastBeat=0;
+  let bassFloor=0, previousBass=0, lastBeat=0;
+  let beatCooldown=0;
 
   function setup(){
     if(analyser) return true;
@@ -2515,14 +2455,16 @@ body.light .hero-frame{
     try{
       ctx=new AC();
       analyser=ctx.createAnalyser();
-      analyser.fftSize=1024;
-      // Больше сглаживания убирает дрожь между отдельными ударами.
-      analyser.smoothingTimeConstant=.84;
-      data=new Uint8Array(analyser.frequencyBinCount);
+      analyser.fftSize=2048;
+      analyser.minDecibels=-92;
+      analyser.maxDecibels=-10;
+      analyser.smoothingTimeConstant=.58;
 
+      data=new Uint8Array(analyser.frequencyBinCount);
       source=ctx.createMediaElementSource(audio);
       source.connect(analyser);
       analyser.connect(ctx.destination);
+
       window.kruzixAudioAnalyser=analyser;
       return true;
     }catch(e){
@@ -2534,6 +2476,7 @@ body.light .hero-frame{
     running=false;
     cancelAnimationFrame(raf);
     avatar.classList.remove('music-beat');
+    beatCooldown=0;
   }
 
   function frame(now){
@@ -2541,30 +2484,48 @@ body.light .hero-frame{
 
     analyser.getByteFrequencyData(data);
 
-    // Узкая область низких частот: не реагируем на середину/голос.
-    const lowStart=Math.max(1,Math.floor(data.length*.006));
-    const lowEnd=Math.max(lowStart+2,Math.floor(data.length*.045));
+    // Bass/kick band: roughly 43-172 Hz at common browser sample rates.
+    const start=Math.max(1,Math.floor(data.length*.004));
+    const end=Math.max(start+4,Math.floor(data.length*.040));
 
-    let bass=0;
-    for(let i=lowStart;i<lowEnd;i++) bass+=data[i];
-    bass/=Math.max(1,lowEnd-lowStart);
+    let energy=0;
+    let peak=0;
+    for(let i=start;i<end;i++){
+      energy+=data[i];
+      if(data[i]>peak) peak=data[i];
+    }
+    energy/=Math.max(1,end-start);
 
-    // Сравниваем бас не с мгновенным уровнем, а с медленной "историей".
-    bassAverage=bassAverage ? bassAverage*.985+bass*.015 : bass;
-    energyAverage=energyAverage ? energyAverage*.992+bass*.008 : bass;
+    // Adaptive noise floor. It follows the track slowly, so a sustained bass
+    // note does not continuously trigger the ripple.
+    bassFloor=bassFloor ? bassFloor*.985+energy*.015 : energy;
 
-    const relative=bass/(bassAverage+8);
-    const rise=(bass-energyAverage)/(energyAverage+12);
+    const rise=energy-previousBass;
+    const ratio=energy/(bassFloor+7);
+    const onset=rise/(bassFloor+10);
 
-    // Удар — это именно заметный подъём над фоном, а не просто громкий бас.
-    const hit=relative>1.42 && rise>.18 && bass>18;
+    previousBass=previousBass*.70+energy*.30;
 
-    if(hit && now-lastBeat>330){
-      lastBeat=now;
+    if(beatCooldown>0) beatCooldown-=16.7;
+
+    // Require a transient onset + enough absolute kick energy + cooldown.
+    const hit=
+      beatCooldown<=0 &&
+      energy>16 &&
+      peak>48 &&
+      ratio>1.32 &&
+      onset>.14;
+
+    if(hit){
+      beatCooldown=210;
 
       const power=Math.max(
-        .22,
-        Math.min(1,(relative-1.25)*.72 + rise*.45)
+        .25,
+        Math.min(1,
+          (ratio-1.15)*.85 +
+          onset*.55 +
+          Math.max(0,peak-48)/180
+        )
       );
 
       avatar.style.setProperty('--beat-power',power.toFixed(3));
@@ -2578,15 +2539,17 @@ body.light .hero-frame{
 
   audio.addEventListener('play',()=>{
     if(!setup()) return;
+
     try{
       if(ctx && ctx.state==='suspended') ctx.resume();
     }catch(e){}
 
     if(!running){
       running=true;
-      bassAverage=0;
-      energyAverage=0;
+      bassFloor=0;
+      previousBass=0;
       lastBeat=0;
+      beatCooldown=0;
       raf=requestAnimationFrame(frame);
     }
   });
@@ -2692,7 +2655,7 @@ body.light .profile-row .socials .profile-eq i{
 }
 </style>
 
-<script id="kruzix-equalizer-v92">
+<script id="kruzix-equalizer-v95">
 (() => {
   const audio=document.getElementById('siteAudio');
   const eq=document.getElementById('profileEqualizer');
@@ -2700,16 +2663,18 @@ body.light .profile-row .socials .profile-eq i{
 
   const bars=[...eq.querySelectorAll('i')];
   let raf=0;
+  let fallTimer=0;
 
-  // 11 полос — одну крайнюю левую убрали.
   const ranges=[
     [0.010,0.026],[0.026,0.040],[0.040,0.060],[0.060,0.088],
     [0.088,0.125],[0.125,0.175],[0.175,0.250],[0.250,0.350],
     [0.350,0.480],[0.480,0.650],[0.650,0.820]
   ];
 
-  function hide(){
+  function hideNow(){
     cancelAnimationFrame(raf);
+    clearTimeout(fallTimer);
+    eq.classList.remove('is-falling');
     eq.classList.add('is-idle');
     bars.forEach(bar=>{
       bar.style.height='3px';
@@ -2717,19 +2682,56 @@ body.light .profile-row .socials .profile-eq i{
     });
   }
 
-  function animate(){
+  function fallAway(){
     cancelAnimationFrame(raf);
-    const analyser=window.kruzixAudioAnalyser;
-    if(audio.paused || audio.ended || !analyser){
-      hide();
+    clearTimeout(fallTimer);
+
+    // If there is nothing visible, just keep it hidden.
+    if(eq.classList.contains('is-idle')){
+      hideNow();
       return;
     }
+
+    eq.classList.remove('is-idle');
+    eq.classList.add('is-falling');
+
+    // Force the browser to see the current heights first, then collapse them.
+    bars.forEach(bar=>{
+      bar.style.transition='none';
+      bar.style.opacity='1';
+    });
+    void eq.offsetHeight;
+
+    requestAnimationFrame(()=>{
+      bars.forEach((bar,i)=>{
+        bar.style.transition=`height ${.24 + i*.012}s cubic-bezier(.22,.61,.36,1),
+                              opacity ${.22 + i*.012}s ease`;
+        bar.style.height='3px';
+        bar.style.opacity='0';
+      });
+    });
+
+    fallTimer=setTimeout(hideNow,430);
+  }
+
+  function animate(){
+    cancelAnimationFrame(raf);
+    clearTimeout(fallTimer);
+
+    const analyser=window.kruzixAudioAnalyser;
+    if(audio.paused || audio.ended || !analyser){
+      fallAway();
+      return;
+    }
+
+    eq.classList.remove('is-idle','is-falling');
+    eq.style.display='flex';
 
     const data=new Uint8Array(analyser.frequencyBinCount);
 
     const frame=()=>{
       if(audio.paused || audio.ended || !window.kruzixAudioAnalyser){
-        hide();
+        fallAway();
         return;
       }
 
@@ -2743,11 +2745,11 @@ body.light .profile-row .socials .profile-eq i{
 
         const avg=sum/Math.max(1,to-from);
         const normalized=Math.min(1,avg/145);
+        bar.style.transition='height .075s linear,opacity .12s ease';
         bar.style.height=(3+normalized*15).toFixed(1)+'px';
         bar.style.opacity=(.50+normalized*.50).toFixed(2);
       });
 
-      eq.classList.remove('is-idle');
       raf=requestAnimationFrame(frame);
     };
 
@@ -2755,8 +2757,8 @@ body.light .profile-row .socials .profile-eq i{
   }
 
   audio.addEventListener('play',animate);
-  audio.addEventListener('pause',hide);
-  audio.addEventListener('ended',hide);
+  audio.addEventListener('pause',fallAway);
+  audio.addEventListener('ended',fallAway);
 
   const wait=setInterval(()=>{
     if(window.kruzixAudioAnalyser){
@@ -2765,8 +2767,7 @@ body.light .profile-row .socials .profile-eq i{
     }
   },100);
 
-  // Ничего не показываем при первой загрузке.
-  hide();
+  hideNow();
 })();
 </script>
 
@@ -2842,3 +2843,55 @@ input,button,a{
 }
 </style>
 
+<style id="v94-nav-buttons-position">
+/* Кнопки навигации чуть левее: визуально зеркальнее относительно kruzix. */
+@media (min-width: 801px){
+  .nav-controls{
+    transform:translateX(-10px);
+  }
+}
+@media (max-width: 800px){
+  .nav-controls{
+    transform:translateX(-6px);
+  }
+}
+</style>
+
+
+<style id="v95-nav-links-spacing">
+@media (min-width:801px){
+  .nav-links{margin-right:8px !important;}
+}
+@media (max-width:800px){
+  .nav-links{margin-right:5px !important;}
+}
+</style>
+
+<style id="v95-player-meta-align">
+.profile .music-meta{
+  padding-left:5px !important;
+}
+@media(max-width:390px){
+  .profile .music-meta{
+    padding-left:4px !important;
+  }
+}
+</style>
+
+<style id="v95-equalizer-fall">
+.profile-row .socials .profile-eq{
+  overflow:visible !important;
+}
+.profile-row .socials .profile-eq.is-idle{
+  display:none !important;
+}
+.profile-row .socials .profile-eq.is-falling{
+  display:flex !important;
+}
+.profile-row .socials .profile-eq.is-falling i{
+  height:3px !important;
+  opacity:0 !important;
+  transition:height .30s cubic-bezier(.22,.61,.36,1),
+             opacity .28s ease !important;
+}
+</style>
