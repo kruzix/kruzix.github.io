@@ -1034,7 +1034,7 @@ html.light .profile .music-track-genre{
 }
 </style>
 
-<script id="kruzix-music-player-v84">
+<script id="kruzix-music-player-v90">
 (() => {
   'use strict';
 
@@ -1057,17 +1057,16 @@ html.light .profile .music-track-genre{
 
   const MAX_TRACKS = 100;
   const FIRST_TRACK = 'music.mp3';
-  const trackUrl = n => n === 1 ? FIRST_TRACK : `music${n}.mp3`;
 
   const state = {
     tracks: [],
     index: 0,
-    muted: false,
-    lastVolume: 0.18,
-    loadingPlaylist: false,
     loadToken: 0,
-    wasPlayingBeforeLoad: false
+    loadingPlaylist: false,
+    lastVolume: 0.18
   };
+
+  const trackUrl = n => n === 1 ? FIRST_TRACK : `music${n}.mp3`;
 
   const fmt = t => {
     if (!Number.isFinite(t) || t < 0) return '0:00';
@@ -1076,70 +1075,93 @@ html.light .profile .music-track-genre{
     return `${m}:${String(s).padStart(2, '0')}`;
   };
 
-  const getTrackName = url => {
-    const file = decodeURIComponent(String(url || '').split('/').pop() || '');
-    return file.replace(/\.mp3$/i, '').replace(/[_-]+/g, ' ').trim();
+  const clean = value => String(value ?? '').trim();
+
+  const getFileName = url => {
+    try {
+      return decodeURIComponent(String(url).split('/').pop() || '');
+    } catch (_) {
+      return String(url).split('/').pop() || '';
+    }
   };
+
+  // Fallback is only used if ID3 cannot be read.
+  const getFallbackName = url =>
+    getFileName(url).replace(/\.mp3$/i, '').replace(/[_-]+/g, ' ').trim();
 
   function setButtonState() {
     const playing = !audio.paused && !audio.ended;
     card.classList.toggle('is-playing', playing);
     if (avatarWrap) avatarWrap.classList.toggle('music-playing', playing);
+
     play.textContent = playing ? '❚❚' : '▶';
     play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     play.title = playing ? 'Pause' : 'Play';
+
     mute.textContent = audio.muted ? '◌' : '◔';
     mute.setAttribute('aria-label', audio.muted ? 'Unmute' : 'Mute');
     mute.title = audio.muted ? 'Unmute' : 'Mute';
   }
 
   function syncProgress() {
-    const d = Number.isFinite(audio.duration) ? audio.duration : 0;
-    const pct = d > 0 ? (audio.currentTime / d) * 100 : 0;
-    progress.value = String(Math.max(0, Math.min(100, pct)));
+    const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    const percent = duration > 0 ? (audio.currentTime / duration) * 100 : 0;
+    progress.value = String(Math.max(0, Math.min(100, percent)));
     currentEl.textContent = fmt(audio.currentTime);
-    durationEl.textContent = fmt(d);
+    durationEl.textContent = fmt(duration);
   }
 
   function setTrackText(title, artist, genre) {
-    const cleanTitle = String(title || '').trim() || `Track ${state.index + 1}`;
-    const cleanArtist = String(artist || '').trim();
-    const cleanGenre = String(genre || '').trim();
+    if (titleTextEl) titleTextEl.textContent = clean(title);
+    if (artistEl) artistEl.textContent = clean(artist);
 
-    if (titleTextEl) titleTextEl.textContent = cleanTitle;
     if (genreEl) {
-      genreEl.textContent = cleanGenre ? `— ${cleanGenre}` : '';
-      genreEl.hidden = !cleanGenre;
+      const genreText = clean(genre);
+      genreEl.textContent = genreText ? `— ${genreText}` : '';
+      genreEl.hidden = !genreText;
     }
-    if (artistEl) artistEl.textContent = cleanArtist;
   }
 
-  function showTrackFallback(url) {
-    setTrackText(getTrackName(url) || `Track ${state.index + 1}`, '', '');
-  }
-
-  function readMetadata(url, token) {
-    const applyFallback = () => {
+  /*
+   * ID3 source of truth:
+   * Windows Explorer -> Properties -> Details:
+   *   Title      = tags.title
+   *   Artist     = tags.artist
+   *   Genre      = tags.genre
+   */
+  function readID3(url, token) {
+    const fallback = () => {
       if (token !== state.loadToken) return;
-      showTrackFallback(url);
+      setTrackText(getFallbackName(url), '', '');
     };
 
     const read = () => {
-      if (!window.jsmediatags) return applyFallback();
+      if (!window.jsmediatags) {
+        fallback();
+        return;
+      }
 
-      // Source of truth: ID3 metadata embedded in the MP3 (Title, Artist, Genre).
-      // This is the same metadata visible in Windows file Properties -> Details.
       window.jsmediatags.read(url, {
         onSuccess(tag) {
           if (token !== state.loadToken) return;
-          const tags = tag.tags || {};
+
+          const tags = tag?.tags || {};
+
+          // Do NOT use filename if the ID3 tag exists.
+          // jsmediatags returns Windows-visible ID3 fields here.
+          const title = clean(tags.title);
+          const artist = clean(tags.artist || tags.albumArtist);
+          const genre = clean(tags.genre);
+
           setTrackText(
-            String(tags.title || '').trim() || getTrackName(url) || `Track ${state.index + 1}`,
-            String(tags.artist || tags.albumArtist || '').trim(),
-            String(tags.genre || '').trim()
+            title || getFallbackName(url),
+            artist,
+            genre
           );
         },
-        onError: applyFallback
+        onError() {
+          fallback();
+        }
       });
     };
 
@@ -1148,26 +1170,23 @@ html.light .profile .music-track-genre{
       return;
     }
 
-    const existing = document.querySelector('script[data-jsmediatags]');
-    if (existing) {
-      existing.addEventListener('load', read, {once:true});
-      existing.addEventListener('error', applyFallback, {once:true});
-      return;
+    let loader = document.querySelector('script[data-jsmediatags]');
+    if (!loader) {
+      loader = document.createElement('script');
+      loader.src = 'https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js';
+      loader.async = true;
+      loader.dataset.jsmediatags = 'true';
+      document.head.appendChild(loader);
     }
 
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js';
-    script.async = true;
-    script.dataset.jsmediatags = 'true';
-    script.onload = read;
-    script.onerror = applyFallback;
-    document.head.appendChild(script);
+    loader.addEventListener('load', read, {once:true});
+    loader.addEventListener('error', fallback, {once:true});
   }
 
   async function exists(url) {
     try {
-      const head = await fetch(url, {method:'HEAD', cache:'no-store'});
-      if (head.ok) return true;
+      const response = await fetch(url, {method:'HEAD', cache:'no-store'});
+      if (response.ok) return true;
     } catch (_) {}
 
     try {
@@ -1186,48 +1205,38 @@ html.light .profile .music-track-genre{
     if (state.loadingPlaylist) return;
     state.loadingPlaylist = true;
 
-    const tracks = [];
+    const found = [];
     for (let n = 1; n <= MAX_TRACKS; n++) {
       const url = trackUrl(n);
-      const ok = await exists(url);
-      if (ok) tracks.push(url);
+      if (await exists(url)) found.push(url);
       else if (n > 1) break;
     }
 
-    if (!tracks.length) {
-      tracks.push(audio.getAttribute('src') || FIRST_TRACK);
-    }
+    state.tracks = found.length ? found : [audio.getAttribute('src') || FIRST_TRACK];
 
-    state.tracks = tracks;
+    const current = audio.getAttribute('src') || FIRST_TRACK;
+    const currentIndex = state.tracks.indexOf(current);
+    state.index = currentIndex >= 0 ? currentIndex : 0;
+
     state.loadingPlaylist = false;
 
-    const currentSrc = audio.getAttribute('src') || FIRST_TRACK;
-    const found = tracks.indexOf(currentSrc);
-    state.index = found >= 0 ? found : 0;
-
-    const currentWasPlaying = !audio.paused && !audio.ended;
-    if (found < 0 || currentSrc !== tracks[state.index]) {
-      await loadTrack(state.index, currentWasPlaying);
-    } else {
-      // Do not reload an already active track just because playlist discovery completed.
-      readMetadata(tracks[state.index], state.loadToken);
-      setButtonState();
-    }
+    // Read ID3 of the actual current track without replacing an already playing source.
+    readID3(state.tracks[state.index], state.loadToken);
   }
 
-  async function loadTrack(index, autoplay = false) {
+  async function loadTrack(index, keepPlaying) {
     if (!state.tracks.length) return;
 
     state.index = (index + state.tracks.length) % state.tracks.length;
+
     const url = state.tracks[state.index];
     const token = ++state.loadToken;
 
-    // Remember playback state before changing source.
-    const shouldPlay = autoplay || state.wasPlayingBeforeLoad || (!audio.paused && !audio.ended);
-    state.wasPlayingBeforeLoad = false;
+    // Important: remember the state BEFORE changing src.
+    const shouldPlay = keepPlaying;
 
-    // Invalidate old metadata immediately so an old callback can never overwrite the new title.
-    showTrackFallback(url);
+    // Immediately clear stale metadata. The new ID3 callback owns the new title.
+    setTrackText(getFallbackName(url), '', '');
 
     audio.pause();
     audio.src = url;
@@ -1237,26 +1246,28 @@ html.light .profile .music-track-genre{
     currentEl.textContent = '0:00';
     durationEl.textContent = '0:00';
     setButtonState();
-    readMetadata(url, token);
 
+    // Read the new file's embedded metadata immediately.
+    readID3(url, token);
+
+    // If the old track was playing, start the new one immediately.
     if (shouldPlay) {
       try {
         await audio.play();
       } catch (_) {
-        // Browser autoplay policy can reject playback; the track is still switched correctly.
+        // User gesture/autoplay policy may reject playback.
       }
     }
+
     setButtonState();
   }
 
   function previousTrack() {
-    state.wasPlayingBeforeLoad = !audio.paused && !audio.ended;
-    loadTrack(state.index - 1, true);
+    loadTrack(state.index - 1, !audio.paused && !audio.ended);
   }
 
   function nextTrack() {
-    state.wasPlayingBeforeLoad = !audio.paused && !audio.ended;
-    loadTrack(state.index + 1, true);
+    loadTrack(state.index + 1, !audio.paused && !audio.ended);
   }
 
   window.kruzixPlayer = {
@@ -1266,6 +1277,7 @@ html.light .profile .music-track-genre{
     pause: () => audio.pause(),
     toggleMute: () => {
       audio.muted = !audio.muted;
+      if (!audio.muted && audio.volume === 0) audio.volume = state.lastVolume || 0.18;
       setButtonState();
     },
     get tracks() { return [...state.tracks]; },
@@ -1311,9 +1323,6 @@ html.light .profile .music-track-genre{
     }
   });
 
-  audio.volume = 0.18;
-  vol.value = '18';
-
   audio.addEventListener('loadedmetadata', syncProgress);
   audio.addEventListener('durationchange', syncProgress);
   audio.addEventListener('timeupdate', syncProgress);
@@ -1321,8 +1330,12 @@ html.light .profile .music-track-genre{
   audio.addEventListener('pause', setButtonState);
 
   audio.addEventListener('ended', () => {
+    // At the end there is no "old playing state" anymore, so explicitly autoplay next.
     nextTrack();
   });
+
+  audio.volume = 0.18;
+  vol.value = '18';
 
   setButtonState();
   syncProgress();
@@ -2548,7 +2561,7 @@ body.light .hero-frame{
 </style>
 
 
-<style id="kruzix-equalizer-v89">
+<style id="kruzix-equalizer-v90">
 /* Эквалайзер находится внутри .socials — его ширина = 100% реальных кнопок. */
 .profile-row .socials{
   position:absolute !important;
@@ -2561,7 +2574,7 @@ body.light .hero-frame{
   width:100% !important;
   max-width:100% !important;
   box-sizing:border-box !important;
-  top:calc(100% + 10px) !important;
+  top:calc(100% + 16px) !important;
   height:18px;
   display:flex;
   align-items:flex-end;
@@ -2599,7 +2612,7 @@ body.light .profile-row .socials .profile-eq i{
 
 @media(max-width:480px){
   .profile-row .socials .profile-eq{
-    top:calc(100% + 9px) !important;
+    top:calc(100% + 15px) !important;
     height:16px;
   }
   .profile-row .socials .profile-eq i{
@@ -2609,7 +2622,7 @@ body.light .profile-row .socials .profile-eq i{
 }
 @media(max-width:360px){
   .profile-row .socials .profile-eq{
-    top:calc(100% + 8px) !important;
+    top:calc(100% + 14px) !important;
     height:14px;
   }
   .profile-row .socials .profile-eq i{
@@ -2619,7 +2632,7 @@ body.light .profile-row .socials .profile-eq i{
 }
 </style>
 
-<script id="kruzix-equalizer-v89">
+<script id="kruzix-equalizer-v90">
 (() => {
   const audio=document.getElementById('siteAudio');
   const eq=document.getElementById('profileEqualizer');
