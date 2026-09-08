@@ -3214,9 +3214,11 @@ input,button,a{
   const avatarWrap = document.querySelector('.avatar-wrap');
   if (!audio || !avatarWrap) return;
 
-  /* One AudioContext / MediaElementSource only.
-     The beat analyser creates window.kruzixAudioAnalyser; this visualizer
-     reuses it instead of creating a second source (which browsers reject). */
+  /*
+    One shared analyser. The beat-analysis module exposes
+    window.kruzixAudioAnalyser; reusing it avoids creating a second
+    MediaElementSource for the same <audio>.
+  */
   const holder = document.createElement('div');
   holder.className = 'avatar-spectrum';
   holder.setAttribute('aria-hidden', 'true');
@@ -3225,14 +3227,16 @@ input,button,a{
   holder.appendChild(canvas);
   avatarWrap.appendChild(holder);
 
-  const ctx2d = canvas.getContext('2d');
-  if (!ctx2d) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
 
-  let raf = 0;
-  let active = false;
-  let smooth = [];
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
-  const POINTS = 52;
+  const POINTS = 64;
+  let raf = 0;
+  let running = false;
+  let fading = false;
+  let values = Array(POINTS).fill(0);
+  let targets = Array(POINTS).fill(0);
 
   function resize() {
     const r = holder.getBoundingClientRect();
@@ -3241,153 +3245,187 @@ input,button,a{
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
-      smooth = Array(POINTS).fill(0);
     }
   }
 
-  function clearCanvas() {
-    ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+  function clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  function stop() {
-    active = false;
-    cancelAnimationFrame(raf);
-    holder.classList.remove('is-active');
-    clearCanvas();
-  }
-
-  function draw() {
-    if (!active) return;
-
-    const analyser = window.kruzixAudioAnalyser;
-    if (audio.paused || audio.ended || !analyser) {
-      stop();
-      return;
-    }
-
-    resize();
-
+  function readSpectrum(analyser) {
     const freq = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(freq);
 
-    const w = canvas.width;
-    const h = canvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    const base = Math.min(w, h) * 0.338;
-
-    const values = [];
     for (let i = 0; i < POINTS; i++) {
-      const t = i / (POINTS - 1);
+      const t = i / POINTS;
 
-      /* Log-ish low/mid distribution: much more useful for music EQ
-         than spreading only the first 30% of FFT bins linearly. */
+      // Smooth logarithmic distribution across useful low/mid frequencies.
       const bin = Math.min(
         freq.length - 1,
-        Math.max(1, Math.floor(1 + Math.pow(t, 0.62) * (freq.length * 0.48)))
+        Math.max(1, Math.floor(1 + Math.pow(t, 0.68) * (freq.length * 0.46)))
       );
 
-      const span = Math.max(2, Math.floor(3 + (1 - t) * 6));
+      const span = Math.max(3, Math.floor(4 + (1 - t) * 5));
       let sum = 0;
-      let count = 0;
-
-      for (let k = 0; k < span; k++) {
-        const index = Math.min(freq.length - 1, bin + k);
-        sum += freq[index];
-        count++;
+      for (let k = -1; k <= span; k++) {
+        sum += freq[Math.min(freq.length - 1, Math.max(0, bin + k))];
       }
+      const raw = (sum / (span + 2)) / 255;
 
-      const raw = (sum / count) / 255;
-
-      /* Stable first pass: avoid a single FFT bin jumping far ahead of its neighbours. */
-      smooth[i] = smooth[i] * 0.78 + raw * 0.22;
+      // Compress extremes so no isolated spike dominates the ring.
+      targets[i] = Math.pow(Math.min(1, raw), 0.82);
     }
 
-    /* Circular neighbour smoothing makes the closed ring continuous.
-       In particular, the first and last points can no longer create one
-       oversized spike where the path closes. */
-    for (let pass = 0; pass < 2; pass++) {
+    // Circular spatial smoothing.
+    for (let pass = 0; pass < 3; pass++) {
       const next = new Array(POINTS);
       for (let i = 0; i < POINTS; i++) {
-        const prev = smooth[(i - 1 + POINTS) % POINTS];
-        const cur = smooth[i];
-        const after = smooth[(i + 1) % POINTS];
-        next[i] = prev * 0.22 + cur * 0.56 + after * 0.22;
+        const prev = targets[(i - 1 + POINTS) % POINTS];
+        const cur = targets[i];
+        const nextV = targets[(i + 1) % POINTS];
+        next[i] = prev * 0.25 + cur * 0.50 + nextV * 0.25;
       }
-      smooth = next;
+      targets = next;
     }
+  }
 
-    /* Compress the dynamic range so the whole equalizer stays balanced. */
-    let mean = 0;
-    for (let i = 0; i < POINTS; i++) mean += smooth[i];
-    mean /= POINTS;
+  function drawPath(base, amp, opacityScale) {
+    const pts = [];
+    const w = canvas.width, h = canvas.height;
+    const cx = w / 2, cy = h / 2;
 
+    // A gentle organic radial wave. The small deterministic variation
+    // keeps it from looking like a mathematically perfect circle.
     for (let i = 0; i < POINTS; i++) {
-      const relative = smooth[i] - mean;
-      const compressed = mean + relative * 0.48;
-      values[i] = Math.min(0.72, Math.max(0.035, compressed));
+      const a = (i / POINTS) * Math.PI * 2 - Math.PI / 2;
+      const v = values[i];
+
+      const organic =
+        0.10 * Math.sin(a * 3 + 0.45) +
+        0.055 * Math.sin(a * 7 - 0.8);
+
+      // Mostly smooth, with restrained pointed peaks where the music rises.
+      const peak = Math.pow(Math.max(0, v), 1.12);
+      const r = base + organic * base * 0.035 + (0.10 + peak * 0.90) * amp;
+
+      pts.push({
+        x: cx + Math.cos(a) * r,
+        y: cy + Math.sin(a) * r
+      });
     }
 
-    clearCanvas();
+    // Quadratic midpoint path: continuous, wave-like, no polygonal teeth.
+    ctx.beginPath();
+    for (let i = 0; i < POINTS; i++) {
+      const p = pts[i];
+      const next = pts[(i + 1) % POINTS];
+      const midX = (p.x + next.x) / 2;
+      const midY = (p.y + next.y) / 2;
 
-    function pathFor(offset, strength, phase = 0) {
-      ctx2d.beginPath();
-
-      for (let i = 0; i <= POINTS; i++) {
-        const j = i % POINTS;
-        const a = (j / POINTS) * Math.PI * 2 - Math.PI / 2 + phase;
-        const v = values[j];
-
-        /* Keep every segment at a consistent visual scale.
-           The spectrum itself still moves, but there is no artificial
-           bass multiplier that can make one part of the closed ring jump. */
-        const r = base + offset + v * base * 0.16 * strength;
-
-        const x = cx + Math.cos(a) * r;
-        const y = cy + Math.sin(a) * r;
-
-        if (i === 0) ctx2d.moveTo(x, y);
-        else ctx2d.lineTo(x, y);
+      if (i === 0) {
+        const prev = pts[POINTS - 1];
+        const startX = (prev.x + p.x) / 2;
+        const startY = (prev.y + p.y) / 2;
+        ctx.moveTo(startX, startY);
       }
 
-      ctx2d.closePath();
+      ctx.quadraticCurveTo(p.x, p.y, midX, midY);
+    }
+    ctx.closePath();
+
+    ctx.globalAlpha = opacityScale;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  function render(fadeOnly = false) {
+    resize();
+
+    if (!fadeOnly) {
+      const analyser = window.kruzixAudioAnalyser;
+      if (analyser && !audio.paused && !audio.ended) {
+        readSpectrum(analyser);
+      }
     }
 
-    /* Subtle, theme-aware spectrum: thin lines, restrained glow. */
+    // Temporal interpolation removes micro-jitter while preserving musical motion.
+    const response = fadeOnly ? 0.075 : 0.115;
+    for (let i = 0; i < POINTS; i++) {
+      values[i] += (targets[i] - values[i]) * response;
+    }
+
+    const w = canvas.width, h = canvas.height;
+    const base = Math.min(w, h) * 0.338;
+    const amp = base * 0.105;
+
+    clear();
+
     const light = document.body.classList.contains('light');
 
-    ctx2d.save();
-    ctx2d.shadowBlur = (light ? 8 : 10) * DPR;
-    ctx2d.shadowColor = light ? 'rgba(104,78,132,.18)' : 'rgba(195,145,255,.24)';
-    pathFor(2 * DPR, 1);
-    ctx2d.strokeStyle = light ? 'rgba(102,78,130,.48)' : 'rgba(214,186,255,.52)';
-    ctx2d.lineWidth = 0.9 * DPR;
-    ctx2d.stroke();
-    ctx2d.restore();
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.shadowBlur = (light ? 6 : 8) * DPR;
+    ctx.shadowColor = light
+      ? 'rgba(104,78,132,.16)'
+      : 'rgba(195,145,255,.20)';
+    ctx.lineWidth = 0.85 * DPR;
+    ctx.strokeStyle = light
+      ? 'rgba(102,78,130,.42)'
+      : 'rgba(214,186,255,.46)';
+    drawPath(base + 1.5 * DPR, amp, 0.72);
 
-    /* Main spectrum line. */
-    pathFor(0, 1);
-    ctx2d.strokeStyle = light ? 'rgba(82,61,108,.70)' : 'rgba(238,221,255,.78)';
-    ctx2d.lineWidth = 1.05 * DPR;
-    ctx2d.stroke();
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 1.0 * DPR;
+    ctx.strokeStyle = light
+      ? 'rgba(82,61,108,.62)'
+      : 'rgba(238,221,255,.72)';
+    drawPath(base, amp, 1);
 
-    /* Very soft secondary trace. */
-    pathFor(-1.5 * DPR, 0.42, 0.014);
-    ctx2d.strokeStyle = light ? 'rgba(132,104,157,.28)' : 'rgba(177,137,226,.24)';
-    ctx2d.lineWidth = 0.65 * DPR;
-    ctx2d.stroke();
+    ctx.lineWidth = 0.6 * DPR;
+    ctx.strokeStyle = light
+      ? 'rgba(132,104,157,.20)'
+      : 'rgba(177,137,226,.18)';
+    drawPath(base - 1.4 * DPR, amp * 0.38, 0.45);
+    ctx.restore();
 
-    raf = requestAnimationFrame(draw);
+    const energy = values.reduce((a, b) => a + b, 0) / POINTS;
+
+    if (!running && energy < 0.006) {
+      targets.fill(0);
+      values.fill(0);
+      clear();
+      fading = false;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      return;
+    }
+
+    raf = requestAnimationFrame(() => render(!running));
   }
 
   function start() {
     const analyser = window.kruzixAudioAnalyser;
     if (audio.paused || audio.ended || !analyser) return;
 
-    active = true;
+    running = true;
+    fading = false;
     holder.classList.add('is-active');
     cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(draw);
+    raf = requestAnimationFrame(() => render(false));
+  }
+
+  function stop() {
+    if (!running && !fading) return;
+
+    running = false;
+    fading = true;
+    targets.fill(0);
+
+    // Keep rendering while values naturally settle to zero.
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => render(true));
+    holder.classList.remove('is-active');
   }
 
   window.addEventListener('resize', resize, { passive: true });
@@ -3397,31 +3435,33 @@ input,button,a{
   audio.addEventListener('pause', stop);
   audio.addEventListener('ended', stop);
 
-  /* The shared analyser is created by the beat-analysis module on play.
-     Wait briefly in case this script runs before that module initializes. */
   const wait = setInterval(() => {
     if (window.kruzixAudioAnalyser) {
       clearInterval(wait);
-      if (!audio.paused) start();
+      if (!audio.paused && !audio.ended) start();
     }
   }, 50);
 
-  stop();
+  holder.classList.remove('is-active');
+  clear();
 })();
 </script>
 
 
 <style id="kruzix-smooth-audio-effects-final">
+/* Smooth audio visuals: no pointer interaction, no layout/hover jitter. */
 .avatar-spectrum{
   opacity:0;
-  transition:opacity .52s ease;
+  transition:opacity .92s cubic-bezier(.22,.61,.36,1);
   will-change:opacity;
   filter:none;
+  pointer-events:none !important;
+  transform:translate3d(-50%,-50%,0);
+  transition-property:opacity;
 }
 .avatar-spectrum.is-active{opacity:1}
 body.light .avatar-spectrum{filter:saturate(.82) brightness(.94)}
 
-/* Сохраняем исходную пульсацию обложки, но мягко запускаем и останавливаем её. */
 .profile .music-art{
   animation:none !important;
   transform:scale(1);
