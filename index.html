@@ -1301,7 +1301,9 @@ html.light .profile .music-track-genre{
   });
 
   audio.addEventListener('ended', () => {
-    nextTrack();
+    // ended fires after the browser marks the current audio as ended,
+    // so nextTrack() must be told explicitly to keep playback running.
+    nextTrack(true);
   });
 
   audio.volume = 0.18;
@@ -2079,8 +2081,6 @@ body.light .profile-row .social{
 }
 </style>
 
-</body>
-</html>
 <style>
 
 </style>
@@ -2895,3 +2895,63 @@ input,button,a{
              opacity .28s ease !important;
 }
 </style>
+
+<style id="kruzix-mobile-player-final">
+/* Mobile: keep the profile clean. Transport buttons and the profile equalizer
+   are desktop-only; the track info and progress bar remain visible. */
+@media (max-width: 700px){
+  .profile .music-controls{
+    display:none !important;
+  }
+  .profile-row .socials .profile-eq{
+    display:none !important;
+  }
+
+  /* Prevent old absolute/animated decorative elements from creating a
+     horizontal layout shift in stricter mobile browsers. */
+  html, body{
+    max-width:100%;
+    overflow-x:hidden;
+  }
+  .wrap, .profile, .profile .music-player, .cards, .card{
+    max-width:100%;
+  }
+  .profile .music-player{
+    min-width:0;
+    grid-template-columns:58px minmax(0,1fr);
+  }
+  .profile .music-main,
+  .profile .music-meta,
+  .profile .music-title{
+    min-width:0;
+  }
+  .profile .music-track-name{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+}
+
+@media (max-width: 390px){
+  .profile .music-player{
+    width:100%;
+    grid-template-columns:52px minmax(0,1fr);
+    gap:10px;
+    padding:11px 12px;
+  }
+  .profile .music-art{
+    width:52px;
+    height:52px;
+  }
+  .profile .music-title{
+    font-size:17px !important;
+  }
+  .profile .music-progress-row{
+    grid-template-columns:30px minmax(40px,1fr) 30px;
+    gap:5px;
+  }
+}
+</style>
+
+</body>
+</html>
