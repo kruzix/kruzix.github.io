@@ -456,6 +456,11 @@ body.light .perf-option input:checked:before{background:#fff !important;box-shad
 .nav-links{position:absolute !important;left:50% !important;top:50% !important;transform:translate(-50%,-50%) !important;margin:0 !important;}
 @media(max-width:520px){.nav-links{left:50% !important;transform:translate(-50%,-50%) !important;}}
 </style>
+<style id="kruzix-critical-first-paint">
+/* Critical first-paint rules: prevent the settings panel from flashing unstyled. */
+.perf-panel{position:absolute;right:20px;top:78px;z-index:1000;opacity:0;visibility:hidden;transform:translateY(-6px);pointer-events:none;}
+.perf-panel.is-open{opacity:1;visibility:visible;transform:none;pointer-events:auto;}
+</style>
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -658,6 +663,7 @@ body.light .link-grid a{
   color:#3b2d44;background:rgba(255,255,255,.46);border-color:rgba(74,45,96,.13)
 }
 body.light footer{color:#87768e}
+</style>
 <script id="theme-settings-base">
 (function(){
   const saved=localStorage.getItem('kruzix-theme');
