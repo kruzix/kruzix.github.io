@@ -379,6 +379,20 @@ body.light .profile{
   box-shadow:0 16px 40px rgba(88,72,103,.07) !important;
 }
 </style>
+
+<style id="kruzix-progress-left-v12">
+/* v12: shift the progress bar and both time labels slightly left */
+.profile .music-progress-row{
+  transform:translateX(-3px);
+  width:calc(100% + 8px);
+}
+@media (max-width:390px){
+  .profile .music-progress-row{
+    transform:translateX(-4px);
+    width:calc(100% + 6px);
+  }
+}
+</style>
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -878,8 +892,8 @@ body.light .flying-butterfly{opacity:.28;filter:drop-shadow(0 0 6px rgba(153,109
 /* Final navigation balance and control order */
 .nav-inner{padding-left:22px;padding-right:22px;box-sizing:border-box}
 .brand-simple{position:relative;left:-24px}
-.nav-links{margin-left:auto;transform:translateX(-10px)}
-.nav-controls{margin-left:12px;transform:translateX(-10px)}
+.nav-links{margin-left:auto;transform:translateX(-8px)}
+.nav-controls{margin-left:12px;transform:translateX(-8px)}
 
 /* Both hanging garlands use the same slow, natural movement. */
 .rose-left .garland-sway,.rose-right .garland-sway{animation:nightVineSway 9s ease-in-out infinite!important}
@@ -2947,12 +2961,12 @@ input,button,a{
 /* Кнопки навигации чуть левее: визуально зеркальнее относительно kruzix. */
 @media (min-width: 801px){
   .nav-controls{
-    transform:translateX(-10px);
+    transform:translateX(-8px);
   }
 }
 @media (max-width: 800px){
   .nav-controls{
-    transform:translateX(-6px);
+    transform:translateX(-4px);
   }
 }
 </style>
@@ -3256,24 +3270,30 @@ input,button,a{
     const freq = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(freq);
 
+    // Use 32 bands and mirror them around the ring so the contour stays
+    // visually balanced instead of becoming denser on one side.
+    const HALF = POINTS / 2;
     for (let i = 0; i < POINTS; i++) {
-      const t = i / POINTS;
+      const mirrored = i <= HALF ? i : POINTS - i;
+      const t = mirrored / HALF;
 
-      // Smooth logarithmic distribution across useful low/mid frequencies.
       const bin = Math.min(
         freq.length - 1,
         Math.max(1, Math.floor(1 + Math.pow(t, 0.68) * (freq.length * 0.46)))
       );
 
-      const span = Math.max(3, Math.floor(4 + (1 - t) * 5));
+      const span = Math.max(4, Math.floor(5 + (1 - t) * 4));
       let sum = 0;
-      for (let k = -1; k <= span; k++) {
-        sum += freq[Math.min(freq.length - 1, Math.max(0, bin + k))];
+      let count = 0;
+      for (let k = -span; k <= span; k++) {
+        const idx = Math.min(freq.length - 1, Math.max(0, bin + k));
+        sum += freq[idx];
+        count++;
       }
-      const raw = (sum / (span + 2)) / 255;
+      const raw = (sum / count) / 255;
 
       // Compress extremes so no isolated spike dominates the ring.
-      targets[i] = Math.pow(Math.min(1, raw), 0.82);
+      targets[i] = Math.pow(Math.min(1, raw), 0.86);
     }
 
     // Circular spatial smoothing.
@@ -3294,19 +3314,14 @@ input,button,a{
     const w = canvas.width, h = canvas.height;
     const cx = w / 2, cy = h / 2;
 
-    // A gentle organic radial wave. The small deterministic variation
-    // keeps it from looking like a mathematically perfect circle.
+    // Keep the resting radius perfectly even. Only the music deforms it.
     for (let i = 0; i < POINTS; i++) {
       const a = (i / POINTS) * Math.PI * 2 - Math.PI / 2;
       const v = values[i];
 
-      const organic =
-        0.10 * Math.sin(a * 3 + 0.45) +
-        0.055 * Math.sin(a * 7 - 0.8);
-
-      // Mostly smooth, with restrained pointed peaks where the music rises.
-      const peak = Math.pow(Math.max(0, v), 1.12);
-      const r = base + organic * base * 0.035 + (0.10 + peak * 0.90) * amp;
+      // Smooth, restrained peaks where the music rises.
+      const peak = Math.pow(Math.max(0, v), 1.10);
+      const r = base + (0.085 + peak * 0.915) * amp;
 
       pts.push({
         x: cx + Math.cos(a) * r,
@@ -3557,3 +3572,8 @@ body.light .profile .music-player:not(.is-playing) .music-art{
 </script>
 </body>
 </html>
+
+<style id="kruzix-progress-position-v16">
+/* v16: move progress row 1px left from v15 */
+.progress-row{transform:translateX(7px) !important;}
+</style>
