@@ -350,6 +350,35 @@ body.light .profile .music-art span{color:#705784;text-shadow:0 0 12px rgba(125,
 }
 </style>
 
+
+<style id="kruzix-light-hero-card-fix">
+/* Светлая тема: верхний hero-блок должен отделяться от фона так же уверенно, как карточки ниже. */
+body.light .hero-frame{
+  background:rgba(255,255,255,.94);
+  border-color:rgba(74,45,96,.18);
+  box-shadow:
+    0 18px 55px rgba(70,44,86,.10),
+    0 2px 10px rgba(70,44,86,.05),
+    0 0 0 1px rgba(255,255,255,.72) inset;
+}
+body.light .hero-frame>img,
+body.light .hero-frame .hero-banner{
+  background:#fff;
+}
+body.light .hero-frame:after{
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.015) 15%,
+    rgba(255,255,255,.025) 55%,
+    rgba(74,45,96,.10) 100%);
+}
+</style>
+
+<style id="kruzix-profile-card-shadow-v80">
+/* v80: top profile card uses exactly the same light-theme shadow as the cards below. */
+body.light .profile{
+  box-shadow:0 16px 40px rgba(88,72,103,.07) !important;
+}
+</style>
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -3203,7 +3232,7 @@ input,button,a{
   let active = false;
   let smooth = [];
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
-  const POINTS = 64;
+  const POINTS = 52;
 
   function resize() {
     const r = holder.getBoundingClientRect();
@@ -3245,7 +3274,7 @@ input,button,a{
     const h = canvas.height;
     const cx = w / 2;
     const cy = h / 2;
-    const base = Math.min(w, h) * 0.335;
+    const base = Math.min(w, h) * 0.338;
 
     const values = [];
     for (let i = 0; i < POINTS; i++) {
@@ -3271,7 +3300,7 @@ input,button,a{
       const raw = (sum / count) / 255;
 
       /* Fast enough to react to kicks, but stable enough not to jitter. */
-      smooth[i] = smooth[i] * 0.64 + raw * 0.36;
+      smooth[i] = smooth[i] * 0.72 + raw * 0.28;
       values[i] = Math.min(1, Math.max(0, smooth[i]));
     }
 
@@ -3288,7 +3317,7 @@ input,button,a{
         /* Keep the effect tight around the avatar while making bass
            noticeably stronger than quiet high frequencies. */
         const bassBoost = 0.72 + (1 - j / POINTS) * 0.28;
-        const r = base + offset + v * base * 0.34 * strength * bassBoost;
+        const r = base + offset + v * base * 0.22 * strength * bassBoost;
 
         const x = cx + Math.cos(a) * r;
         const y = cy + Math.sin(a) * r;
@@ -3300,26 +3329,28 @@ input,button,a{
       ctx2d.closePath();
     }
 
-    /* Soft outer glow. */
+    /* Subtle, theme-aware spectrum: thin lines, restrained glow. */
+    const light = document.body.classList.contains('light');
+
     ctx2d.save();
-    ctx2d.shadowBlur = 15 * DPR;
-    ctx2d.shadowColor = 'rgba(195,145,255,.42)';
-    pathFor(4 * DPR, 1);
-    ctx2d.strokeStyle = 'rgba(207,167,255,.32)';
-    ctx2d.lineWidth = 1.2 * DPR;
+    ctx2d.shadowBlur = (light ? 8 : 10) * DPR;
+    ctx2d.shadowColor = light ? 'rgba(104,78,132,.18)' : 'rgba(195,145,255,.24)';
+    pathFor(2 * DPR, 1);
+    ctx2d.strokeStyle = light ? 'rgba(102,78,130,.48)' : 'rgba(214,186,255,.52)';
+    ctx2d.lineWidth = 0.9 * DPR;
     ctx2d.stroke();
     ctx2d.restore();
 
     /* Main spectrum line. */
-    pathFor(1 * DPR, 1);
-    ctx2d.strokeStyle = 'rgba(229,207,255,.88)';
-    ctx2d.lineWidth = 1.35 * DPR;
+    pathFor(0, 1);
+    ctx2d.strokeStyle = light ? 'rgba(82,61,108,.70)' : 'rgba(238,221,255,.78)';
+    ctx2d.lineWidth = 1.05 * DPR;
     ctx2d.stroke();
 
-    /* Quiet secondary layer. */
-    pathFor(-2.5 * DPR, 0.58, 0.018);
-    ctx2d.strokeStyle = 'rgba(166,116,226,.38)';
-    ctx2d.lineWidth = 0.8 * DPR;
+    /* Very soft secondary trace. */
+    pathFor(-1.5 * DPR, 0.42, 0.014);
+    ctx2d.strokeStyle = light ? 'rgba(132,104,157,.28)' : 'rgba(177,137,226,.24)';
+    ctx2d.lineWidth = 0.65 * DPR;
     ctx2d.stroke();
 
     raf = requestAnimationFrame(draw);
@@ -3359,10 +3390,12 @@ input,button,a{
 <style id="kruzix-smooth-audio-effects-final">
 .avatar-spectrum{
   opacity:0;
-  transition:opacity .48s ease;
+  transition:opacity .52s ease;
   will-change:opacity;
+  filter:none;
 }
 .avatar-spectrum.is-active{opacity:1}
+body.light .avatar-spectrum{filter:saturate(.82) brightness(.94)}
 
 /* Сохраняем исходную пульсацию обложки, но мягко запускаем и останавливаем её. */
 .profile .music-art{
