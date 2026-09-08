@@ -10,5 +10,11 @@
     "title": "The Queen",
     "artist": "Lady Gaga",
     "genre": "Instrumental"
+  },
+  {
+    "file": "music3.mp3",
+    "title": "Heavy Metal Lover",
+    "artist": "Lady Gaga",
+    "genre": ""
   }
 ]
