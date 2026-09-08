@@ -1229,8 +1229,9 @@ html.light .profile .music-track-genre{
     loadTrack(state.index - 1, !audio.paused && !audio.ended);
   }
 
-  function nextTrack() {
-    loadTrack(state.index + 1, !audio.paused && !audio.ended);
+  function nextTrack(forcePlay = false) {
+    const keepPlaying = forcePlay || (!audio.paused && !audio.ended);
+    loadTrack(state.index + 1, keepPlaying);
   }
 
   window.kruzixPlayer = {
@@ -3010,6 +3011,253 @@ input,button,a{
   }
 }
 </style>
+
+
+<style id="kruzix-info-hover-and-mobile-player-final">
+/* Information rows: subtle lavender highlight on hover/focus. */
+.row{
+  position:relative;
+  transition:color .2s ease, background .2s ease, border-color .2s ease, padding-left .2s ease, padding-right .2s ease;
+  border-radius:10px;
+}
+.row:hover,
+.row:focus-within{
+  color:#eee6f4 !important;
+  background:linear-gradient(90deg,rgba(190,145,245,.10),rgba(190,145,245,.035),transparent);
+  border-bottom-color:rgba(207,174,255,.18) !important;
+  padding-left:10px;
+  padding-right:10px;
+}
+.row:hover b,
+.row:focus-within b{
+  color:#fff !important;
+  text-shadow:0 0 14px rgba(201,163,255,.35);
+}
+
+/* Mobile player: keep only Previous / Play-Pause / Next.
+   Volume and mute controls stay hidden so the three main buttons have room. */
+@media (max-width:700px){
+  .music-controls{
+    display:flex !important;
+    grid-column:1 / -1 !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:12px !important;
+    width:100% !important;
+  }
+  .music-controls #musicBack,
+  .music-controls #musicPlay,
+  .music-controls #musicNext{
+    display:grid !important;
+    place-items:center !important;
+    flex:0 0 auto !important;
+  }
+  .music-controls #musicMute,
+  .music-controls #musicVolume{
+    display:none !important;
+  }
+
+  .music-icon{
+    width:40px !important;
+    height:40px !important;
+    border-radius:13px !important;
+  }
+  .music-play{
+    width:48px !important;
+    height:48px !important;
+    border-radius:50% !important;
+  }
+}
+
+@media (max-width:390px){
+  .music-controls{gap:10px !important}
+  .music-icon{width:38px !important;height:38px !important}
+  .music-play{width:46px !important;height:46px !important}
+}
+</style>
+
+
+
+<style id="kruzix-radial-avatar-equalizer">
+/*
+  Radial spectrum visualizer: the avatar is surrounded by a living,
+  irregular waveform instead of a fixed circular ripple.
+*/
+.avatar-wrap{overflow:visible !important;}
+.avatar-spectrum{
+  position:absolute;
+  left:50%; top:50%;
+  width:150%; height:150%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+  pointer-events:none;
+  overflow:visible;
+}
+.avatar-spectrum canvas{
+  display:block;
+  width:100%; height:100%;
+  overflow:visible;
+}
+.avatar-wrap .avatar-ripple{display:none !important;}
+@media(max-width:800px){
+  .avatar-spectrum{width:150%;height:150%;}
+}
+@media(max-width:480px){
+  .avatar-spectrum{width:158%;height:158%;}
+}
+</style>
+
+<script id="kruzix-radial-avatar-equalizer-js">
+(() => {
+  const audio=document.getElementById('siteAudio');
+  const avatarWrap=document.querySelector('.avatar-wrap');
+  if(!audio || !avatarWrap) return;
+
+  /* Replace the old passive ripple with a real radial spectrum. */
+  const oldRipples=avatarWrap.querySelectorAll('.avatar-ripple');
+  oldRipples.forEach(el=>el.style.display='none');
+
+  const holder=document.createElement('div');
+  holder.className='avatar-spectrum';
+  holder.setAttribute('aria-hidden','true');
+  const canvas=document.createElement('canvas');
+  holder.appendChild(canvas);
+  avatarWrap.appendChild(holder);
+
+  const ctx2d=canvas.getContext('2d');
+  let analyser=null, audioCtx=null, source=null, freq=null;
+  let raf=0, active=false;
+  let smooth=[];
+  const DPR=Math.min(window.devicePixelRatio||1,2);
+
+  function init(){
+    if(analyser) return true;
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return false;
+    try{
+      audioCtx=new AC();
+      analyser=audioCtx.createAnalyser();
+      analyser.fftSize=1024;
+      analyser.minDecibels=-90;
+      analyser.maxDecibels=-8;
+      analyser.smoothingTimeConstant=.72;
+      freq=new Uint8Array(analyser.frequencyBinCount);
+      source=audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function resize(){
+    const r=holder.getBoundingClientRect();
+    const w=Math.max(1,Math.round(r.width*DPR));
+    const h=Math.max(1,Math.round(r.height*DPR));
+    if(canvas.width!==w || canvas.height!==h){
+      canvas.width=w; canvas.height=h;
+    }
+  }
+  addEventListener('resize',resize,{passive:true});
+  resize();
+
+  function draw(){
+    if(!active || !analyser){ raf=requestAnimationFrame(draw); return; }
+    analyser.getByteFrequencyData(freq);
+    resize();
+
+    const w=canvas.width, h=canvas.height;
+    ctx2d.clearRect(0,0,w,h);
+    const cx=w/2, cy=h/2;
+    const base=Math.min(w,h)*.335;
+    const points=72;
+
+    if(smooth.length!==points) smooth=Array(points).fill(0);
+
+    /* Low/mid spectrum is distributed around the circle like a 360° EQ. */
+    const values=[];
+    for(let i=0;i<points;i++){
+      const t=i/(points-1);
+      /* More weight on bass and low mids, while still following the whole EQ. */
+      const bin=Math.floor(2 + Math.pow(t,.72)*(freq.length*.30));
+      const span=3+Math.floor((1-t)*4);
+      let sum=0;
+      for(let k=0;k<span;k++) sum+=freq[Math.min(freq.length-1,bin+k)];
+      const raw=(sum/span)/255;
+      smooth[i]=smooth[i]*.76 + raw*.24;
+      values[i]=smooth[i];
+    }
+
+    function pathFor(radiusBoost, phase, strength){
+      ctx2d.beginPath();
+      for(let i=0;i<=points;i++){
+        const j=i%points;
+        const a=(j/points)*Math.PI*2 - Math.PI/2 + phase;
+        const v=values[j];
+        /* Bass gives larger waves; a little harmonic wobble keeps it organic. */
+        const r=base + radiusBoost + v*(base*.30*strength) + Math.sin(a*7+phase*3)*DPR*.7;
+        const x=cx+Math.cos(a)*r;
+        const y=cy+Math.sin(a)*r;
+        if(i===0) ctx2d.moveTo(x,y); else ctx2d.lineTo(x,y);
+      }
+      ctx2d.closePath();
+    }
+
+    /* Soft glow layer. */
+    ctx2d.save();
+    ctx2d.shadowBlur=13*DPR;
+    ctx2d.shadowColor='rgba(195,145,255,.38)';
+    pathFor(4*DPR,0,.95);
+    ctx2d.strokeStyle='rgba(207,167,255,.30)';
+    ctx2d.lineWidth=1.25*DPR;
+    ctx2d.stroke();
+    ctx2d.restore();
+
+    /* Main irregular EQ line. */
+    pathFor(1*DPR,0,.82);
+    ctx2d.strokeStyle='rgba(229,207,255,.82)';
+    ctx2d.lineWidth=1.35*DPR;
+    ctx2d.stroke();
+
+    /* A second, quieter line creates the layered waveform feel. */
+    pathFor(-3*DPR,.035,.55);
+    ctx2d.strokeStyle='rgba(166,116,226,.42)';
+    ctx2d.lineWidth=.8*DPR;
+    ctx2d.stroke();
+
+    raf=requestAnimationFrame(draw);
+  }
+
+  audio.addEventListener('play',()=>{
+    if(!init()) return;
+    try{ if(audioCtx.state==='suspended') audioCtx.resume(); }catch(e){}
+    if(!active){
+      active=true;
+      holder.classList.add('is-active');
+      cancelAnimationFrame(raf);
+      raf=requestAnimationFrame(draw);
+    }
+  });
+
+  audio.addEventListener('pause',()=>{
+    active=false;
+    holder.classList.remove('is-active');
+    cancelAnimationFrame(raf);
+    ctx2d.clearRect(0,0,canvas.width,canvas.height);
+  });
+  audio.addEventListener('ended',()=>{
+    active=false;
+    cancelAnimationFrame(raf);
+  });
+
+  /* If the page restores an already-playing audio element. */
+  if(!audio.paused){
+    if(init()){
+      active=true;
+      raf=requestAnimationFrame(draw);
+    }
+  }
+})();
+</script>
 
 </body>
 </html>
