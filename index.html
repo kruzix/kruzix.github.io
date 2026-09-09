@@ -1,3 +1,4 @@
+
 <meta name="description" content="kruzix | a little piece of my world, links, interests and lavender dreams.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="kruzix">
@@ -725,7 +726,6 @@ html.light .quote::after{
  <section class="music-player" aria-label="Music player">
   <audio id="siteAudio" preload="metadata" src="music.mp3"></audio>
   <div class="music-art-wrap" aria-hidden="true">
-    <span class="music-art-circle"></span>
     <div class="music-art"><span>✦</span></div>
   </div>
   <div class="music-main">
@@ -4085,7 +4085,7 @@ html.light .music-playlist-toggle{
    desktop art 70px / play 48px, mobile art 58px / play 48px.
 */
 
-/* Cover wrapper: gives the rotating circle a real layer BEHIND the cover. */
+/* Keep the original album-cover size and animation. */
 .profile .music-art-wrap{
   position:relative;
   width:70px;
@@ -4094,104 +4094,77 @@ html.light .music-playlist-toggle{
   place-items:center;
   flex:0 0 70px;
   overflow:visible;
-  isolation:isolate;
 }
 .profile .music-art-wrap .music-art{
   position:relative;
-  z-index:2;
+  z-index:1;
   width:70px !important;
   height:70px !important;
   transform-origin:center;
 }
-
-/* The requested circle behind the album cover. */
-.profile .music-art-circle{
-  position:absolute;
-  z-index:1;
-  width:84px;
-  height:84px;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%) rotate(0deg);
-  border-radius:50%;
-  border:1px solid rgba(210,178,255,.20);
-  border-top-color:rgba(214,185,255,.86);
-  border-right-color:rgba(175,124,239,.58);
-  box-shadow:
-    0 0 16px rgba(177,125,244,.16),
-    inset 0 0 10px rgba(198,156,255,.05);
-  opacity:.72;
-  pointer-events:none;
-  will-change:transform,opacity;
-}
-
-/* Rotate only the circle, never the square cover. */
-.profile .music-player.is-playing .music-art-circle{
-  animation:kruzixCoverCircleSpin 3.8s linear infinite;
-  opacity:1;
-}
-@keyframes kruzixCoverCircleSpin{
-  from{transform:translate(-50%,-50%) rotate(0deg)}
-  to{transform:translate(-50%,-50%) rotate(360deg)}
-}
-
-/* Keep the old cover pulse/glow exactly as the base version intended. */
 .profile .music-player.is-playing .music-art{
   animation:musicArtPulse 2.6s ease-in-out infinite !important;
   transform-origin:center;
   will-change:transform,box-shadow;
 }
 
-/* True circular animated ring around the existing 48px Play button.
-   No extra icon/pseudo play symbol is added, so the Play/Pause glyph cannot duplicate. */
+/* Exact reference-style Play ring: fixed SVG circle, centered on the existing button. */
 .profile .music-player .music-play{
-  position:relative;
-  z-index:1;
-  width:48px;
-  height:48px;
-  min-width:48px;
-  min-height:48px;
-  border-radius:50%;
+  position:relative !important;
+  display:grid !important;
+  place-items:center !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+  line-height:1 !important;
   transform:none !important;
 }
-.profile .music-player .music-play::before{
-  content:"";
-  position:absolute;
-  z-index:0;
-  width:58px;
-  height:58px;
-  left:50%;
-  top:50%;
-  margin-left:-29px;
-  margin-top:-29px;
-  border-radius:50%;
-  border:2px solid rgba(214,188,255,.18);
-  border-top-color:#d8bfff;
-  border-right-color:rgba(180,128,245,.72);
-  box-shadow:0 0 14px rgba(177,125,244,.18);
-  pointer-events:none;
-  animation:none;
+.profile .music-player .music-play::before,
+.profile .music-player .music-play::after{
+  content:none !important;
+  display:none !important;
+  animation:none !important;
 }
-.profile .music-player.is-playing .music-play::before{
-  animation:kruzixPlayCircleSpin 1.65s linear infinite;
+.profile .music-player .music-play-ring-svg{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:calc(100% + 14px) !important;
+  height:calc(100% + 14px) !important;
+  display:block !important;
+  overflow:visible !important;
+  pointer-events:none !important;
+  z-index:-1 !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  transform:translate(-50%,-50%) rotate(0deg) !important;
+  transform-origin:50% 50% !important;
+  aspect-ratio:1 / 1 !important;
 }
-@keyframes kruzixPlayCircleSpin{
-  from{transform:rotate(0deg)}
-  to{transform:rotate(360deg)}
+.profile .music-player.is-playing .music-play-ring-svg{
+  opacity:1 !important;
+  visibility:visible !important;
+  animation:kruzixReferenceRingSpinV86 2.2s linear infinite !important;
+}
+.profile .music-play-ring-svg circle{
+  fill:none !important;
+  stroke:#d2b1ff !important;
+  stroke-width:2 !important;
+  stroke-linecap:round !important;
+  vector-effect:non-scaling-stroke !important;
+  filter:drop-shadow(0 0 4px rgba(184,132,247,.75)) !important;
+  stroke-dasharray:78 217 !important;
+  stroke-dashoffset:0 !important;
+}
+@keyframes kruzixReferenceRingSpinV86{
+  from{transform:translate(-50%,-50%) rotate(0deg)}
+  to{transform:translate(-50%,-50%) rotate(360deg)}
 }
 
-/* Light theme: keep both circles visible but softer. */
-body.light .profile .music-art-circle{
-  border-color:rgba(117,91,145,.20);
-  border-top-color:rgba(112,82,147,.72);
-  border-right-color:rgba(145,108,179,.52);
-  box-shadow:0 0 14px rgba(126,102,147,.12);
-}
-body.light .profile .music-play::before{
-  border-color:rgba(93,70,115,.15);
-  border-top-color:#76558f;
-  border-right-color:rgba(126,91,164,.62);
-  box-shadow:0 0 12px rgba(126,102,147,.12);
+/* The performance mode must not disable these two requested player animations. */
+body.performance-lite .profile .music-player.is-playing .music-art{
+  animation:musicArtPulse 2.6s ease-in-out infinite !important;
+  transition:none !important;
+  transform-origin:center !important;
 }
 
 @media(max-width:700px){
@@ -4203,10 +4176,6 @@ body.light .profile .music-play::before{
   .profile .music-art-wrap .music-art{
     width:58px !important;
     height:58px !important;
-  }
-  .profile .music-art-circle{
-    width:72px;
-    height:72px;
   }
   .profile .music-player .music-play{
     width:48px !important;
@@ -4226,10 +4195,6 @@ body.light .profile .music-play::before{
     width:56px !important;
     height:56px !important;
   }
-  .profile .music-art-circle{
-    width:68px;
-    height:68px;
-  }
   .profile .music-player .music-play{
     width:46px !important;
     height:46px !important;
@@ -4237,10 +4202,45 @@ body.light .profile .music-play::before{
     min-height:46px !important;
   }
 }
-
-/* Lite mode is allowed to keep the requested player animations. */
 </style>
 
+<script id="kruzix-reference-play-ring">
+(() => {
+  const play = document.getElementById('musicPlay');
+  const player = play?.closest('.music-player');
+  const audio = document.getElementById('siteAudio');
+  if (!play || !player || !audio) return;
+
+  // Keep exactly one ring, even if an older version left one behind.
+  play.querySelectorAll('.music-play-ring, .music-play-ring-svg').forEach(node => node.remove());
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.classList.add('music-play-ring-svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+
+  const circle = document.createElementNS(svgNS, 'circle');
+  circle.setAttribute('cx', '50');
+  circle.setAttribute('cy', '50');
+  circle.setAttribute('r', '47');
+  svg.appendChild(circle);
+  play.appendChild(svg);
+
+  const sync = () => {
+    player.classList.toggle('is-playing', !audio.paused && !audio.ended);
+  };
+  audio.addEventListener('play', sync);
+  audio.addEventListener('pause', sync);
+  audio.addEventListener('ended', sync);
+  audio.addEventListener('emptied', sync);
+  audio.addEventListener('loadedmetadata', sync);
+  audio.addEventListener('error', sync);
+  sync();
+})();
+</script>
 </body>
 <style id="kruzix-status-and-ru-format-v27">
 .profile-info .status{margin-left:0 !important;}
