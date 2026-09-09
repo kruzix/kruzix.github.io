@@ -5322,138 +5322,110 @@ html.light .music-playlist-toggle span{
 </style>
 
 
-<style id="kruzix-player-final-v87">
-/* FINAL PLAYER EFFECTS — deliberately one implementation only. */
+<style id="kruzix-player-clean-v88">
+/* Clean final player effects: one ring, one cover pulse. */
 .profile .music-player .music-play{
   position:relative !important;
   isolation:isolate !important;
   overflow:visible !important;
-  width:50px !important;
-  height:50px !important;
-  min-width:50px !important;
-  min-height:50px !important;
-  border-radius:50% !important;
 }
-
-/* One circular rotating ring. It is centered from the button itself,
-   not from the player, so it can never become a page-sized ellipse. */
 .profile .music-player .music-play::before{
   content:"" !important;
   position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  width:58px !important;
-  height:58px !important;
-  min-width:58px !important;
-  min-height:58px !important;
-  max-width:58px !important;
-  max-height:58px !important;
-  box-sizing:border-box !important;
+  inset:-5px !important;
+  width:auto !important;
+  height:auto !important;
+  border:2px solid rgba(203,168,255,.20) !important;
+  border-top-color:rgba(222,190,255,.98) !important;
+  border-right-color:rgba(171,111,235,.78) !important;
   border-radius:50% !important;
-  padding:2px !important;
-  transform:translate(-50%,-50%) rotate(0deg) !important;
-  transform-origin:50% 50% !important;
+  box-sizing:border-box !important;
+  transform:none !important;
   pointer-events:none !important;
-  z-index:1 !important;
+  z-index:3 !important;
   opacity:0 !important;
-  background:conic-gradient(
-    from 0deg,
-    transparent 0deg 35deg,
-    rgba(190,145,245,.12) 50deg,
-    rgba(210,177,255,.98) 82deg,
-    rgba(157,94,224,.90) 112deg,
-    rgba(190,145,245,.18) 145deg,
-    transparent 175deg 360deg
-  ) !important;
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0) !important;
-  -webkit-mask-composite:xor !important;
-  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0) !important;
-  mask-composite:exclude !important;
   filter:drop-shadow(0 0 4px rgba(184,132,247,.72)) !important;
 }
 .profile .music-player.is-playing .music-play::before{
   opacity:1 !important;
-  animation:kruzixFinalPlayRingV87 2.2s linear infinite !important;
+  animation:kruzixPlayRingCleanV88 1.9s linear infinite !important;
 }
-.profile .music-player:not(.is-playing) .music-play::before{
-  opacity:0 !important;
-  animation:none !important;
-}
-@keyframes kruzixFinalPlayRingV87{
-  from{transform:translate(-50%,-50%) rotate(0deg)}
-  to{transform:translate(-50%,-50%) rotate(360deg)}
-}
+@keyframes kruzixPlayRingCleanV88{to{transform:rotate(360deg)}}
 
-/* Restore the reference file's album-cover animation exactly:
-   1 -> 1.025 -> 1 every 2.6s, with the purple glow breathing with it. */
+/* Reference-style cover: tiny 1 -> 1.025 -> 1 pulse plus breathing glow. */
 .profile .music-art{
-  animation:none !important;
-  transform:scale(1) !important;
   transform-origin:center center !important;
   will-change:transform,box-shadow !important;
 }
-@keyframes kruzixFinalMusicArtPulseV87{
-  0%,100%{
-    transform:scale(1);
-    box-shadow:0 0 26px rgba(170,126,255,.20);
-  }
-  50%{
-    transform:scale(1.025);
-    box-shadow:
-      0 0 35px rgba(180,132,240,.38),
-      0 0 54px rgba(180,132,240,.16);
-  }
+@keyframes kruzixMusicArtCleanV88{
+  0%,100%{transform:scale(1);box-shadow:0 0 26px rgba(170,126,255,.20)}
+  50%{transform:scale(1.025);box-shadow:0 0 35px rgba(180,132,240,.38),0 0 54px rgba(180,132,240,.16)}
 }
 .profile .music-player.is-playing .music-art{
-  animation:kruzixFinalMusicArtPulseV87 2.6s ease-in-out infinite !important;
+  animation:kruzixMusicArtCleanV88 2.6s ease-in-out infinite !important;
 }
 
-/* Do not let the site's performance mode silently disable these two
-   effects; they are part of the music-player visual itself. */
-body.performance-lite .profile .music-player.is-playing .music-art{
-  animation:kruzixFinalMusicArtPulseV87 2.6s ease-in-out infinite !important;
-  transform-origin:center center !important;
+/* Two animated halos behind the cover, matching the circular treatment in the reference. */
+.profile .music-art-aura{
+  position:absolute !important;
+  left:0 !important;top:0 !important;
+  width:70px !important;height:70px !important;
+  border-radius:50% !important;
+  pointer-events:none !important;
+  z-index:0 !important;
+  opacity:0 !important;
+  transform:scale(.82) !important;
+  border:1px solid rgba(205,166,255,.38) !important;
+  box-shadow:0 0 22px rgba(188,135,255,.18) !important;
 }
-body.performance-lite .profile .music-player.is-playing .music-play::before{
-  opacity:1 !important;
-  animation:kruzixFinalPlayRingV87 2.2s linear infinite !important;
+.profile .music-player.is-playing .music-art-aura{opacity:1 !important;animation:kruzixArtAuraCleanV88 3.2s ease-out infinite !important}
+@keyframes kruzixArtAuraCleanV88{
+  0%{transform:scale(.82);opacity:.42}
+  55%{transform:scale(1.30);opacity:.16}
+  100%{transform:scale(1.55);opacity:0}
 }
-
 @media(max-width:700px){
-  .profile .music-player{
-    width:100% !important;
-    max-width:100% !important;
-    margin-left:0 !important;
-    margin-right:0 !important;
-    box-sizing:border-box !important;
-  }
-  .profile .music-player .music-play{
-    width:50px !important;
-    height:50px !important;
-    min-width:50px !important;
-    min-height:50px !important;
-  }
-}
-@media(max-width:390px){
-  .profile .music-player .music-play{
-    width:46px !important;
-    height:46px !important;
-    min-width:46px !important;
-    min-height:46px !important;
-  }
-  .profile .music-player .music-play::before{
-    width:54px !important;
-    height:54px !important;
-    min-width:54px !important;
-    min-height:54px !important;
-    max-width:54px !important;
-    max-height:54px !important;
-  }
+  .profile .music-player{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;box-sizing:border-box !important}
 }
 @media(prefers-reduced-motion:reduce){
+  .profile .music-player.is-playing .music-play::before,
   .profile .music-player.is-playing .music-art,
-  .profile .music-player.is-playing .music-play::before{
-    animation:none !important;
-  }
+  .profile .music-player.is-playing .music-art-aura{animation:none !important}
 }
 </style>
+<script id="kruzix-player-clean-v88-js">
+(() => {
+  const card=document.querySelector('.profile .music-player');
+  const play=document.getElementById('musicPlay');
+  const audio=document.getElementById('siteAudio');
+  const art=document.querySelector('.profile .music-art');
+  if(!card||!play||!audio||!art)return;
+
+  /* Create the aura outside the clipped cover so it is genuinely behind it. */
+  let aura=card.querySelector('.music-art-aura');
+  if(!aura){
+    aura=document.createElement('span');
+    aura.className='music-art-aura';
+    const artBox=art.parentElement;
+    if(artBox && getComputedStyle(artBox).position==='static') artBox.style.position='relative';
+    artBox?.insertBefore(aura,art);
+  }
+
+  const sync=()=>{
+    const playing=!audio.paused&&!audio.ended;
+    card.classList.toggle('is-playing',playing);
+    if(playing){
+      play.textContent='❚❚';
+      play.setAttribute('aria-label','Pause');
+    }else{
+      play.textContent='▶';
+      play.setAttribute('aria-label','Play');
+    }
+  };
+  audio.addEventListener('play',sync);
+  audio.addEventListener('pause',sync);
+  audio.addEventListener('ended',sync);
+  audio.addEventListener('emptied',sync);
+  sync();
+})();
+</script>
