@@ -3,18 +3,21 @@
     "file": "music.mp3",
     "title": "Electric Chapel",
     "artist": "Lady Gaga",
-    "genre": "Instrumental"
+    "genre": "Instrumental",
+    "cover": "BTW.jpg"
   },
   {
     "file": "music2.mp3",
     "title": "The Queen",
     "artist": "Lady Gaga",
-    "genre": "Instrumental"
+    "genre": "Instrumental",
+    "cover": "BTW.jpg"
   },
   {
     "file": "music3.mp3",
     "title": "Heavy Metal Lover",
     "artist": "Lady Gaga",
-    "genre": "Instrumental"
+    "genre": "Instrumental",
+    "cover": "BTW.jpg"
   }
 ]
