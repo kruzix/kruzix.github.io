@@ -1254,7 +1254,10 @@ html.light .profile .music-track-genre{
     return FALLBACK_TRACKS;
   }
   function setButtonState() {
-    const playing = !audio.paused && !audio.ended;
+    const switching = audio.dataset.kruzixSwitching === '1';
+    const playing = switching
+      ? audio.dataset.kruzixSwitchResume === '1'
+      : (!audio.paused && !audio.ended);
     card.classList.toggle('is-playing', playing);
     if (avatarWrap) avatarWrap.classList.toggle('music-playing', playing);
     play.textContent = playing ? '❚❚' : '▶';
@@ -1328,6 +1331,9 @@ html.light .profile .music-track-genre{
     // Preserve the state of the old track.
     const shouldPlay = !!keepPlaying;
     state.pendingPlay = shouldPlay;
+    // Keep the visual play state stable while the source is being swapped.
+    audio.dataset.kruzixSwitching = '1';
+    audio.dataset.kruzixSwitchResume = shouldPlay ? '1' : '0';
     audio.pause();
     // Metadata is updated immediately from tracks.json.
     showTrack(track);
@@ -1344,6 +1350,10 @@ html.light .profile .music-track-genre{
     if (shouldPlay) {
       await startPlayback();
     }
+    // Source swap is finished; now let the real audio state control the button.
+    audio.dataset.kruzixSwitching = '0';
+    audio.dataset.kruzixSwitchResume = '0';
+    setButtonState();
     // Prevent an old async operation from affecting the new track.
     if (token !== state.loadToken) return;
   }
@@ -3665,7 +3675,10 @@ body.light .perf-option input:not(:checked):before{
     volume.value = '18';
   }
   const sync = () => {
-    const playing = !audio.paused && !audio.ended;
+    const switching = audio.dataset.kruzixSwitching === '1';
+    const playing = switching
+      ? audio.dataset.kruzixSwitchResume === '1'
+      : (!audio.paused && !audio.ended);
     play.textContent = playing ? '❚❚' : '▶';
     play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     document.querySelector('.music-player')?.classList.toggle('is-playing', playing);
@@ -3905,6 +3918,7 @@ html.light .music-playlist-artist,html.light .music-playlist-num{color:#84788d}
 <style id="kruzix-music-playlist-v2-final">
 /* Refined playlist: rounded glass control + fully rounded list */
 .profile .music-player{
+  position:relative !important;
   border-radius:24px !important;
   overflow:visible !important;
 }
@@ -4508,10 +4522,55 @@ html.light .music-playlist-toggle span{
 }
 @media(max-width:700px){
   .music-playlist-toggle{
-    width:42px !important;
-    height:31px !important;
-    border-radius:16px !important;
-    margin:-3px auto -11px !important;
+    position:absolute !important;
+    right:12px !important;
+    bottom:-15px !important;
+    width:38px !important;
+    height:28px !important;
+    margin:0 !important;
+    border-radius:15px !important;
   }
+}
+</style>
+
+
+<style id="kruzix-playing-ring-v1">
+/* Rotating lilac outline around the play/pause button while music is playing. */
+.music-player .music-play{
+  position:relative !important;
+  isolation:isolate;
+  border-color:rgba(222,207,246,.14) !important;
+  overflow:visible !important;
+}
+.music-player .music-play::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:-3px;
+  border-radius:inherit;
+  padding:2px;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 35deg,
+    rgba(190,145,245,.12) 50deg,
+    rgba(210,177,255,.98) 82deg,
+    rgba(157,94,224,.9) 112deg,
+    rgba(190,145,245,.18) 145deg,
+    transparent 175deg 360deg
+  );
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+  opacity:0;
+  pointer-events:none;
+}
+.music-player.is-playing .music-play::before{
+  opacity:1;
+  animation:kruzixPlayRingSpin 2.2s linear infinite;
+}
+@keyframes kruzixPlayRingSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){
+  .music-player.is-playing .music-play::before{animation:none}
 }
 </style>
