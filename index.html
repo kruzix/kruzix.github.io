@@ -4098,10 +4098,11 @@ body.light .music-playlist-artist,body.light .music-playlist-num{color:#84788d}
 }
 .music-playlist-toggle{
   position:relative !important;
-  z-index:30 !important;
+  z-index:50 !important;
   width:46px !important;
   height:30px !important;
-  margin:-3px auto -11px !important;
+  margin:-3px auto -18px !important;
+  transform:translateY(7px) !important;
   border:1px solid rgba(219,202,255,.15) !important;
   border-radius:15px !important;
   background:linear-gradient(135deg,rgba(54,42,72,.72),rgba(24,18,35,.88)) !important;
@@ -4111,11 +4112,11 @@ body.light .music-playlist-artist,body.light .music-playlist-num{color:#84788d}
   transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease !important;
 }
 .music-playlist-toggle:hover{
-  transform:translateY(1px) !important;
+  transform:translateY(0) !important;
   border-color:rgba(201,164,240,.32) !important;
   box-shadow:0 10px 26px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08), 0 0 22px rgba(166,121,235,.16) !important;
 }
-.music-playlist-toggle:active{transform:translateY(2px) scale(.97) !important}
+.music-playlist-toggle:active{transform:translateY(0) scale(.97) !important}
 .music-playlist-toggle span{
   font-size:22px !important;
   line-height:1 !important;
@@ -4127,7 +4128,9 @@ body.light .music-playlist-artist,body.light .music-playlist-num{color:#84788d}
 }
 .music-playlist-wrap{
   width:100% !important;
-  margin-top:7px !important;
+  margin-top:14px !important;
+  position:relative !important;
+  z-index:1 !important;
 }
 .music-playlist{
   border-radius:24px !important;
@@ -4162,7 +4165,7 @@ body.light .music-playlist-toggle{
 }
 @media(max-width:700px){
   .profile .music-player{border-radius:20px !important}
-  .music-playlist-toggle{width:44px !important;height:29px !important;border-radius:15px !important;margin:-2px auto -10px !important}
+  .music-playlist-toggle{width:44px !important;height:29px !important;border-radius:15px !important;margin:-2px auto -16px !important;transform:translateY(6px) !important}
   .music-playlist{border-radius:20px !important}
 }
 </style>
@@ -4332,6 +4335,26 @@ body.performance-lite .profile .music-player.is-playing .music-art{
 </style>
 
 
+
+<style id="kruzix-playlist-button-hover-fix">
+/* Hover: keep the button in place and only give it the old subtle scale-up. */
+.profile .music-player .music-playlist-toggle:hover,
+.profile .music-player .music-playlist-toggle:focus-visible{
+  transform:translateY(7px) scale(1.06) !important;
+}
+.profile .music-player .music-playlist-toggle:active{
+  transform:translateY(7px) scale(.97) !important;
+}
+@media (max-width:700px){
+  .profile .music-player .music-playlist-toggle:hover,
+  .profile .music-player .music-playlist-toggle:focus-visible{
+    transform:translateY(5px) scale(1.06) !important;
+  }
+  .profile .music-player .music-playlist-toggle:active{
+    transform:translateY(5px) scale(.97) !important;
+  }
+}
+</style>
 </body>
 <style id="kruzix-status-and-ru-format-v27">
 .profile-info .status{margin-left:0 !important;}
@@ -4858,7 +4881,7 @@ body.light .music-playlist-toggle span{
     width:42px !important;
     height:31px !important;
     border-radius:16px !important;
-    margin:-3px auto -11px !important;
+    margin:-3px auto -18px !important;
   }
 }
 </style>
@@ -4870,6 +4893,114 @@ body.light .music-playlist-toggle span{
     justify-self:end !important;
     justify-content:flex-end !important;
     width:100% !important;
+  }
+}
+</style>
+
+
+
+
+<style id="kruzix-final-playlist-position-v2">
+/* Final: centered transport controls on mobile; playlist toggle straddles the
+   bottom edge of the player on every viewport without covering the play button. */
+.profile .music-player{
+  position:relative !important;
+  overflow:visible !important;
+}
+.profile .music-player .music-playlist-toggle{
+  position:relative !important;
+  z-index:100 !important;
+  display:grid !important;
+  place-items:center !important;
+  left:auto !important;
+  top:auto !important;
+  width:46px !important;
+  height:30px !important;
+  margin:0 auto -15px !important;
+  transform:translateY(15px) !important;
+}
+.profile .music-player .music-playlist-toggle:hover{
+  transform:translateY(14px) !important;
+}
+.profile .music-player .music-playlist-toggle:active{
+  transform:translateY(16px) scale(.97) !important;
+}
+.profile .music-playlist-wrap{
+  position:relative !important;
+  z-index:1 !important;
+  margin-top:0 !important;
+}
+@media(max-width:700px){
+  .profile .music-player .music-controls{
+    grid-column:1 / -1 !important;
+    justify-self:center !important;
+    width:max-content !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    justify-content:center !important;
+  }
+  .profile .music-player .music-playlist-toggle{
+    width:44px !important;
+    height:29px !important;
+    border-radius:15px !important;
+    margin:0 auto -14.5px !important;
+    transform:translateY(14.5px) !important;
+  }
+  .profile .music-player .music-playlist-toggle:hover{
+    transform:translateY(13.5px) !important;
+  }
+  .profile .music-player .music-playlist-toggle:active{
+    transform:translateY(15.5px) scale(.97) !important;
+  }
+}
+</style>
+
+<style id="kruzix-playlist-final-spacing-v2">
+/* Final playlist button spacing/layering */
+.profile .music-player{overflow:visible !important}
+.profile .music-player .music-playlist-toggle{
+  position:relative !important;
+  z-index:100 !important;
+  margin:-3px auto -13px !important;
+  transform:translateY(7px) !important;
+}
+.profile .music-player .music-playlist-wrap{
+  position:relative !important;
+  z-index:1 !important;
+  margin-top:0 !important;
+}
+@media (max-width:700px){
+  .profile .music-player .music-controls{
+    justify-self:center !important;
+    justify-content:center !important;
+    width:100% !important;
+  }
+  .profile .music-player .music-playlist-toggle{
+    margin:-2px auto -12px !important;
+    transform:translateY(5px) !important;
+  }
+  .profile .music-player .music-playlist-wrap{
+    margin-top:0 !important;
+  }
+}
+</style>
+
+<style id="kruzix-playlist-hover-final-true">
+/* Final: hover only scales the playlist button; its position never changes. */
+.profile .music-player .music-playlist-toggle:hover,
+.profile .music-player .music-playlist-toggle:focus-visible{
+  transform:translateY(7px) scale(1.06) !important;
+}
+.profile .music-player .music-playlist-toggle:active{
+  transform:translateY(7px) scale(.97) !important;
+}
+@media (max-width:700px){
+  .profile .music-player .music-playlist-toggle:hover,
+  .profile .music-player .music-playlist-toggle:focus-visible{
+    transform:translateY(5px) scale(1.06) !important;
+  }
+  .profile .music-player .music-playlist-toggle:active{
+    transform:translateY(5px) scale(.97) !important;
   }
 }
 </style>
