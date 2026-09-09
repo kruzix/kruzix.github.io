@@ -5683,3 +5683,233 @@ html.light .music-playlist-toggle span{
   }
 }
 </style>
+
+
+<style id="kruzix-mobile-play-final-v84">
+/*
+  v84: rebuild the mobile Play ring as an SVG circle.
+  SVG viewBox coordinates keep it geometrically circular even if the
+  surrounding CSS/layout changes. Also remove the old ::after icon layer,
+  which was drawing a second pause icon on top of the real button text.
+*/
+
+/* Never let the old pseudo-elements draw anything. */
+.profile .music-player .music-play::before,
+.profile .music-player .music-play::after{
+  content:none !important;
+  display:none !important;
+  animation:none !important;
+}
+
+/* The real button remains the only icon container. */
+.profile .music-player .music-play{
+  position:relative !important;
+  display:grid !important;
+  place-items:center !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+  font-size:clamp(20px,5vw,25px) !important;
+  line-height:1 !important;
+  transform:none !important;
+}
+
+/* SVG ring: fixed square viewport = mathematically circular ring. */
+.profile .music-player .music-play-ring-svg{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:calc(100% + 14px) !important;
+  height:calc(100% + 14px) !important;
+  display:block !important;
+  overflow:visible !important;
+  pointer-events:none !important;
+  z-index:-1 !important;
+  opacity:0 !important;
+  transform:translate(-50%,-50%) rotate(0deg) !important;
+  transform-origin:50% 50% !important;
+  aspect-ratio:1 / 1 !important;
+}
+
+.profile .music-player.is-playing .music-play-ring-svg{
+  opacity:1 !important;
+  animation:kruzixPlayRingSvgSpinV84 2.2s linear infinite !important;
+}
+
+.profile .music-play-ring-svg circle{
+  fill:none !important;
+  stroke:rgba(205,170,255,.98) !important;
+  stroke-width:2.1 !important;
+  stroke-linecap:round !important;
+  vector-effect:non-scaling-stroke !important;
+  filter:drop-shadow(0 0 4px rgba(184,132,247,.75)) !important;
+  stroke-dasharray:78 217 !important;
+  stroke-dashoffset:0 !important;
+}
+
+@keyframes kruzixPlayRingSvgSpinV84{
+  from{transform:translate(-50%,-50%) rotate(0deg)}
+  to{transform:translate(-50%,-50%) rotate(360deg)}
+}
+
+/* Keep the mobile player symmetric. */
+@media(max-width:700px){
+  .profile .music-player{
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    box-sizing:border-box !important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .profile .music-player.is-playing .music-play-ring-svg{
+    animation:none !important;
+  }
+}
+</style>
+
+<script id="kruzix-play-ring-svg-v84">
+(() => {
+  const play = document.getElementById('musicPlay');
+  const player = play?.closest('.music-player');
+  const audio = document.getElementById('siteAudio');
+  if (!play || !player || !audio) return;
+
+  // Remove the old ring element if one of the previous patches created it.
+  play.querySelectorAll('.music-play-ring, .music-play-ring-svg').forEach(node => node.remove());
+
+  // Use a fixed SVG coordinate system so the ring can never become an ellipse.
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.classList.add('music-play-ring-svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+
+  const circle = document.createElementNS(svgNS, 'circle');
+  circle.setAttribute('cx', '50');
+  circle.setAttribute('cy', '50');
+  circle.setAttribute('r', '47');
+  svg.appendChild(circle);
+  play.appendChild(svg);
+
+  // The main player already owns the authoritative .is-playing state.
+  // These listeners make the ring react immediately and independently.
+  const sync = () => {
+    player.classList.toggle('is-playing', !audio.paused && !audio.ended);
+  };
+  audio.addEventListener('play', sync);
+  audio.addEventListener('pause', sync);
+  audio.addEventListener('ended', sync);
+  audio.addEventListener('emptied', sync);
+  sync();
+})();
+</script>
+
+
+<style id="kruzix-smooth-cover-glow-v85">
+/*
+  Album-cover animation from the reference version:
+  very subtle enlargement -> return to normal, synchronized with playback.
+  The glow breathes together with the scale so the effect feels like one
+  soft pulse instead of a separate flashing shadow.
+*/
+.profile .music-art{
+  animation:none !important;
+  transform:scale(1);
+  will-change:transform,box-shadow,filter;
+}
+
+@keyframes kruzixCoverGlowBreathV85{
+  0%,100%{
+    box-shadow:
+      0 0 26px rgba(170,126,255,.20),
+      0 0 42px rgba(180,132,240,.18);
+  }
+  50%{
+    box-shadow:
+      0 0 32px rgba(170,126,255,.28),
+      0 0 54px rgba(180,132,240,.34),
+      0 0 76px rgba(180,132,240,.12);
+  }
+}
+
+.profile .music-player.is-playing .music-art{
+  animation:kruzixCoverGlowBreathV85 2.6s ease-in-out infinite !important;
+}
+
+@media(prefers-reduced-motion:reduce){
+  .profile .music-player.is-playing .music-art{
+    animation:none !important;
+  }
+}
+</style>
+
+<script id="kruzix-smooth-cover-pulse-v85">
+(function(){
+  const card=document.querySelector('.music-player');
+  const art=document.querySelector('.music-art');
+  const audio=document.querySelector('audio');
+  if(!card||!art||!audio||!art.animate)return;
+
+  let pulse=null, settle=null;
+
+  function cancelAll(){
+    if(pulse){pulse.cancel();pulse=null}
+    if(settle){settle.cancel();settle=null}
+  }
+
+  function startPulse(){
+    cancelAll();
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+
+    /*
+      Same motion as the reference:
+      1 -> 1.025 -> 1 over 2.6 seconds.
+      It is intentionally tiny so the cover never looks like it is jumping.
+    */
+    pulse=art.animate(
+      [
+        {transform:'scale(1)'},
+        {transform:'scale(1.025)',offset:.5},
+        {transform:'scale(1)'}
+      ],
+      {duration:2600,easing:'ease-in-out',iterations:Infinity}
+    );
+  }
+
+  function stopPulseSmoothly(){
+    if(!pulse){
+      art.style.transform='scale(1)';
+      return;
+    }
+
+    /*
+      Freeze the exact current scale first, then gently settle back to 1.
+      This prevents the cover from snapping when Pause is pressed.
+    */
+    const current=getComputedStyle(art).transform;
+    pulse.cancel();
+    pulse=null;
+    art.style.transform=current;
+
+    requestAnimationFrame(function(){
+      settle=art.animate(
+        [{transform:current},{transform:'scale(1)'}],
+        {duration:550,easing:'ease-out',fill:'forwards'}
+      );
+      settle.onfinish=function(){
+        art.style.transform='scale(1)';
+        settle=null;
+      };
+    });
+  }
+
+  audio.addEventListener('play',startPulse);
+  audio.addEventListener('pause',stopPulseSmoothly);
+  audio.addEventListener('ended',stopPulseSmoothly);
+
+  if(!audio.paused&&!audio.ended)startPulse();
+})();
+</script>
