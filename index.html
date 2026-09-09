@@ -1,4 +1,3 @@
-
 <meta name="description" content="kruzix | a little piece of my world, links, interests and lavender dreams.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="kruzix">
@@ -268,10 +267,10 @@ body.light .profile .music-art span{color:#705784;text-shadow:0 0 12px rgba(125,
     font-size:16px !important;
   }
   .profile .music-player .music-controls #musicPlay{
-    width:50px !important;
-    height:50px !important;
+    width:48px !important;
+    height:48px !important;
     border-radius:50% !important;
-    font-size:18px !important;
+    font-size:17px !important;
   }
 }
 @media (max-width:390px){
@@ -608,8 +607,8 @@ html.light .quote::after{
 </style>
 
 
-<style id="kruzix-pc-volume-next-row-v3">
-/* Desktop: transport buttons on row 1, volume slider centered on row 2. */
+
+<style id="kruzix-pc-buttons-above-volume-v4">
 @media (min-width:701px){
   .profile .music-player .music-controls{
     display:grid !important;
@@ -618,10 +617,11 @@ html.light .quote::after{
     justify-content:center !important;
     align-items:center !important;
     column-gap:9px !important;
-    row-gap:6px !important;
+    row-gap:7px !important;
     width:100% !important;
   }
 
+  /* Buttons = first row */
   .profile .music-player .music-controls #musicShuffle{
     grid-column:1 !important;
     grid-row:1 !important;
@@ -643,6 +643,7 @@ html.light .quote::after{
     grid-row:1 !important;
   }
 
+  /* Volume = second row, directly under the buttons */
   .profile .music-player .music-controls #musicVolume{
     display:block !important;
     grid-column:1 / 6 !important;
@@ -655,8 +656,8 @@ html.light .quote::after{
   }
 }
 
-/* Mobile: do not show the volume slider. */
 @media (max-width:700px){
+  /* Mobile keeps the original behavior: no volume slider. */
   .profile .music-player .music-controls #musicVolume{
     display:none !important;
   }
@@ -723,7 +724,10 @@ html.light .quote::after{
  </div>
  <section class="music-player" aria-label="Music player">
   <audio id="siteAudio" preload="metadata" src="music.mp3"></audio>
-  <div class="music-art" aria-hidden="true"><span>✦</span></div>
+  <div class="music-art-wrap" aria-hidden="true">
+    <span class="music-art-circle"></span>
+    <div class="music-art"><span>✦</span></div>
+  </div>
   <div class="music-main">
     <div class="music-meta">
       <div class="music-title" aria-live="polite"><span class="music-track-name">Electric Chapel</span><span class="music-track-genre" data-i18n="instrumental">— Instrumental</span></div>
@@ -1271,7 +1275,6 @@ html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78)
   .music-controls #musicVolume{flex:0 1 auto}
 }
 @media(prefers-reduced-motion:reduce){
-  .music-player.is-playing .music-art{animation:none!important}
   *,*::before,*::after{scroll-behavior:auto!important}
 }
 </style>
@@ -1375,8 +1378,7 @@ html.light .profile .music-track-genre{
         file: clean(item.file),
         title: clean(item.title),
         artist: clean(item.artist),
-        genre: clean(item.genre),
-        cover: clean(item.cover || item.artwork || item.image || item.coverUrl || item.albumArt || '')
+        genre: clean(item.genre)
       }));
   }
   async function loadTracksJson() {
@@ -1433,12 +1435,8 @@ html.light .profile .music-track-genre{
       track => track.file.split('/').pop() === currentName
     );
     state.index = foundIndex >= 0 ? foundIndex : 0;
-    // Metadata and artwork come from tracks.json immediately, including the first track.
-    const initialTrack = state.tracks[state.index];
-    showTrack(initialTrack);
-    document.dispatchEvent(new CustomEvent('kruzix:trackchange', {
-      detail: { index: state.index, track: initialTrack }
-    }));
+    // Metadata comes ONLY from tracks.json now.
+    showTrack(state.tracks[state.index]);
     return state.tracks;
   }
   function ensurePlaylist() {
@@ -3388,51 +3386,6 @@ input,button,a{
   clear();
 })();
 </script>
-<style id="kruzix-smooth-audio-effects-final">
-.avatar-spectrum{
-  opacity:0;
-  transition:opacity .92s cubic-bezier(.22,.61,.36,1);
-  will-change:opacity;
-  filter:none;
-  pointer-events:none !important;
-  transform:translate3d(-50%,-50%,0);
-  transition-property:opacity;
-}
-.avatar-spectrum.is-active{opacity:1}
-body.light .avatar-spectrum{filter:saturate(.82) brightness(.94)}
-.profile .music-art{
-  animation:none !important;
-  transform:scale(1);
-  will-change:transform,box-shadow;
-  transition:transform .55s ease,box-shadow .55s ease,filter .55s ease !important;
-}
-.profile .music-player.is-playing .music-art{
-  box-shadow:
-    0 0 26px rgba(170,126,255,.20),
-    0 0 42px rgba(180,132,240,.30),
-    0 0 72px rgba(180,132,240,.14) !important;
-}
-.profile .music-player:not(.is-playing) .music-art{
-  box-shadow:0 0 26px rgba(170,126,255,.20) !important;
-}
-body.light .profile .music-art{
-  transition:transform .55s ease,box-shadow .55s ease,filter .55s ease !important;
-}
-body.light .profile .music-player.is-playing .music-art{
-  box-shadow:
-    0 0 22px rgba(126,102,147,.11),
-    0 0 40px rgba(126,102,147,.22),
-    0 0 64px rgba(126,102,147,.10) !important;
-}
-body.light .profile .music-player:not(.is-playing) .music-art{
-  box-shadow:0 0 22px rgba(126,102,147,.11) !important;
-}
-@media(prefers-reduced-motion:reduce){
-  .avatar-spectrum,
-  .profile .music-art{transition-duration:.001ms !important}
-}
-</style>
-
 <style id="kruzix-performance-settings-v16">
 .nav-controls{display:flex;align-items:center;gap:8px}
 .perf-toggle{
@@ -4126,693 +4079,166 @@ html.light .music-playlist-toggle{
 })();
 </script>
 
+<style id="kruzix-player-animation-fix-clean">
+/* === Clean music animation fix ===
+   The original player dimensions stay untouched:
+   desktop art 70px / play 48px, mobile art 58px / play 48px.
+*/
 
-
-
-
-
-
-
-
-
-
-<style id="kruzix-playing-ring-v1">
-/* Rotating lilac outline around the play/pause button while music is playing. */
-.music-player .music-play{
-  position:relative !important;
+/* Cover wrapper: gives the rotating circle a real layer BEHIND the cover. */
+.profile .music-art-wrap{
+  position:relative;
+  width:70px;
+  height:70px;
+  display:grid;
+  place-items:center;
+  flex:0 0 70px;
+  overflow:visible;
   isolation:isolate;
-  border-color:rgba(222,207,246,.14) !important;
-  overflow:visible !important;
 }
-.music-player .music-play::before{
+.profile .music-art-wrap .music-art{
+  position:relative;
+  z-index:2;
+  width:70px !important;
+  height:70px !important;
+  transform-origin:center;
+}
+
+/* The requested circle behind the album cover. */
+.profile .music-art-circle{
+  position:absolute;
+  z-index:1;
+  width:84px;
+  height:84px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) rotate(0deg);
+  border-radius:50%;
+  border:1px solid rgba(210,178,255,.20);
+  border-top-color:rgba(214,185,255,.86);
+  border-right-color:rgba(175,124,239,.58);
+  box-shadow:
+    0 0 16px rgba(177,125,244,.16),
+    inset 0 0 10px rgba(198,156,255,.05);
+  opacity:.72;
+  pointer-events:none;
+  will-change:transform,opacity;
+}
+
+/* Rotate only the circle, never the square cover. */
+.profile .music-player.is-playing .music-art-circle{
+  animation:kruzixCoverCircleSpin 3.8s linear infinite;
+  opacity:1;
+}
+@keyframes kruzixCoverCircleSpin{
+  from{transform:translate(-50%,-50%) rotate(0deg)}
+  to{transform:translate(-50%,-50%) rotate(360deg)}
+}
+
+/* Keep the old cover pulse/glow exactly as the base version intended. */
+.profile .music-player.is-playing .music-art{
+  animation:musicArtPulse 2.6s ease-in-out infinite !important;
+  transform-origin:center;
+  will-change:transform,box-shadow;
+}
+
+/* True circular animated ring around the existing 48px Play button.
+   No extra icon/pseudo play symbol is added, so the Play/Pause glyph cannot duplicate. */
+.profile .music-player .music-play{
+  position:relative;
+  z-index:1;
+  width:48px;
+  height:48px;
+  min-width:48px;
+  min-height:48px;
+  border-radius:50%;
+  transform:none !important;
+}
+.profile .music-player .music-play::before{
   content:"";
   position:absolute;
-  z-index:-1;
-  inset:-3px;
-  border-radius:inherit;
-  padding:2px;
-  background:conic-gradient(
-    from 0deg,
-    transparent 0deg 35deg,
-    rgba(190,145,245,.12) 50deg,
-    rgba(210,177,255,.98) 82deg,
-    rgba(157,94,224,.9) 112deg,
-    rgba(190,145,245,.18) 145deg,
-    transparent 175deg 360deg
-  );
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  mask-composite:exclude;
-  opacity:0;
+  z-index:0;
+  width:58px;
+  height:58px;
+  left:50%;
+  top:50%;
+  margin-left:-29px;
+  margin-top:-29px;
+  border-radius:50%;
+  border:2px solid rgba(214,188,255,.18);
+  border-top-color:#d8bfff;
+  border-right-color:rgba(180,128,245,.72);
+  box-shadow:0 0 14px rgba(177,125,244,.18);
   pointer-events:none;
+  animation:none;
 }
-.music-player.is-playing .music-play::before{
-  opacity:1;
-  animation:kruzixPlayRingSpin 2.2s linear infinite;
+.profile .music-player.is-playing .music-play::before{
+  animation:kruzixPlayCircleSpin 1.65s linear infinite;
 }
-@keyframes kruzixPlayRingSpin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){
-  .music-player.is-playing .music-play::before{animation:none}
-}
-</style>
-
-
-
-
-
-
-
-
-
-
-
-<style id="kruzix-mobile-player-layout-v72">
-/*
-  Mobile/tablet layout.
-  This intentionally replaces the previous absolute playlist-button positioning,
-  which was the reason the whole player visually shifted on mobile.
-*/
-@media (max-width:900px){
-  .profile .music-player{
-    width:calc(100% - 28px) !important;
-    margin:28px auto 24px !important;
-    min-height:0 !important;
-    display:grid !important;
-    grid-template-columns:76px minmax(0,1fr) !important;
-    grid-template-areas:
-      "art main"
-      "controls controls"
-      "playlist playlist" !important;
-    column-gap:18px !important;
-    row-gap:18px !important;
-    padding:16px !important;
-    box-sizing:border-box !important;
-  }
-
-  .profile .music-art{
-    grid-area:art !important;
-    width:76px !important;
-    height:76px !important;
-    align-self:start !important;
-    justify-self:start !important;
-  }
-
-  .profile .music-main{
-    grid-area:main !important;
-    width:100% !important;
-    min-width:0 !important;
-    align-self:start !important;
-  }
-
-  .profile .music-title{
-    font-size:clamp(22px,5.8vw,32px) !important;
-    line-height:1.08 !important;
-    white-space:nowrap !important;
-  }
-
-  .profile .music-track-name{
-    font-size:1em !important;
-  }
-
-  .profile .music-track-genre{
-    font-size:.64em !important;
-    margin-left:4px !important;
-  }
-
-  .profile .music-artist{
-    font-size:clamp(16px,4.3vw,22px) !important;
-    line-height:1.15 !important;
-    margin-top:5px !important;
-  }
-
-  .profile .music-progress-row{
-    grid-template-columns:42px minmax(0,1fr) 42px !important;
-    gap:8px !important;
-    margin-top:14px !important;
-    width:100% !important;
-    transform:none !important;
-  }
-
-  .profile .music-time{
-    font-size:clamp(12px,3.4vw,16px) !important;
-    line-height:1 !important;
-  }
-
-  .profile .music-controls{
-    grid-area:controls !important;
-    position:static !important;
-    width:100% !important;
-    display:flex !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:16px !important;
-    margin:0 !important;
-  }
-
-  /* The compact mobile version shown in the reference: previous / play / next. */
-  .profile .music-controls #musicShuffle,
-  .profile .music-controls #musicRepeat,
-  .profile .music-controls #musicMute,
-  .profile .music-controls #musicVolume{
-    display:none !important;
-  }
-
-  .profile .music-controls #musicBack,
-  .profile .music-controls #musicNext{
-    width:56px !important;
-    height:56px !important;
-    border-radius:18px !important;
-    font-size:21px !important;
-  }
-
-  .profile .music-controls #musicPlay{
-    width:68px !important;
-    height:68px !important;
-    border-radius:50% !important;
-    font-size:24px !important;
-  }
-
-  /* Return the playlist button to its own row instead of the progress line. */
-  .profile #musicPlaylistToggle,
-  .profile .music-playlist-toggle{
-    grid-area:playlist !important;
-    position:static !important;
-    right:auto !important;
-    left:auto !important;
-    top:auto !important;
-    transform:none !important;
-    justify-self:center !important;
-    align-self:center !important;
-    margin:-4px auto -8px !important;
-  }
-}
-
-@media (max-width:480px){
-  .profile .music-player{
-    grid-template-columns:68px minmax(0,1fr) !important;
-    column-gap:14px !important;
-    row-gap:16px !important;
-    padding:14px !important;
-  }
-
-  .profile .music-art{
-    width:68px !important;
-    height:68px !important;
-  }
-
-  .profile .music-title{
-    font-size:clamp(19px,6vw,25px) !important;
-  }
-
-  .profile .music-artist{
-    font-size:clamp(15px,4.8vw,19px) !important;
-  }
-
-  .profile .music-track-genre{
-    font-size:.60em !important;
-  }
-
-  .profile .music-controls{
-    gap:13px !important;
-  }
-
-  .profile .music-controls #musicBack,
-  .profile .music-controls #musicNext{
-    width:50px !important;
-    height:50px !important;
-    font-size:19px !important;
-  }
-
-  .profile .music-controls #musicPlay{
-    width:62px !important;
-    height:62px !important;
-    font-size:22px !important;
-  }
-}
-</style>
-
-
-<style id="kruzix-mobile-player-controls-v73">
-/* Restore Shuffle and Loop on mobile and keep the entire button row centered. */
-@media (max-width:900px){
-  .profile .music-controls{
-    grid-area:controls !important;
-    position:static !important;
-    inset:auto !important;
-    transform:none !important;
-    width:100% !important;
-    min-width:0 !important;
-    margin:0 !important;
-    padding:0 !important;
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:clamp(8px,2.2vw,16px) !important;
-    box-sizing:border-box !important;
-  }
-
-  /* All five controls are visible on mobile. */
-  .profile .music-controls #musicShuffle,
-  .profile .music-controls #musicRepeat,
-  .profile .music-controls #musicBack,
-  .profile .music-controls #musicNext,
-  .profile .music-controls #musicPlay{
-    display:grid !important;
-    place-items:center !important;
-    position:static !important;
-    left:auto !important;
-    right:auto !important;
-    top:auto !important;
-    bottom:auto !important;
-    transform:none !important;
-    flex:0 0 auto !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
-  }
-
-  /* Shuffle / previous / next / loop: identical compact size. */
-  .profile .music-controls #musicShuffle,
-  .profile .music-controls #musicRepeat,
-  .profile .music-controls #musicBack,
-  .profile .music-controls #musicNext{
-    width:clamp(42px,11vw,56px) !important;
-    height:clamp(42px,11vw,56px) !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    border-radius:16px !important;
-    font-size:clamp(16px,4vw,21px) !important;
-  }
-
-  /* Play remains the visual center, but no longer pushes other buttons aside. */
-  .profile .music-controls #musicPlay{
-    width:clamp(56px,14vw,68px) !important;
-    height:clamp(56px,14vw,68px) !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    border-radius:50% !important;
-    font-size:clamp(20px,5vw,25px) !important;
-  }
-}
-
-@media (max-width:480px){
-  .profile .music-controls{
-    gap:clamp(5px,1.8vw,9px) !important;
-  }
-
-  .profile .music-controls #musicShuffle,
-  .profile .music-controls #musicRepeat,
-  .profile .music-controls #musicBack,
-  .profile .music-controls #musicNext{
-    width:clamp(38px,10.5vw,46px) !important;
-    height:clamp(38px,10.5vw,46px) !important;
-    border-radius:14px !important;
-    font-size:16px !important;
-  }
-
-  .profile .music-controls #musicPlay{
-    width:clamp(52px,13vw,60px) !important;
-    height:clamp(52px,13vw,60px) !important;
-    font-size:21px !important;
-  }
-}
-</style>
-
-
-<style id="kruzix-mobile-controls-grid-v74">
-/*
-  Mobile transport controls: use an explicit five-column grid.
-  This prevents the buttons from inheriting conflicting flex/grid dimensions
-  from the older mobile styles.
-*/
-@media (max-width:900px){
-  .profile .music-player .music-controls{
-    grid-area:controls !important;
-    display:grid !important;
-    grid-template-columns:48px 48px 62px 48px 48px !important;
-    grid-template-rows:62px !important;
-    justify-content:center !important;
-    align-items:center !important;
-    justify-items:stretch !important;
-    column-gap:10px !important;
-    row-gap:0 !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    margin:0 auto !important;
-    padding:0 !important;
-    box-sizing:border-box !important;
-    position:static !important;
-    transform:none !important;
-    overflow:visible !important;
-  }
-
-  .profile .music-player .music-controls #musicShuffle,
-  .profile .music-player .music-controls #musicBack,
-  .profile .music-player .music-controls #musicPlay,
-  .profile .music-player .music-controls #musicNext,
-  .profile .music-player .music-controls #musicRepeat{
-    display:grid !important;
-    place-items:center !important;
-    position:static !important;
-    inset:auto !important;
-    transform:none !important;
-    margin:0 !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    max-width:none !important;
-    box-sizing:border-box !important;
-  }
-
-  .profile .music-player .music-controls #musicShuffle{
-    grid-column:1 !important;
-    grid-row:1 !important;
-    width:48px !important;
-    height:48px !important;
-    border-radius:15px !important;
-    font-size:18px !important;
-  }
-
-  .profile .music-player .music-controls #musicBack{
-    grid-column:2 !important;
-    grid-row:1 !important;
-    width:48px !important;
-    height:48px !important;
-    border-radius:15px !important;
-    font-size:18px !important;
-  }
-
-  .profile .music-player .music-controls #musicPlay{
-    grid-column:3 !important;
-    grid-row:1 !important;
-    width:62px !important;
-    height:62px !important;
-    border-radius:50% !important;
-    font-size:23px !important;
-  }
-
-  .profile .music-player .music-controls #musicNext{
-    grid-column:4 !important;
-    grid-row:1 !important;
-    width:48px !important;
-    height:48px !important;
-    border-radius:15px !important;
-    font-size:18px !important;
-  }
-
-  .profile .music-player .music-controls #musicRepeat{
-    grid-column:5 !important;
-    grid-row:1 !important;
-    width:48px !important;
-    height:48px !important;
-    border-radius:15px !important;
-    font-size:18px !important;
-  }
-
-  .profile .music-player .music-controls #musicMute,
-  .profile .music-player .music-controls #musicVolume{
-    display:none !important;
-  }
-}
-
-@media (max-width:480px){
-  .profile .music-player .music-controls{
-    grid-template-columns:42px 42px 56px 42px 42px !important;
-    grid-template-rows:56px !important;
-    column-gap:7px !important;
-  }
-
-  .profile .music-player .music-controls #musicShuffle,
-  .profile .music-player .music-controls #musicBack,
-  .profile .music-player .music-controls #musicNext,
-  .profile .music-player .music-controls #musicRepeat{
-    width:42px !important;
-    height:42px !important;
-    border-radius:14px !important;
-    font-size:16px !important;
-  }
-
-  .profile .music-player .music-controls #musicPlay{
-    width:56px !important;
-    height:56px !important;
-    font-size:21px !important;
-  }
-}
-
-@media (max-width:360px){
-  .profile .music-player .music-controls{
-    grid-template-columns:38px 38px 50px 38px 38px !important;
-    column-gap:5px !important;
-  }
-
-  .profile .music-player .music-controls #musicShuffle,
-  .profile .music-player .music-controls #musicBack,
-  .profile .music-player .music-controls #musicNext,
-  .profile .music-player .music-controls #musicRepeat{
-    width:38px !important;
-    height:38px !important;
-    font-size:15px !important;
-  }
-
-  .profile .music-player .music-controls #musicPlay{
-    width:50px !important;
-    height:50px !important;
-    font-size:19px !important;
-  }
-}
-</style>
-
-
-
-
-
-
-
-<style id="kruzix-static-artwork-v77">
-/* Permanent player artwork — no track covers, replacement images or artwork animations. */
-.profile .music-art{
-  width:78px !important;
-  height:78px !important;
-  min-width:78px !important;
-  min-height:78px !important;
-  position:relative !important;
-  isolation:isolate !important;
-  overflow:hidden !important;
-  display:grid !important;
-  place-items:center !important;
-  border-radius:18px !important;
-  border:1px solid rgba(221,202,255,.18) !important;
-  background:
-    radial-gradient(circle at 65% 30%, rgba(213,182,255,.90), transparent 22%),
-    radial-gradient(circle at 35% 75%, rgba(116,75,181,.75), transparent 38%),
-    linear-gradient(145deg,#181126,#3c2957) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.035),
-    0 0 26px rgba(170,126,255,.20) !important;
-  transform:none !important;
-  animation:none !important;
-}
-
-/* One permanent inner circle, matching the original artwork. */
-.profile .music-art::before{
-  content:"" !important;
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  width:68% !important;
-  height:68% !important;
-  transform:translate(-50%,-50%) !important;
-  border-radius:50% !important;
-  border:1px solid rgba(236,226,249,.34) !important;
-  background:transparent !important;
-  box-shadow:
-    0 0 0 2px rgba(255,255,255,.018),
-    inset 0 0 8px rgba(255,255,255,.02) !important;
-  z-index:1 !important;
-  pointer-events:none !important;
-  opacity:1 !important;
-  animation:none !important;
-}
-
-/* Disable all old cover/record pseudo-element layers. */
-.profile .music-art::after{
-  content:none !important;
-  display:none !important;
-  opacity:0 !important;
-  animation:none !important;
-}
-
-.profile .music-art span{
-  position:relative !important;
-  z-index:3 !important;
-  display:grid !important;
-  place-items:center !important;
-  width:100% !important;
-  height:100% !important;
-  color:#f5f0fb !important;
-  font-size:28px !important;
-  line-height:1 !important;
-  text-shadow:
-    0 0 12px rgba(255,255,255,.48),
-    0 0 20px rgba(205,171,255,.52) !important;
-  opacity:1 !important;
-  transform:none !important;
-  filter:none !important;
-  animation:none !important;
-}
-
-/* Even if old scripts are present elsewhere, covers can never become visible. */
-.profile .music-art.has-cover,
-.profile .music-art.cover-visible,
-.profile .music-art.has-cover.cover-visible{
-  background:
-    radial-gradient(circle at 65% 30%, rgba(213,182,255,.90), transparent 22%),
-    radial-gradient(circle at 35% 75%, rgba(116,75,181,.75), transparent 38%),
-    linear-gradient(145deg,#181126,#3c2957) !important;
-}
-.profile .music-art.has-cover::before,
-.profile .music-art.cover-visible::before,
-.profile .music-art.has-cover.cover-visible::before{
-  width:68% !important;
-  height:68% !important;
-  opacity:1 !important;
-  transform:translate(-50%,-50%) !important;
-  background:transparent !important;
-  border:1px solid rgba(236,226,249,.34) !important;
-  box-shadow:
-    0 0 0 2px rgba(255,255,255,.018),
-    inset 0 0 8px rgba(255,255,255,.02) !important;
-  animation:none !important;
-}
-.profile .music-art.has-cover::after,
-.profile .music-art.cover-visible::after,
-.profile .music-art.has-cover.cover-visible::after{
-  content:none !important;
-  display:none !important;
-}
-
-/* Preserve a refined light-theme variant without changing the artwork's structure. */
-body.light .profile .music-art{
-  background:
-    radial-gradient(circle at 65% 30%, rgba(198,170,222,.72), transparent 24%),
-    radial-gradient(circle at 35% 75%, rgba(174,148,204,.42), transparent 42%),
-    linear-gradient(145deg,#f8f5fa,#e8e0ee) !important;
-  border-color:rgba(92,67,117,.18) !important;
-  box-shadow:0 0 22px rgba(125,91,164,.12) !important;
-}
-body.light .profile .music-art::before,
-body.light .profile .music-art.has-cover::before{
-  border-color:rgba(91,69,113,.22) !important;
-}
-body.light .profile .music-art span{
-  color:#705784 !important;
-  text-shadow:0 0 12px rgba(125,91,164,.32) !important;
-}
-</style>
-
-<script id="kruzix-static-artwork-v77-script">
-(() => {
-  const art = document.querySelector('.profile .music-art');
-  if (!art) return;
-
-  const restoreStaticArtwork = () => {
-    art.classList.remove('has-cover', 'cover-visible');
-    art.style.removeProperty('--track-cover');
-
-    // Remove decorative/record layers inserted by older versions.
-    art.querySelectorAll(
-      '.track-art-ring, .art-decor, .art-symbols, .art-dot'
-    ).forEach(node => node.remove());
-
-    // Ensure the original star remains the only foreground symbol.
-    let star = Array.from(art.children).find(
-      node => node.tagName === 'SPAN' && !node.classList.contains('art-symbol')
-    );
-    if (!star) {
-      star = document.createElement('span');
-      star.textContent = '✦';
-      art.appendChild(star);
-    } else {
-      star.textContent = '✦';
-      star.removeAttribute('style');
-      star.className = '';
-    }
-  };
-
-  restoreStaticArtwork();
-  document.addEventListener('kruzix:trackchange', restoreStaticArtwork);
-})();
-</script>
-
-
-<style id="kruzix-v78-pause-animation-mobile-width">
-/* Restore and reinforce the animated ring around the Play/Pause button. */
-.music-player .music-play{
-  position:relative !important;
-  isolation:isolate !important;
-  z-index:0 !important;
-  overflow:visible !important;
-}
-
-.music-player .music-play::before{
-  content:"" !important;
-  position:absolute !important;
-  inset:-4px !important;
-  border-radius:inherit !important;
-  padding:2px !important;
-  pointer-events:none !important;
-  z-index:2 !important;
-  background:conic-gradient(
-    from 0deg,
-    transparent 0deg 35deg,
-    rgba(190,145,245,.12) 50deg,
-    rgba(210,177,255,.98) 82deg,
-    rgba(157,94,224,.90) 112deg,
-    rgba(190,145,245,.18) 145deg,
-    transparent 175deg 360deg
-  ) !important;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0) !important;
-  -webkit-mask-composite:xor !important;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0) !important;
-  mask-composite:exclude !important;
-  opacity:0 !important;
-  transform:rotate(0deg) !important;
-}
-
-.music-player.is-playing .music-play::before{
-  opacity:1 !important;
-  animation:kruzixPlayRingSpin 2.2s linear infinite !important;
-}
-
-.music-player:not(.is-playing) .music-play::before{
-  animation:none !important;
-  opacity:0 !important;
-}
-
-@keyframes kruzixPlayRingSpin{
+@keyframes kruzixPlayCircleSpin{
+  from{transform:rotate(0deg)}
   to{transform:rotate(360deg)}
 }
 
-/* On phones the player is only slightly wider and sits a little closer
-   to the Japanese quote without changing the desktop layout. */
-@media (max-width:900px){
-  .profile .music-player{
-    width:calc(100% - 16px) !important;
-    margin:22px auto 24px !important;
+/* Light theme: keep both circles visible but softer. */
+body.light .profile .music-art-circle{
+  border-color:rgba(117,91,145,.20);
+  border-top-color:rgba(112,82,147,.72);
+  border-right-color:rgba(145,108,179,.52);
+  box-shadow:0 0 14px rgba(126,102,147,.12);
+}
+body.light .profile .music-play::before{
+  border-color:rgba(93,70,115,.15);
+  border-top-color:#76558f;
+  border-right-color:rgba(126,91,164,.62);
+  box-shadow:0 0 12px rgba(126,102,147,.12);
+}
+
+@media(max-width:700px){
+  .profile .music-art-wrap{
+    width:58px;
+    height:58px;
+    flex-basis:58px;
+  }
+  .profile .music-art-wrap .music-art{
+    width:58px !important;
+    height:58px !important;
+  }
+  .profile .music-art-circle{
+    width:72px;
+    height:72px;
+  }
+  .profile .music-player .music-play{
+    width:48px !important;
+    height:48px !important;
+    min-width:48px !important;
+    min-height:48px !important;
+    font-size:17px !important;
+  }
+}
+@media(max-width:390px){
+  .profile .music-art-wrap{
+    width:56px;
+    height:56px;
+    flex-basis:56px;
+  }
+  .profile .music-art-wrap .music-art{
+    width:56px !important;
+    height:56px !important;
+  }
+  .profile .music-art-circle{
+    width:68px;
+    height:68px;
+  }
+  .profile .music-player .music-play{
+    width:46px !important;
+    height:46px !important;
+    min-width:46px !important;
+    min-height:46px !important;
   }
 }
 
-@media (max-width:480px){
-  .profile .music-player{
-    width:calc(100% - 12px) !important;
-    margin-top:20px !important;
-  }
-}
+/* Lite mode is allowed to keep the requested player animations. */
 </style>
 
 </body>
@@ -5320,112 +4746,3 @@ html.light .music-playlist-toggle span{
   }
 }
 </style>
-
-
-<style id="kruzix-player-clean-v88">
-/* Clean final player effects: one ring, one cover pulse. */
-.profile .music-player .music-play{
-  position:relative !important;
-  isolation:isolate !important;
-  overflow:visible !important;
-}
-.profile .music-player .music-play::before{
-  content:"" !important;
-  position:absolute !important;
-  inset:-5px !important;
-  width:auto !important;
-  height:auto !important;
-  border:2px solid rgba(203,168,255,.20) !important;
-  border-top-color:rgba(222,190,255,.98) !important;
-  border-right-color:rgba(171,111,235,.78) !important;
-  border-radius:50% !important;
-  box-sizing:border-box !important;
-  transform:none !important;
-  pointer-events:none !important;
-  z-index:3 !important;
-  opacity:0 !important;
-  filter:drop-shadow(0 0 4px rgba(184,132,247,.72)) !important;
-}
-.profile .music-player.is-playing .music-play::before{
-  opacity:1 !important;
-  animation:kruzixPlayRingCleanV88 1.9s linear infinite !important;
-}
-@keyframes kruzixPlayRingCleanV88{to{transform:rotate(360deg)}}
-
-/* Reference-style cover: tiny 1 -> 1.025 -> 1 pulse plus breathing glow. */
-.profile .music-art{
-  transform-origin:center center !important;
-  will-change:transform,box-shadow !important;
-}
-@keyframes kruzixMusicArtCleanV88{
-  0%,100%{transform:scale(1);box-shadow:0 0 26px rgba(170,126,255,.20)}
-  50%{transform:scale(1.025);box-shadow:0 0 35px rgba(180,132,240,.38),0 0 54px rgba(180,132,240,.16)}
-}
-.profile .music-player.is-playing .music-art{
-  animation:kruzixMusicArtCleanV88 2.6s ease-in-out infinite !important;
-}
-
-/* Two animated halos behind the cover, matching the circular treatment in the reference. */
-.profile .music-art-aura{
-  position:absolute !important;
-  left:0 !important;top:0 !important;
-  width:70px !important;height:70px !important;
-  border-radius:50% !important;
-  pointer-events:none !important;
-  z-index:0 !important;
-  opacity:0 !important;
-  transform:scale(.82) !important;
-  border:1px solid rgba(205,166,255,.38) !important;
-  box-shadow:0 0 22px rgba(188,135,255,.18) !important;
-}
-.profile .music-player.is-playing .music-art-aura{opacity:1 !important;animation:kruzixArtAuraCleanV88 3.2s ease-out infinite !important}
-@keyframes kruzixArtAuraCleanV88{
-  0%{transform:scale(.82);opacity:.42}
-  55%{transform:scale(1.30);opacity:.16}
-  100%{transform:scale(1.55);opacity:0}
-}
-@media(max-width:700px){
-  .profile .music-player{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;box-sizing:border-box !important}
-}
-@media(prefers-reduced-motion:reduce){
-  .profile .music-player.is-playing .music-play::before,
-  .profile .music-player.is-playing .music-art,
-  .profile .music-player.is-playing .music-art-aura{animation:none !important}
-}
-</style>
-<script id="kruzix-player-clean-v88-js">
-(() => {
-  const card=document.querySelector('.profile .music-player');
-  const play=document.getElementById('musicPlay');
-  const audio=document.getElementById('siteAudio');
-  const art=document.querySelector('.profile .music-art');
-  if(!card||!play||!audio||!art)return;
-
-  /* Create the aura outside the clipped cover so it is genuinely behind it. */
-  let aura=card.querySelector('.music-art-aura');
-  if(!aura){
-    aura=document.createElement('span');
-    aura.className='music-art-aura';
-    const artBox=art.parentElement;
-    if(artBox && getComputedStyle(artBox).position==='static') artBox.style.position='relative';
-    artBox?.insertBefore(aura,art);
-  }
-
-  const sync=()=>{
-    const playing=!audio.paused&&!audio.ended;
-    card.classList.toggle('is-playing',playing);
-    if(playing){
-      play.textContent='❚❚';
-      play.setAttribute('aria-label','Pause');
-    }else{
-      play.textContent='▶';
-      play.setAttribute('aria-label','Play');
-    }
-  };
-  audio.addEventListener('play',sync);
-  audio.addEventListener('pause',sync);
-  audio.addEventListener('ended',sync);
-  audio.addEventListener('emptied',sync);
-  sync();
-})();
-</script>
