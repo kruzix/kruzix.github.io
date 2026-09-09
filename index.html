@@ -531,6 +531,344 @@ html.light .quote::after{
 }
 </style>
 
+
+<style id="kruzix-shuffle-repeat-v2">
+.music-controls .music-mode{
+  transition:color .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.music-controls .music-mode.is-active{
+  color:#dfc9ff !important;
+  background:rgba(151,94,205,.18) !important;
+  border-color:rgba(193,143,245,.58) !important;
+  box-shadow:0 0 14px rgba(177,111,255,.22), inset 0 0 10px rgba(177,111,255,.07);
+}
+@media(max-width:700px){
+  .profile .music-player .music-controls{
+    display:grid !important;
+    grid-template-columns:38px 40px 46px 40px 38px !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:8px !important;
+  }
+  .profile .music-player .music-controls #musicShuffle{
+    grid-column:1 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicBack{
+    grid-column:2 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicPlay{
+    grid-column:3 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicNext{
+    grid-column:4 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicRepeat{
+    grid-column:5 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicMute,
+  .profile .music-player .music-controls #musicVolume{
+    display:none !important;
+  }
+}
+@media(max-width:390px){
+  .profile .music-player .music-controls{
+    grid-template-columns:34px 38px 44px 38px 34px !important;
+    gap:7px !important;
+  }
+}
+</style>
+
+<style id="kruzix-controls-order-fix">
+@media(max-width:700px){
+  .profile .music-player .music-controls{
+    grid-template-columns:38px 40px 46px 40px 38px !important;
+  }
+  .profile .music-player .music-controls #musicShuffle{grid-column:1 !important}
+  .profile .music-player .music-controls #musicBack{grid-column:2 !important}
+  .profile .music-player .music-controls #musicPlay{grid-column:3 !important}
+  .profile .music-player .music-controls #musicNext{grid-column:4 !important}
+  .profile .music-player .music-controls #musicRepeat{grid-column:5 !important}
+  .profile .music-player .music-controls #musicVolume{display:none !important}
+}
+@media(max-width:390px){
+  .profile .music-player .music-controls{
+    grid-template-columns:34px 38px 44px 38px 34px !important;
+  }
+}
+</style>
+
+
+
+<style id="kruzix-pc-buttons-above-volume-v4">
+@media (min-width:701px){
+  .profile .music-player .music-controls{
+    display:grid !important;
+    grid-template-columns:40px 40px 48px 40px 40px !important;
+    grid-template-rows:46px 26px !important;
+    justify-content:center !important;
+    align-items:center !important;
+    column-gap:9px !important;
+    row-gap:7px !important;
+    width:100% !important;
+  }
+
+  /* Buttons = first row */
+  .profile .music-player .music-controls #musicShuffle{
+    grid-column:1 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicBack{
+    grid-column:2 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicPlay{
+    grid-column:3 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicNext{
+    grid-column:4 !important;
+    grid-row:1 !important;
+  }
+  .profile .music-player .music-controls #musicRepeat{
+    grid-column:5 !important;
+    grid-row:1 !important;
+  }
+
+  /* Volume = second row, directly under the buttons */
+  .profile .music-player .music-controls #musicVolume{
+    display:block !important;
+    grid-column:1 / 6 !important;
+    grid-row:2 !important;
+    width:150px !important;
+    height:18px !important;
+    justify-self:center !important;
+    align-self:center !important;
+    margin:0 !important;
+  }
+}
+
+@media (max-width:700px){
+  /* Mobile keeps the original behavior: no volume slider. */
+  .profile .music-player .music-controls #musicVolume{
+    display:none !important;
+  }
+}
+</style>
+
+
+<style id="kruzix-cover-layout-v1">
+/* Track cover: the actual artwork sits inside the existing purple glass frame. */
+.profile .music-art{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  background:radial-gradient(circle at 65% 30%,rgba(213,182,255,.22),transparent 25%),#181126;
+}
+.profile .music-cover{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
+  opacity:.76;
+  filter:saturate(.72) hue-rotate(7deg) brightness(.72) contrast(.92);
+  transform:scale(1.03);
+}
+.profile .music-art:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  border-radius:inherit;
+  background:
+    linear-gradient(135deg,rgba(206,166,255,.22),rgba(68,37,98,.24)),
+    radial-gradient(circle at 50% 40%,transparent 20%,rgba(38,17,55,.42) 100%);
+  pointer-events:none;
+}
+.profile .music-cover-fallback{
+  position:relative;
+  z-index:3;
+  font-size:24px;
+  color:#f0e8ff;
+  text-shadow:0 0 14px rgba(202,169,255,.9);
+}
+
+/* Desktop: progress + playback buttons are on one horizontal level. */
+@media(min-width:701px){
+  .profile .music-player{
+    grid-template-columns:70px minmax(0,1fr) 260px !important;
+    align-items:center !important;
+  }
+  .profile .music-main{
+    min-width:0;
+  }
+  .profile .music-progress-row{
+    margin-top:10px !important;
+  }
+  .profile .music-controls{
+    align-self:center !important;
+    justify-self:stretch !important;
+    display:grid !important;
+    grid-template-columns:repeat(5, 36px) !important;
+    grid-template-rows:46px 26px !important;
+    justify-content:end !important;
+    align-items:center !important;
+    gap:8px !important;
+    padding-top:12px !important;
+  }
+  .profile .music-controls #musicShuffle{grid-column:1;grid-row:1}
+  .profile .music-controls #musicBack{grid-column:2;grid-row:1}
+  .profile .music-controls #musicPlay{grid-column:3;grid-row:1}
+  .profile .music-controls #musicNext{grid-column:4;grid-row:1}
+  .profile .music-controls #musicRepeat{grid-column:5;grid-row:1}
+  .profile .music-controls .music-volume-wrap{
+    grid-column:1 / 6;
+    grid-row:2;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:9px;
+  }
+  .profile .music-controls .music-volume{
+    width:150px !important;
+    margin:0 !important;
+  }
+  .music-volume-percent{
+    min-width:30px;
+    font-size:10px;
+    color:#a99bb7;
+    font-variant-numeric:tabular-nums;
+    text-align:left;
+  }
+}
+
+/* Keep mobile compact; no volume slider on mobile. */
+@media(max-width:700px){
+  .profile .music-cover{opacity:.74}
+  .profile .music-controls .music-volume-wrap{
+    display:none !important;
+  }
+}
+
+/* Slightly rounder, softer cover frame. */
+.profile .music-art{
+  border-radius:18px !important;
+  box-shadow:0 0 24px rgba(170,126,255,.18), inset 0 0 18px rgba(174,123,240,.08);
+}
+</style>
+
+
+<style id="kruzix-vinyl-sketch-v1">
+/* Пробный вариант по эскизу: внешняя рамка остаётся прежней,
+   внутри неё появляется круглая "пластинка". */
+.profile .music-art{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  display:grid !important;
+  place-items:center !important;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(182,142,232,.12),transparent 62%),
+    linear-gradient(145deg,#181126,#30203f) !important;
+  border-radius:18px !important;
+}
+
+.profile .music-record{
+  position:absolute;
+  width:88%;
+  height:88%;
+  left:6%;
+  top:6%;
+  border-radius:50%;
+  overflow:hidden;
+  background:#17121f;
+  box-shadow:
+    0 0 0 1px rgba(213,185,249,.28),
+    0 0 18px rgba(157,107,222,.22),
+    inset 0 0 18px rgba(0,0,0,.55);
+  transform-origin:50% 50%;
+  z-index:1;
+}
+
+.profile .music-record-cover{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.48;
+  filter:saturate(.58) hue-rotate(12deg) brightness(.62) contrast(.92);
+  transform:scale(1.04);
+}
+
+.profile .music-record-tint{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 63% 35%,rgba(210,174,255,.20),transparent 24%),
+    radial-gradient(circle at 30% 78%,rgba(119,72,175,.30),transparent 45%),
+    rgba(58,32,82,.20);
+  pointer-events:none;
+}
+
+.profile .music-record-ring{
+  position:absolute;
+  inset:7%;
+  border-radius:50%;
+  border:1px solid rgba(215,190,250,.13);
+  pointer-events:none;
+}
+.profile .music-record-ring.ring-2{
+  inset:20%;
+  border-color:rgba(215,190,250,.07);
+}
+
+.profile .music-record-hole{
+  position:absolute;
+  z-index:4;
+  width:21px;
+  height:21px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#17121f;
+  border:1px solid rgba(222,204,249,.20);
+  box-shadow:
+    0 0 0 5px rgba(20,14,29,.38),
+    0 0 12px rgba(188,145,239,.24);
+}
+
+.profile .music-record-star{
+  display:block;
+  color:#f1eaff;
+  font-size:16px;
+  line-height:1;
+  text-shadow:
+    0 0 7px rgba(220,197,255,.9),
+    0 0 15px rgba(174,126,235,.72);
+}
+
+/* При проигрывании вращается только пластинка.
+   Звёздочка в центре остаётся неподвижной. */
+.profile .music-player.is-playing .music-record{
+  animation:kruzixRecordSpin 4.8s linear infinite;
+}
+@keyframes kruzixRecordSpin{
+  to{transform:rotate(360deg)}
+}
+
+@media(max-width:700px){
+  .profile .music-record-hole{width:19px;height:19px}
+  .profile .music-record-star{font-size:14px}
+}
+</style>
+
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -591,7 +929,15 @@ html.light .quote::after{
  </div>
  <section class="music-player" aria-label="Music player">
   <audio id="siteAudio" preload="metadata" src="music.mp3"></audio>
-  <div class="music-art" aria-hidden="true"><span>✦</span></div>
+  <div class="music-art" aria-hidden="true">
+    <div class="music-record">
+      <img class="music-record-cover" id="musicCover" src="avatar.gif" alt="">
+      <span class="music-record-tint"></span>
+      <span class="music-record-ring ring-1"></span>
+      <span class="music-record-ring ring-2"></span>
+    </div>
+    <span class="music-record-hole"><span class="music-record-star">✦</span></span>
+  </div>
   <div class="music-main">
     <div class="music-meta">
       <div class="music-title" aria-live="polite"><span class="music-track-name">Electric Chapel</span><span class="music-track-genre" data-i18n="instrumental">— Instrumental</span></div>
@@ -604,11 +950,15 @@ html.light .quote::after{
     </div>
   </div>
   <div class="music-controls">
+    <button class="music-icon music-mode" id="musicShuffle" type="button" aria-label="Shuffle off" title="Shuffle">⤨</button>
     <button class="music-icon" id="musicBack" type="button" aria-label="Previous track" title="Previous track">⏮</button>
     <button class="music-play" id="musicPlay" type="button" aria-label="Play">▶</button>
     <button class="music-icon" id="musicNext" type="button" aria-label="Next track" title="Next track">⏭</button>
-    <button class="music-icon" id="musicMute" type="button" aria-label="Mute" title="Mute">◔</button>
-    <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="18" aria-label="Volume">
+    <button class="music-icon music-mode" id="musicRepeat" type="button" aria-label="Repeat off" title="Repeat one track">↻</button>
+    <div class="music-volume-wrap">
+      <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="18" aria-label="Volume">
+      <span class="music-volume-percent" id="musicVolumePercent">18%</span>
+    </div>
   </div>
   <button class="music-playlist-toggle" id="musicPlaylistToggle" type="button" aria-expanded="false" aria-controls="musicPlaylist" aria-label="Show playlist" title="Show playlist">
     <span aria-hidden="true">⌄</span>
@@ -1130,7 +1480,6 @@ html.light .music-player{background:linear-gradient(135deg,rgba(255,255,255,.78)
 </style>
 <style id="kruzix-music-player-v67-style">
 .music-controls{flex-wrap:nowrap}
-.music-controls #musicNext{order:3}
 .music-controls #musicMute{order:4}
 .music-controls #musicVolume{order:5}
 @media(max-width:700px){
@@ -1201,6 +1550,8 @@ html.light .profile .music-track-genre{
   const play = document.getElementById('musicPlay');
   const back = document.getElementById('musicBack');
   const next = document.getElementById('musicNext');
+  const shuffleBtn = document.getElementById('musicShuffle');
+  const repeatBtn = document.getElementById('musicRepeat');
   const mute = document.getElementById('musicMute');
   const vol = document.getElementById('musicVolume');
   const progress = document.getElementById('musicProgress');
@@ -1209,16 +1560,27 @@ html.light .profile .music-track-genre{
   const titleTextEl = card?.querySelector('.music-track-name');
   const genreEl = card?.querySelector('.music-track-genre');
   const artistEl = card?.querySelector('.music-artist');
-  if (!audio || !card || !play || !back || !next || !mute || !vol || !progress) return;
+  const recordCoverEl = document.getElementById('musicCover');
+  if (recordCoverEl) {
+    recordCoverEl.onerror = () => {
+      recordCoverEl.onerror = null;
+      recordCoverEl.src = 'avatar.gif';
+    };
+  }
+  const coverEl = document.getElementById('musicCover');
+  const volumePercentEl = document.getElementById('musicVolumePercent');
+  if (!audio || !card || !play || !back || !next || !vol || !progress) return;
   const TRACKS_FILE = 'tracks.json';
   const FALLBACK_TRACKS = [
-    {file:'music.mp3', title:'Electric Chapel', artist:'Lady Gaga', genre:'Instrumental'},
-    {file:'music2.mp3', title:'The Queen', artist:'Lady Gaga', genre:'Instrumental'},
-    {file:'music3.mp3', title:'Heavy Metal Lover', artist:'Lady Gaga', genre:'Instrumental'}
+    {file:'music.mp3', title:'Electric Chapel', artist:'Lady Gaga', genre:'Instrumental', cover:''},
+    {file:'music2.mp3', title:'The Queen', artist:'Lady Gaga', genre:'Instrumental', cover:''},
+    {file:'music3.mp3', title:'Heavy Metal Lover', artist:'Lady Gaga', genre:'Instrumental', cover:''}
   ];
   const state = {
     tracks: [],
     index: 0,
+    shuffle: false,
+    repeatOne: false,
     loadToken: 0,
     playlistPromise: null,
     pendingPlay: false
@@ -1238,7 +1600,8 @@ html.light .profile .music-track-genre{
         file: clean(item.file),
         title: clean(item.title),
         artist: clean(item.artist),
-        genre: clean(item.genre)
+        genre: clean(item.genre),
+        cover: clean(item.cover)
       }));
   }
   async function loadTracksJson() {
@@ -1254,19 +1617,18 @@ html.light .profile .music-track-genre{
     return FALLBACK_TRACKS;
   }
   function setButtonState() {
-    const switching = audio.dataset.kruzixSwitching === '1';
-    const playing = switching
-      ? audio.dataset.kruzixSwitchResume === '1'
-      : (!audio.paused && !audio.ended);
+    const playing = !audio.paused && !audio.ended;
     card.classList.toggle('is-playing', playing);
     if (avatarWrap) avatarWrap.classList.toggle('music-playing', playing);
     play.textContent = playing ? '❚❚' : '▶';
     play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     play.title = playing ? 'Pause' : 'Play';
-    mute.textContent = audio.muted ? '◌' : '◔';
-    mute.setAttribute('aria-label', audio.muted ? 'Unmute' : 'Mute');
-    mute.title = audio.muted ? 'Unmute' : 'Mute';
   }
+  function syncVolumePercent() {
+    if (!volumePercentEl || !vol) return;
+    volumePercentEl.textContent = `${Math.round(Number(vol.value) || 0)}%`;
+  }
+
   function syncProgress() {
     const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
     const percent = duration > 0 ? (audio.currentTime / duration) * 100 : 0;
@@ -1276,6 +1638,17 @@ html.light .profile .music-track-genre{
   }
   function showTrack(track) {
     if (!track) return;
+
+    if (coverEl) {
+      const cover = clean(track.cover);
+      coverEl.onerror = () => {
+        coverEl.onerror = null;
+        coverEl.src = 'avatar.gif';
+      };
+      coverEl.src = cover || 'avatar.gif';
+      coverEl.alt = track.title ? `${track.title} cover` : '';
+    }
+
     if (titleTextEl) {
       titleTextEl.textContent = track.title || track.file.replace(/\.mp3$/i, '');
     }
@@ -1331,9 +1704,6 @@ html.light .profile .music-track-genre{
     // Preserve the state of the old track.
     const shouldPlay = !!keepPlaying;
     state.pendingPlay = shouldPlay;
-    // Keep the visual play state stable while the source is being swapped.
-    audio.dataset.kruzixSwitching = '1';
-    audio.dataset.kruzixSwitchResume = shouldPlay ? '1' : '0';
     audio.pause();
     // Metadata is updated immediately from tracks.json.
     showTrack(track);
@@ -1350,10 +1720,6 @@ html.light .profile .music-track-genre{
     if (shouldPlay) {
       await startPlayback();
     }
-    // Source swap is finished; now let the real audio state control the button.
-    audio.dataset.kruzixSwitching = '0';
-    audio.dataset.kruzixSwitchResume = '0';
-    setButtonState();
     // Prevent an old async operation from affecting the new track.
     if (token !== state.loadToken) return;
   }
@@ -1362,6 +1728,14 @@ html.light .profile .music-track-genre{
   }
   function nextTrack(forcePlay = false) {
     const keepPlaying = forcePlay || (!audio.paused && !audio.ended);
+    if (state.shuffle && state.tracks.length > 1) {
+      let nextIndex = state.index;
+      while (nextIndex === state.index) {
+        nextIndex = Math.floor(Math.random() * state.tracks.length);
+      }
+      loadTrack(nextIndex, keepPlaying);
+      return;
+    }
     loadTrack(state.index + 1, keepPlaying);
   }
   window.kruzixPlayer = {
@@ -1382,6 +1756,11 @@ html.light .profile .music-track-genre{
   };
   window.kruzixNextTrack = nextTrack;
   window.kruzixPreviousTrack = previousTrack;
+  vol.addEventListener('input', e => {
+    audio.volume = Number(e.target.value) / 100;
+    syncVolumePercent();
+  });
+
   play.addEventListener('click', () => {
     if (audio.paused) startPlayback();
     else {
@@ -1397,12 +1776,23 @@ html.light .profile .music-track-genre{
     e.preventDefault();
     nextTrack();
   });
-  mute.addEventListener('click', e => {
+
+  shuffleBtn?.addEventListener('click', e => {
     e.preventDefault();
-    audio.muted = !audio.muted;
-    setButtonState();
+    state.shuffle = !state.shuffle;
+    shuffleBtn.classList.toggle('is-active', state.shuffle);
+    shuffleBtn.setAttribute('aria-label', state.shuffle ? 'Shuffle on' : 'Shuffle off');
+    shuffleBtn.title = state.shuffle ? 'Shuffle on' : 'Shuffle off';
   });
-  vol.addEventListener('input', () => {
+
+  repeatBtn?.addEventListener('click', e => {
+    e.preventDefault();
+    state.repeatOne = !state.repeatOne;
+    repeatBtn.classList.toggle('is-active', state.repeatOne);
+    repeatBtn.setAttribute('aria-label', state.repeatOne ? 'Repeat one on' : 'Repeat off');
+    repeatBtn.title = state.repeatOne ? 'Repeat one track' : 'Repeat off';
+  });
+vol.addEventListener('input', () => {
     const value = Math.max(0, Math.min(100, Number(vol.value) || 0)) / 100;
     audio.volume = value;
     audio.muted = value === 0;
@@ -1423,6 +1813,10 @@ html.light .profile .music-track-genre{
     if (state.pendingPlay && audio.paused) startPlayback();
   });
   audio.addEventListener('ended', () => {
+    if (state.repeatOne) {
+      loadTrack(state.index, true);
+      return;
+    }
     // ended fires after the browser marks the current audio as ended,
     // so nextTrack() must be told explicitly to keep playback running.
     nextTrack(true);
@@ -3675,10 +4069,7 @@ body.light .perf-option input:not(:checked):before{
     volume.value = '18';
   }
   const sync = () => {
-    const switching = audio.dataset.kruzixSwitching === '1';
-    const playing = switching
-      ? audio.dataset.kruzixSwitchResume === '1'
-      : (!audio.paused && !audio.ended);
+    const playing = !audio.paused && !audio.ended;
     play.textContent = playing ? '❚❚' : '▶';
     play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     document.querySelector('.music-player')?.classList.toggle('is-playing', playing);
@@ -3918,7 +4309,6 @@ html.light .music-playlist-artist,html.light .music-playlist-num{color:#84788d}
 <style id="kruzix-music-playlist-v2-final">
 /* Refined playlist: rounded glass control + fully rounded list */
 .profile .music-player{
-  position:relative !important;
   border-radius:24px !important;
   overflow:visible !important;
 }
@@ -4522,55 +4912,11 @@ html.light .music-playlist-toggle span{
 }
 @media(max-width:700px){
   .music-playlist-toggle{
-    position:absolute !important;
-    right:12px !important;
-    bottom:-15px !important;
-    width:38px !important;
-    height:28px !important;
-    margin:0 !important;
-    border-radius:15px !important;
+    width:42px !important;
+    height:31px !important;
+    border-radius:16px !important;
+    margin:-3px auto -11px !important;
   }
 }
 </style>
 
-
-<style id="kruzix-playing-ring-v1">
-/* Rotating lilac outline around the play/pause button while music is playing. */
-.music-player .music-play{
-  position:relative !important;
-  isolation:isolate;
-  border-color:rgba(222,207,246,.14) !important;
-  overflow:visible !important;
-}
-.music-player .music-play::before{
-  content:"";
-  position:absolute;
-  z-index:-1;
-  inset:-3px;
-  border-radius:inherit;
-  padding:2px;
-  background:conic-gradient(
-    from 0deg,
-    transparent 0deg 35deg,
-    rgba(190,145,245,.12) 50deg,
-    rgba(210,177,255,.98) 82deg,
-    rgba(157,94,224,.9) 112deg,
-    rgba(190,145,245,.18) 145deg,
-    transparent 175deg 360deg
-  );
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  mask-composite:exclude;
-  opacity:0;
-  pointer-events:none;
-}
-.music-player.is-playing .music-play::before{
-  opacity:1;
-  animation:kruzixPlayRingSpin 2.2s linear infinite;
-}
-@keyframes kruzixPlayRingSpin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){
-  .music-player.is-playing .music-play::before{animation:none}
-}
-</style>
