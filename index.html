@@ -665,6 +665,25 @@ html.light .quote::after{
 }
 </style>
 
+<style id="kruzix-player-position-volume-percent">
+/* Move only the track information a little closer to the album cover. */
+.profile .music-main{transform:translateX(-6px)}
+.music-volume-percent{
+  display:inline-block;
+  min-width:30px;
+  margin-left:-3px;
+  color:#83798e;
+  font-size:10px;
+  font-variant-numeric:tabular-nums;
+  text-align:left;
+  white-space:nowrap;
+  align-self:center;
+}
+@media(max-width:700px){
+  .profile .music-main{transform:translateX(-4px)}
+  .music-volume-percent{display:none}
+}
+</style>
 </head>
 <body>
 <div id="background-dots" aria-hidden="true"></div>
@@ -746,6 +765,7 @@ html.light .quote::after{
     <button class="music-icon" id="musicNext" type="button" aria-label="Next track" title="Next track">⏭</button>
     <button class="music-icon music-mode" id="musicRepeat" type="button" aria-label="Repeat off" title="Repeat one track">↻</button>
     <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="18" aria-label="Volume">
+    <span class="music-volume-percent" id="musicVolumePercent">18%</span>
   </div>
   <button class="music-playlist-toggle" id="musicPlaylistToggle" type="button" aria-expanded="false" aria-controls="musicPlaylist" aria-label="Show playlist" title="Show playlist">
     <span aria-hidden="true">⌄</span>
@@ -1555,6 +1575,8 @@ vol.addEventListener('input', () => {
     const value = Math.max(0, Math.min(100, Number(vol.value) || 0)) / 100;
     audio.volume = value;
     audio.muted = value === 0;
+    const percent = document.getElementById('musicVolumePercent');
+    if (percent) percent.textContent = Math.round(value * 100) + '%';
     setButtonState();
   });
   progress.addEventListener('input', () => {
@@ -1582,6 +1604,8 @@ vol.addEventListener('input', () => {
   });
   audio.volume = 0.18;
   vol.value = '18';
+  const initialVolumePercent = document.getElementById('musicVolumePercent');
+  if (initialVolumePercent) initialVolumePercent.textContent = '18%';
   setButtonState();
   syncProgress();
   ensurePlaylist();
@@ -4174,13 +4198,13 @@ body.performance-lite .profile .music-player.is-playing .music-art{
 }
 @media(max-width:390px){
   .profile .music-art-wrap{
-    width:56px;
-    height:56px;
-    flex-basis:56px;
+    width:52px;
+    height:52px;
+    flex-basis:52px;
   }
   .profile .music-art-wrap .music-art{
-    width:56px !important;
-    height:56px !important;
+    width:52px !important;
+    height:52px !important;
   }
   .profile .music-player .music-play{
     width:46px !important;
