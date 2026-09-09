@@ -614,15 +614,14 @@ html.light .quote::after{
   .profile .music-player .music-controls{
     display:grid !important;
     grid-template-columns:40px 40px 48px 40px 40px !important;
-    grid-template-rows:46px 26px !important;
-    justify-content:center !important;
+    grid-template-rows:46px 22px !important;
+    justify-content:end !important;
     align-items:center !important;
     column-gap:9px !important;
-    row-gap:7px !important;
-    width:100% !important;
+    row-gap:9px !important;
+    width:auto !important;
   }
 
-  /* Buttons = first row */
   .profile .music-player .music-controls #musicShuffle{
     grid-column:1 !important;
     grid-row:1 !important;
@@ -643,32 +642,60 @@ html.light .quote::after{
     grid-column:5 !important;
     grid-row:1 !important;
   }
+  .profile .music-player .music-controls #musicMute{
+    grid-column:1 !important;
+    grid-row:2 !important;
+    width:30px !important;
+    height:30px !important;
+    min-width:30px !important;
+    min-height:30px !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    color:#83798e !important;
+    box-shadow:none !important;
+    font-size:12px !important;
+    line-height:1 !important;
+    justify-self:end !important;
+    align-self:center !important;
+  }
+  .profile .music-player .music-controls #musicMute:hover{
+    color:#c6a9dc !important;
+    background:transparent !important;
+  }
 
-  /* Volume = second row, directly under the buttons */
+  /* Volume sits directly to the right of the mute button. */
   .profile .music-player .music-controls #musicVolume{
     display:block !important;
-    grid-column:1 / 6 !important;
+    grid-column:2 / 5 !important;
     grid-row:2 !important;
     width:150px !important;
     height:18px !important;
-    justify-self:center !important;
+    justify-self:start !important;
     align-self:center !important;
     margin:0 !important;
   }
 
-  /* Keep the volume percentage on the same row, directly to the slider's right. */
-  .profile .music-player .music-controls{
-    position:relative !important;
-  }
+  /* Percentage sits directly to the right of the volume slider. */
   .profile .music-player .music-controls #musicVolumePercent{
-    position:absolute !important;
-    left:calc(50% + 82px) !important;
-    top:58px !important;
+    position:static !important;
+    grid-column:5 !important;
+    grid-row:2 !important;
     margin:0 !important;
     min-width:0 !important;
     padding:0 !important;
     white-space:nowrap !important;
-    align-self:auto !important;
+    align-self:center !important;
+  }
+
+  .profile .music-player .music-controls #musicMute{
+    position:relative !important;
+    left:20px !important;
+  }
+  .profile .music-player .music-controls #musicVolume,
+  .profile .music-player .music-controls #musicVolumePercent{
+    position:relative !important;
+    left:12px !important;
   }
 }
 
@@ -779,6 +806,7 @@ html.light .quote::after{
     <button class="music-play" id="musicPlay" type="button" aria-label="Play">▶</button>
     <button class="music-icon" id="musicNext" type="button" aria-label="Next track" title="Next track">⏭</button>
     <button class="music-icon music-mode" id="musicRepeat" type="button" aria-label="Repeat off" title="Repeat one track">↻</button>
+    <button class="music-mute" id="musicMute" type="button" aria-label="Mute" title="Mute">◔</button>
     <input class="music-volume" id="musicVolume" type="range" min="0" max="100" value="18" aria-label="Volume">
     <span class="music-volume-percent" id="musicVolumePercent">18%</span>
   </div>
@@ -1396,7 +1424,8 @@ html.light .profile .music-track-genre{
     repeatOne: false,
     loadToken: 0,
     playlistPromise: null,
-    pendingPlay: false
+    pendingPlay: false,
+    previousVolume: 0.18
   };
   const clean = value => String(value ?? '').trim();
   const fmt = t => {
@@ -1546,7 +1575,19 @@ html.light .profile .music-track-genre{
       audio.pause();
     },
     toggleMute: () => {
-      audio.muted = !audio.muted;
+      if (audio.muted || audio.volume === 0) {
+        const restored = Math.max(0.01, Math.min(1, state.previousVolume || 0.18));
+        audio.volume = restored;
+        vol.value = String(Math.round(restored * 100));
+        audio.muted = false;
+      } else {
+        state.previousVolume = Math.max(0.01, Math.min(1, audio.volume));
+        audio.volume = 0;
+        vol.value = '0';
+        audio.muted = true;
+      }
+      const percent = document.getElementById('musicVolumePercent');
+      if (percent) percent.textContent = Math.round(audio.volume * 100) + '%';
       setButtonState();
     },
     get tracks() { return [...state.tracks]; },
@@ -1575,19 +1616,37 @@ html.light .profile .music-track-genre{
     e.preventDefault();
     state.shuffle = !state.shuffle;
     shuffleBtn.classList.toggle('is-active', state.shuffle);
-    shuffleBtn.setAttribute('aria-label', state.shuffle ? 'Shuffle on' : 'Shuffle off');
-    shuffleBtn.title = state.shuffle ? 'Shuffle on' : 'Shuffle off';
+    shuffleBtn.setAttribute('aria-label', document.documentElement.lang==='ru' ? (state.shuffle ? 'Перемешивание включено' : 'Перемешивание выключено') : (state.shuffle ? 'Shuffle on' : 'Shuffle off'));
+    shuffleBtn.title = document.documentElement.lang==='ru' ? (state.shuffle ? 'Перемешивание включено' : 'Перемешивание выключено') : (state.shuffle ? 'Shuffle on' : 'Shuffle off');
   });
 
   repeatBtn?.addEventListener('click', e => {
     e.preventDefault();
     state.repeatOne = !state.repeatOne;
     repeatBtn.classList.toggle('is-active', state.repeatOne);
-    repeatBtn.setAttribute('aria-label', state.repeatOne ? 'Repeat one on' : 'Repeat off');
-    repeatBtn.title = state.repeatOne ? 'Repeat one track' : 'Repeat off';
+    repeatBtn.setAttribute('aria-label', document.documentElement.lang==='ru' ? (state.repeatOne ? 'Повтор трека включён' : 'Повтор выключен') : (state.repeatOne ? 'Repeat one on' : 'Repeat off'));
+    repeatBtn.title = document.documentElement.lang==='ru' ? (state.repeatOne ? 'Повтор трека включён' : 'Повтор выключен') : (state.repeatOne ? 'Repeat one track' : 'Repeat off');
   });
-vol.addEventListener('input', () => {
+  mute?.addEventListener('click', e => {
+    e.preventDefault();
+    if (audio.muted || audio.volume === 0) {
+      const restored = Math.max(0.01, Math.min(1, state.previousVolume || 0.18));
+      audio.volume = restored;
+      vol.value = String(Math.round(restored * 100));
+      audio.muted = false;
+    } else {
+      state.previousVolume = Math.max(0.01, Math.min(1, audio.volume));
+      audio.volume = 0;
+      vol.value = '0';
+      audio.muted = true;
+    }
+    const percent = document.getElementById('musicVolumePercent');
+    if (percent) percent.textContent = Math.round(audio.volume * 100) + '%';
+    setButtonState();
+  });
+  vol.addEventListener('input', () => {
     const value = Math.max(0, Math.min(100, Number(vol.value) || 0)) / 100;
+    if (value > 0) state.previousVolume = value;
     audio.volume = value;
     audio.muted = value === 0;
     const percent = document.getElementById('musicVolumePercent');
@@ -3627,6 +3686,26 @@ body.light .perf-option input[type="checkbox"]:checked{
     const sub=document.querySelector('.butterfly-header .section-note'); if(sub) sub.textContent=T[lang].dreamNote;
     const flower=document.querySelector('.flower small'); if(flower) flower.textContent=T[lang].cultivate;
     localStorage.setItem(LANG_KEY,lang);
+    const audioEl=document.getElementById('siteAudio');
+    const playlistToggle=document.getElementById('musicPlaylistToggle');
+    const shuffle=document.getElementById('musicShuffle');
+    const back=document.getElementById('musicBack');
+    const play=document.getElementById('musicPlay');
+    const next=document.getElementById('musicNext');
+    const repeat=document.getElementById('musicRepeat');
+    const mute=document.getElementById('musicMute');
+    const volume=document.getElementById('musicVolume');
+    const progress=document.getElementById('musicProgress');
+    const ru=lang==='ru';
+    if(shuffle){ shuffle.title=ru?(shuffle.classList.contains('is-active')?'Перемешивание включено':'Перемешивание'): 'Shuffle'; shuffle.setAttribute('aria-label',ru?(shuffle.classList.contains('is-active')?'Перемешивание включено':'Перемешивание выключено'):(shuffle.classList.contains('is-active')?'Shuffle on':'Shuffle off')); }
+    if(back){ back.title=ru?'Предыдущий трек':'Previous track'; back.setAttribute('aria-label',back.title); }
+    if(play){ const paused=!audioEl || audioEl.paused; play.title=ru?(paused?'Воспроизвести':'Пауза'):(paused?'Play':'Pause'); play.setAttribute('aria-label',play.title); }
+    if(next){ next.title=ru?'Следующий трек':'Next track'; next.setAttribute('aria-label',next.title); }
+    if(repeat){ repeat.title=ru?(repeat.classList.contains('is-active')?'Повтор трека включён':'Повтор трека'):'Repeat one track'; repeat.setAttribute('aria-label',ru?(repeat.classList.contains('is-active')?'Повтор трека включён':'Повтор выключен'):(repeat.classList.contains('is-active')?'Repeat one track':'Repeat off')); }
+    if(mute){ const muted=!!(audioEl && (audioEl.muted || audioEl.volume===0)); mute.title=ru?(muted?'Включить звук':'Выключить звук'):(muted?'Unmute':'Mute'); mute.setAttribute('aria-label',mute.title); }
+    if(volume) volume.setAttribute('aria-label',ru?'Громкость':'Volume');
+    if(progress) progress.setAttribute('aria-label',ru?'Прогресс трека':'Track progress');
+    if(playlistToggle){ const open=playlistToggle.getAttribute('aria-expanded')==='true'; playlistToggle.title=ru?(open?'Скрыть список треков':'Показать список треков'):(open?'Hide playlist':'Show playlist'); playlistToggle.setAttribute('aria-label',playlistToggle.title); }
     document.querySelectorAll('[data-lang-choice]').forEach(el=>el.classList.toggle('is-active',el.dataset.langChoice===lang));
     if(shouldAnimate){
       window.setTimeout(()=>animatedTargets.forEach(el=>{
@@ -3771,6 +3850,8 @@ body.light .perf-option input:not(:checked):before{
   if (volume && (!Number.isFinite(Number(volume.value)) || Number(volume.value) <= 0)) {
     volume.value = '18';
   }
+  const percent = document.getElementById('musicVolumePercent');
+  if (percent) percent.textContent = Math.round(audio.volume * 100) + '%';
   const sync = () => {
     const playing = !audio.paused && !audio.ended;
     play.textContent = playing ? '❚❚' : '▶';
@@ -3896,10 +3977,10 @@ body.light .perf-option input:not(:checked):before{
 .music-playlist-artist{font-size:10px;color:#82788c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .music-playlist-current{font-size:12px;color:#c6a1ec;opacity:0;transition:opacity .2s ease}
 .music-playlist-item.is-current .music-playlist-current{opacity:1}
-html.light .music-playlist{background:linear-gradient(180deg,rgba(247,243,250,.96),rgba(236,231,242,.94));border-color:rgba(90,68,108,.12);box-shadow:0 16px 32px rgba(74,57,92,.09)}
-html.light .music-playlist-item{color:#514657}
-html.light .music-playlist-item:hover,html.light .music-playlist-item.is-current{background:rgba(134,97,173,.09);color:#302837}
-html.light .music-playlist-artist,html.light .music-playlist-num{color:#84788d}
+body.light .music-playlist{background:linear-gradient(180deg,rgba(247,243,250,.96),rgba(236,231,242,.94));border-color:rgba(90,68,108,.12);box-shadow:0 16px 32px rgba(74,57,92,.09)}
+body.light .music-playlist-item{color:#514657}
+body.light .music-playlist-item:hover,body.light .music-playlist-item.is-current{background:rgba(134,97,173,.09);color:#302837}
+body.light .music-playlist-artist,body.light .music-playlist-num{color:#84788d}
 @media(max-width:700px){
   .music-playlist-toggle{margin:-1px auto -9px}
   .music-playlist{border-radius:0 0 16px 16px}
@@ -3923,7 +4004,7 @@ html.light .music-playlist-artist,html.light .music-playlist-num{color:#84788d}
 
   function render() {
     if (!tracks.length) {
-      list.innerHTML = '<div style="padding:12px;color:#82788c;font-size:11px;text-align:center">No tracks</div>';
+      list.innerHTML = '<div style="padding:12px;color:#82788c;font-size:11px;text-align:center">'+(document.documentElement.lang==='ru'?'Нет треков':'No tracks')+'</div>';
       return;
     }
     list.innerHTML = tracks.map((track, i) => `
@@ -3976,8 +4057,8 @@ html.light .music-playlist-artist,html.light .music-playlist-num{color:#84788d}
   toggle.addEventListener('click', () => {
     const open = wrap.classList.toggle('is-open');
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    toggle.setAttribute('aria-label', open ? 'Hide playlist' : 'Show playlist');
-    toggle.title = open ? 'Hide playlist' : 'Show playlist';
+    toggle.setAttribute('aria-label', document.documentElement.lang==='ru' ? (open ? 'Скрыть список треков' : 'Показать список треков') : (open ? 'Hide playlist' : 'Show playlist'));
+    toggle.title = document.documentElement.lang==='ru' ? (open ? 'Скрыть список треков' : 'Показать список треков') : (open ? 'Hide playlist' : 'Show playlist');
   });
 
   list.addEventListener('click', e => {
@@ -4070,11 +4151,11 @@ html.light .music-playlist-artist,html.light .music-playlist-num{color:#84788d}
 .music-playlist-item:hover{
   background:rgba(187,140,232,.10) !important;
 }
-html.light .music-playlist{
+body.light .music-playlist{
   background:linear-gradient(145deg,rgba(250,247,252,.98),rgba(237,232,243,.96)) !important;
   border-color:rgba(90,68,108,.13) !important;
 }
-html.light .music-playlist-toggle{
+body.light .music-playlist-toggle{
   background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(238,231,244,.96)) !important;
   border-color:rgba(90,68,108,.14) !important;
   color:#665473 !important;
@@ -4118,6 +4199,26 @@ html.light .music-playlist-toggle{
 })();
 </script>
 
+<style id="kruzix-volume-mute-final">
+/* Small mute control sits immediately before the volume slider. */
+.profile .music-player .music-controls #musicMute{
+  display:grid !important;
+  place-items:center !important;
+  border:0 !important;
+  background:transparent !important;
+  color:#83798e !important;
+  box-shadow:none !important;
+  cursor:pointer !important;
+  font:400 12px/1 Arial,sans-serif !important;
+  opacity:.92 !important;
+}
+.profile .music-player .music-controls #musicMute:hover{color:#b894cf !important}
+body.light .profile .music-player .music-controls #musicMute{color:#83798e !important}
+body.light .profile .music-player .music-controls #musicMute:hover{color:#76588d !important}
+@media(max-width:700px){
+  .profile .music-player .music-controls #musicMute{display:none !important}
+}
+</style>
 <style id="kruzix-player-animation-fix-clean">
 /* === Clean music animation fix ===
    The original player dimensions stay untouched:
@@ -4665,6 +4766,31 @@ body.performance-lite .profile{
 }
 </style>
 
+<style id="kruzix-playlist-light-final">
+/* Final white-theme corrections for the playlist and its toggle. */
+body.light .music-playlist-toggle{
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(238,232,244,.98)) !important;
+  border-color:rgba(90,68,108,.16) !important;
+  color:#5f4d6d !important;
+  box-shadow:0 7px 18px rgba(74,57,92,.10),inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+body.light .music-playlist-toggle span{border-color:#665473 !important}
+body.light .music-playlist{
+  background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(239,234,245,.98)) !important;
+  border-color:rgba(90,68,108,.14) !important;
+  box-shadow:0 18px 38px rgba(74,57,92,.10),inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+body.light .music-playlist-item{color:#514657 !important}
+body.light .music-playlist-item:hover{background:rgba(134,97,173,.09) !important;color:#302837 !important}
+body.light .music-playlist-item.is-current{
+  background:linear-gradient(90deg,rgba(134,97,173,.12),rgba(134,97,173,.045)) !important;
+  color:#302837 !important;
+  box-shadow:inset 0 0 0 1px rgba(134,97,173,.12),0 0 18px rgba(126,102,147,.05) !important;
+}
+body.light .music-playlist-artist,body.light .music-playlist-num{color:#84788d !important}
+body.light .music-playlist-item.is-current .music-playlist-num,
+body.light .music-playlist-item.is-current .music-playlist-current{color:#8b69a5 !important}
+</style>
 <style id="kruzix-playlist-arrow-v3">
 /* Clean player-style playlist arrow */
 .music-playlist-toggle{
@@ -4718,13 +4844,13 @@ body.performance-lite .profile{
 .music-playlist-toggle[aria-expanded="true"] span{
   transform:translateY(2px) rotate(225deg) !important;
 }
-html.light .music-playlist-toggle{
+body.light .music-playlist-toggle{
   background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(238,231,244,.98)) !important;
   border-color:rgba(90,68,108,.16) !important;
   color:#5f4d6d !important;
   box-shadow:0 7px 18px rgba(74,57,92,.10),inset 0 1px 0 rgba(255,255,255,.9) !important;
 }
-html.light .music-playlist-toggle span{
+body.light .music-playlist-toggle span{
   border-color:#665473 !important;
 }
 @media(max-width:700px){
@@ -4733,6 +4859,17 @@ html.light .music-playlist-toggle span{
     height:31px !important;
     border-radius:16px !important;
     margin:-3px auto -11px !important;
+  }
+}
+</style>
+
+
+<style id="kruzix-mobile-music-buttons-right-final">
+@media (max-width:700px){
+  .profile .music-player .music-controls{
+    justify-self:end !important;
+    justify-content:flex-end !important;
+    width:100% !important;
   }
 }
 </style>
