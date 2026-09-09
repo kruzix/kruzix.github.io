@@ -5419,3 +5419,100 @@ html.light .music-playlist-toggle span{
   }
 }
 </style>
+
+
+<style id="kruzix-mobile-play-ring-v80">
+/* Keep the animated ring on mobile, but lock it to a true circle.
+   The ring is centered independently of the button's layout so it
+   cannot stretch into an ellipse or expand across the page. */
+@media (max-width:900px){
+  .profile .music-player .music-play{
+    position:relative !important;
+    isolation:isolate !important;
+    overflow:visible !important;
+  }
+
+  .profile .music-player .music-play::before{
+    display:block !important;
+    content:"" !important;
+    position:absolute !important;
+    z-index:-1 !important;
+    width:calc(100% + 8px) !important;
+    height:calc(100% + 8px) !important;
+    left:50% !important;
+    top:50% !important;
+    right:auto !important;
+    bottom:auto !important;
+    inset:auto !important;
+    box-sizing:border-box !important;
+    border-radius:50% !important;
+    padding:2px !important;
+    pointer-events:none !important;
+    background:conic-gradient(
+      from 0deg,
+      transparent 0deg 35deg,
+      rgba(190,145,245,.12) 50deg,
+      rgba(210,177,255,.98) 82deg,
+      rgba(157,94,224,.90) 112deg,
+      rgba(190,145,245,.18) 145deg,
+      transparent 175deg 360deg
+    ) !important;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0) !important;
+    -webkit-mask-composite:xor !important;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0) !important;
+    mask-composite:exclude !important;
+    opacity:0 !important;
+    transform:translate(-50%,-50%) rotate(0deg) !important;
+  }
+
+  .profile .music-player.is-playing .music-play::before{
+    opacity:1 !important;
+    animation:kruzixMobilePlayRingSpinV80 2.2s linear infinite !important;
+  }
+
+  .profile .music-player:not(.is-playing) .music-play::before{
+    opacity:0 !important;
+    animation:none !important;
+  }
+
+  @keyframes kruzixMobilePlayRingSpinV80{
+    from{transform:translate(-50%,-50%) rotate(0deg)}
+    to{transform:translate(-50%,-50%) rotate(360deg)}
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .profile .music-player.is-playing .music-play::before{
+    animation:none !important;
+  }
+}
+</style>
+
+
+<style id="kruzix-mobile-player-width-v81">
+/* Mobile: make the player noticeably wider while keeping its left edge
+   aligned with the avatar/content edge. It grows to the right only. */
+@media (max-width:700px){
+  .profile .music-player{
+    width:calc(100% + 20px) !important;
+    max-width:none !important;
+    margin-left:0 !important;
+    margin-right:-20px !important;
+    box-sizing:border-box !important;
+  }
+}
+
+@media (max-width:390px){
+  .profile .music-player{
+    width:calc(100% + 20px) !important;
+    max-width:none !important;
+    margin-left:0 !important;
+    margin-right:-20px !important;
+  }
+}
+</style>
+
