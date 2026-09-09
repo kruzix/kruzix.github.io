@@ -4745,6 +4745,76 @@ body.light .profile .music-art span{
 })();
 </script>
 
+
+<style id="kruzix-v78-pause-animation-mobile-width">
+/* Restore and reinforce the animated ring around the Play/Pause button. */
+.music-player .music-play{
+  position:relative !important;
+  isolation:isolate !important;
+  z-index:0 !important;
+  overflow:visible !important;
+}
+
+.music-player .music-play::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:-4px !important;
+  border-radius:inherit !important;
+  padding:2px !important;
+  pointer-events:none !important;
+  z-index:2 !important;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg 35deg,
+    rgba(190,145,245,.12) 50deg,
+    rgba(210,177,255,.98) 82deg,
+    rgba(157,94,224,.90) 112deg,
+    rgba(190,145,245,.18) 145deg,
+    transparent 175deg 360deg
+  ) !important;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite:xor !important;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) !important;
+  mask-composite:exclude !important;
+  opacity:0 !important;
+  transform:rotate(0deg) !important;
+}
+
+.music-player.is-playing .music-play::before{
+  opacity:1 !important;
+  animation:kruzixPlayRingSpin 2.2s linear infinite !important;
+}
+
+.music-player:not(.is-playing) .music-play::before{
+  animation:none !important;
+  opacity:0 !important;
+}
+
+@keyframes kruzixPlayRingSpin{
+  to{transform:rotate(360deg)}
+}
+
+/* On phones the player is only slightly wider and sits a little closer
+   to the Japanese quote without changing the desktop layout. */
+@media (max-width:900px){
+  .profile .music-player{
+    width:calc(100% - 16px) !important;
+    margin:22px auto 24px !important;
+  }
+}
+
+@media (max-width:480px){
+  .profile .music-player{
+    width:calc(100% - 12px) !important;
+    margin-top:20px !important;
+  }
+}
+</style>
+
 </body>
 <style id="kruzix-status-and-ru-format-v27">
 .profile-info .status{margin-left:0 !important;}
