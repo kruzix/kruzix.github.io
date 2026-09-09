@@ -5320,3 +5320,102 @@ html.light .music-playlist-toggle span{
   }
 }
 </style>
+
+
+<style id="kruzix-mobile-player-v79-final">
+/*
+  Mobile player refinement:
+  - player starts exactly on the same left edge as the avatar/content area;
+  - player is slightly wider than the previous mobile version;
+  - mobile Play/Pause uses a calm glow pulse instead of the harsh rotating ring;
+  - Play/Pause icon gets a short, smooth state-change animation.
+*/
+@media (max-width:900px){
+  .profile .music-player{
+    width:100% !important;
+    max-width:none !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+
+  /* Remove the desktop rotating conic ring on touch-sized layouts. */
+  .profile .music-player .music-play::before{
+    display:none !important;
+    animation:none !important;
+  }
+
+  .profile .music-player .music-play{
+    font-size:0 !important;
+    transition:
+      background .28s ease,
+      border-color .28s ease,
+      box-shadow .35s ease,
+      transform .18s cubic-bezier(.2,.8,.2,1) !important;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+
+  .profile .music-player .music-play::after{
+    content:"▶";
+    display:block;
+    font-family:Arial, sans-serif;
+    font-size:21px;
+    line-height:1;
+    transform:scale(1) translateX(1px);
+    opacity:1;
+    transition:
+      opacity .14s ease,
+      transform .22s cubic-bezier(.2,.8,.2,1) !important;
+  }
+
+  .profile .music-player.is-playing .music-play{
+    background:rgba(180,137,235,.20) !important;
+    animation:kruzixMobilePlayPulse 2.8s ease-in-out infinite;
+  }
+
+  .profile .music-player.is-playing .music-play::after{
+    content:"❚❚";
+    font-size:19px;
+    transform:scale(.88);
+  }
+
+  .profile .music-player .music-play:active{
+    transform:scale(.94) !important;
+  }
+
+  @keyframes kruzixMobilePlayPulse{
+    0%,100%{
+      box-shadow:0 0 16px rgba(169,119,229,.16);
+    }
+    50%{
+      box-shadow:
+        0 0 28px rgba(169,119,229,.30),
+        0 0 46px rgba(169,119,229,.10);
+    }
+  }
+}
+
+@media (max-width:480px){
+  .profile .music-player{
+    width:100% !important;
+    margin-top:20px !important;
+  }
+
+  .profile .music-player .music-play::after{
+    font-size:20px;
+  }
+
+  .profile .music-player.is-playing .music-play::after{
+    font-size:18px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .profile .music-player.is-playing .music-play{
+    animation:none !important;
+  }
+  .profile .music-player .music-play::after{
+    transition:none !important;
+  }
+}
+</style>
