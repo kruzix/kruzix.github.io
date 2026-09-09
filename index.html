@@ -655,6 +655,21 @@ html.light .quote::after{
     align-self:center !important;
     margin:0 !important;
   }
+
+  /* Keep the volume percentage on the same row, directly to the slider's right. */
+  .profile .music-player .music-controls{
+    position:relative !important;
+  }
+  .profile .music-player .music-controls #musicVolumePercent{
+    position:absolute !important;
+    left:calc(50% + 82px) !important;
+    top:58px !important;
+    margin:0 !important;
+    min-width:0 !important;
+    padding:0 !important;
+    white-space:nowrap !important;
+    align-self:auto !important;
+  }
 }
 
 @media (max-width:700px){
